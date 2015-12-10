@@ -1,28 +1,17 @@
 OSV Hello World
 -------------
+What is OSv? http://osv.io/
 
-@Capstanfile
+You do not need to install OSv, Pythia will automatically download and build the base image for you.
+After installing Pythia, run this command, this will compile and run the example.
+```bash
+cd
+git clone https://github.com/secureosv/pythia.git
+cd pythia
+sudo ./install.sh
+pythia ./examples/hello_osv.md --osv
 ```
-base: cloudius/osv-base
 
-#
-# The command line passed to OSv to start up the application.
-#
-cmdline: /tools/hello.so
-
-#
-# The command to use to build the application.  In this example, we just use
-# make.
-#
-#build: make
-
-#
-# List of files that are included in the generated image.
-#
-files:
-  /tools/hello.so: hello.so
-
-```
 
 ```pythia
 #backend:c++

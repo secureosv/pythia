@@ -12,15 +12,16 @@ OSV_ROOT = os.path.expanduser('~/osv')
 if not os.path.isdir(OSV_ROOT):
 	subprocess.check_call(['git', 'clone', 'https://github.com/secureosv/osv.git'], cwd=os.path.expanduser('~/'))
 	subprocess.check_call(['scripts/setup.py'], cwd=os.path.expanduser('~/osv'))
+	subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=os.path.expanduser('~/osv'))
 	subprocess.check_call(['make'], cwd=os.path.expanduser('~/osv'))
 
-CAPSTAN = '/usr/local/bin/capstan'
-if not os.path.isfile(CAPSTAN):
-	print 'downloading Capstan'
-	subprocess.check_call(
-		['sudo', 'wget', 'http://osv.capstan.s3.amazonaws.com/capstan/v0.1.8/linux_amd64/capstan'],
-		cwd='/usr/local/bin'
-	)
+#CAPSTAN = '/usr/local/bin/capstan'
+#if not os.path.isfile(CAPSTAN):
+#	print 'downloading Capstan'
+#	subprocess.check_call(
+#		['sudo', 'wget', 'http://osv.capstan.s3.amazonaws.com/capstan/v0.1.8/linux_amd64/capstan'],
+#		cwd='/usr/local/bin'
+#	)
 
 GO_EXE = None
 if os.path.isfile('/usr/bin/go'):
@@ -1355,8 +1356,12 @@ def build( modules, module_path, datadirs=None ):
 				'	rm -f myapp.so',
 			]
 			open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
+			## how come myapp.so is not copied to osv/build/last ?
+			open(builddir+'/usr.manifest', 'wb').write('/tools/myapp.so: ../../apps/pythia_build/myapp.so')
+
 			subprocess.check_call(['./scripts/build', 'image=pythia_build'], cwd=OSV_ROOT)
-			raise RuntimeError('ok')
+			subprocess.check_call(['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--execute', '/tools/myapp.so'], cwd=OSV_ROOT)
+			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
 
 		else:
 			cmd = ['g++']
@@ -1604,10 +1609,12 @@ exports.myinit = function() {
 
 def main():
 	if len(sys.argv)==1 or '--help' in sys.argv:
-		print('usage: ./rusthon.py [python files] [markdown files] [tar file] [--release] [--run=] [--data=]')
+		print('usage: pythia [python files] [markdown files] [tar file] [--release] [--run=] [--data=]')
 		print('		[tar file] is the optional name of the output tar that contains the build')
 		print
 		print('		source files, transpiled source, and output binaries.')
+		print
+		print('		--osv builds OSv image and runs it in a VM')
 		print
 		print('		--release generates optimized output without extra runtime checks')
 		print
