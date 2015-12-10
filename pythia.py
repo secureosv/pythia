@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__version__ = '0.9.9'
+__version__ = '1.0.0'
 import os, sys, subprocess, hashlib, time
 import tempfile
 import webbrowser
@@ -8,6 +8,19 @@ import webbrowser
 ## if installed as a symbolic link, this ensures things can still be bootstrapped from the `src` subfolder
 RUSTHON_LIB_ROOT = os.path.dirname(unicode(os.path.realpath(__file__), sys.getfilesystemencoding()))
 
+OSV_ROOT = os.path.expanduser('~/osv')
+if not os.path.isdir(OSV_ROOT):
+	subprocess.check_call(['git', 'clone', 'https://github.com/secureosv/osv.git'], cwd=os.path.expanduser('~/'))
+	subprocess.check_call(['scripts/setup.py'], cwd=os.path.expanduser('~/osv'))
+	subprocess.check_call(['make'], cwd=os.path.expanduser('~/osv'))
+
+CAPSTAN = '/usr/local/bin/capstan'
+if not os.path.isfile(CAPSTAN):
+	print 'downloading Capstan'
+	subprocess.check_call(
+		['sudo', 'wget', 'http://osv.capstan.s3.amazonaws.com/capstan/v0.1.8/linux_amd64/capstan'],
+		cwd='/usr/local/bin'
+	)
 
 GO_EXE = None
 if os.path.isfile('/usr/bin/go'):
@@ -407,6 +420,9 @@ def import_md( url, modules=None, index_offset=0, force_tagname=None ):
 			# End of a code block.
 			if in_code:
 				if lang:
+					if lang=='pythia':
+						lang = 'rusthon'
+
 					if lang=='python' and 'from rusthon import *' in code:
 						rusthonpy = []
 						for rln in open(__file__, 'rb').read().splitlines():
@@ -1291,6 +1307,12 @@ def build( modules, module_path, datadirs=None ):
 		mods_sorted_by_index = sorted(modules['c++'], key=lambda mod: mod.get('index'))
 		mainmod = None
 		builddir = tempfile.gettempdir()
+
+		if '--osv' in sys.argv:
+			builddir = os.path.join(OSV_ROOT, 'apps/pythia_build')
+			if not os.path.isdir(builddir):
+				os.makedirs(builddir)
+
 		#compile_mode = 'binary'
 		for mod in mods_sorted_by_index:
 			if 'tag' in mod and mod['tag'] and ( mod['tag'].endswith('.hpp') or mod['tag'].endswith('.hpp') ):
@@ -1322,90 +1344,105 @@ def build( modules, module_path, datadirs=None ):
 		tmpfile = builddir + '/rusthon-c++-build.cpp'
 		data = '\n'.join(source)
 		open(tmpfile, 'wb').write( data )
-		cmd = ['g++']
+		if '--osv' in sys.argv:
+			makefile = [
+				'.PHONY: module',
+				'module: myapp.so',
+				'myapp.so:',
+				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp',
+				'.PHONY: clean',
+				'clean:',
+				'	rm -f myapp.so',
+			]
+			open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
+			subprocess.check_call(['./scripts/build', 'image=pythia_build'], cwd=OSV_ROOT)
+			raise RuntimeError('ok')
 
-		if compile_mode=='binary':
-			cmd.extend(['-O3', '-fprofile-generate', '-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
-
-		cmd.append('-Wl,-rpath,/usr/local/lib/')  ## extra user installed dynamic libs
-		cmd.append('-Wl,-rpath,./')  ## can not load dynamic libs from same directory without this
-		cmd.append(tmpfile)
-
-		if '/' in exename and not os.path.isdir( os.path.join(builddir,os.path.split(exename)[0]) ):
-			os.makedirs(os.path.join(builddir,os.path.split(exename)[0]))
-
-		if compile_mode == 'binary':
-			cmd.extend(['-o', os.path.join(builddir,exename)])
-		elif compile_mode == 'dynamiclib':
-			cmd.extend(
-				['-shared', '-fPIC']
-			)
-			exename += '.so'
-			cmd.extend(['-o', os.path.join(builddir,exename)])
-
-		cmd.extend(
-			['-pthread', '-std=c++11' ]
-		)
-
-		for D in defines:
-			cmd.append('-D%s' %D)
-
-		if nuitka:
-			## note: linking happens after the object-bin above is created `-o ruston-c++-bin`,
-			## fixes the error: undefined reference to `_PyThreadState_Current', etc.
-			#if not nuitka_include_path:
-			#	nuitka_include_path = '/usr/local/lib/python2.7/dist-packages/nuitka/build/include'
-			#cmd.append('-I'+nuitka_include_path)
-			cmd.append('-I/usr/include/python2.7')
-			cmd.append('-lpython2.7')
-
-		if idirs:
-			for idir in idirs:
-				cmd.append('-I'+idir)
-
-		if links:
-			for lib in links:
-				cmd.append('-l'+lib)
-
-		## always link to libdl, external libraries may require dl_open, etc.
-		cmd.append('-ldl')
-
-
-		if link or giws:
-
-			if giws:   ## link to the JVM if giws bindings were compiled ##
-				cmd.append('-ljvm')
-
-				os.environ['LD_LIBRARY_PATH']=''
-				#for jrepath in 'include include/linux jre/lib/i386 jre/lib/i386/client/'.split():
-				for jrepath in 'include include/linux'.split():
-					cmd.append('-I%s/%s' %(os.environ['JAVA_HOME'], jrepath))
-				for jrepath in 'jre/lib/amd64 jre/lib/amd64/server/'.split():
-					cmd.append('-L%s/%s' %(os.environ['JAVA_HOME'], jrepath))
-					os.environ['LD_LIBRARY_PATH'] += ':%s/%s'%(os.environ['JAVA_HOME'], jrepath)
-				#raise RuntimeError(os.environ['LD_LIBRARY_PATH'])
-
-			#else:  ## TODO fix jvm with static c libs
-			#	cmd.append('-static')
-
-			if link:  ## c staticlibs or giws c++ wrappers ##
-				cmd.append('-L' + tempfile.gettempdir() + '/.')
-				for libname in link:
-					cmd.append('-l'+libname)
-
-		print('========== g++ : compile main ==========')
-		print(' '.join(cmd))
-		subprocess.check_call( cmd )
-		mainmod['build'] = {
-			'source':data, 
-			'binary':tempfile.gettempdir() + '/' + exename, 
-			'name':exename
-		}
-		if compile_mode == 'binary':
-			output['c++'].append( mainmod['build'] )
-			output['executeables'].append(tempfile.gettempdir() + '/' + exename)
 		else:
-			output['datafiles'][ exename ] = open(tempfile.gettempdir() + '/' + exename, 'rb').read()
+			cmd = ['g++']
+
+			if compile_mode=='binary':
+				cmd.extend(['-O3', '-fprofile-generate', '-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
+
+			cmd.append('-Wl,-rpath,/usr/local/lib/')  ## extra user installed dynamic libs
+			cmd.append('-Wl,-rpath,./')  ## can not load dynamic libs from same directory without this
+			cmd.append(tmpfile)
+
+			if '/' in exename and not os.path.isdir( os.path.join(builddir,os.path.split(exename)[0]) ):
+				os.makedirs(os.path.join(builddir,os.path.split(exename)[0]))
+
+			if compile_mode == 'binary':
+				cmd.extend(['-o', os.path.join(builddir,exename)])
+			elif compile_mode == 'dynamiclib':
+				cmd.extend(
+					['-shared', '-fPIC']
+				)
+				exename += '.so'
+				cmd.extend(['-o', os.path.join(builddir,exename)])
+
+			cmd.extend(
+				['-pthread', '-std=c++11' ]
+			)
+
+			for D in defines:
+				cmd.append('-D%s' %D)
+
+			if nuitka:
+				## note: linking happens after the object-bin above is created `-o ruston-c++-bin`,
+				## fixes the error: undefined reference to `_PyThreadState_Current', etc.
+				#if not nuitka_include_path:
+				#	nuitka_include_path = '/usr/local/lib/python2.7/dist-packages/nuitka/build/include'
+				#cmd.append('-I'+nuitka_include_path)
+				cmd.append('-I/usr/include/python2.7')
+				cmd.append('-lpython2.7')
+
+			if idirs:
+				for idir in idirs:
+					cmd.append('-I'+idir)
+
+			if links:
+				for lib in links:
+					cmd.append('-l'+lib)
+
+			## always link to libdl, external libraries may require dl_open, etc.
+			cmd.append('-ldl')
+
+
+			if link or giws:
+
+				if giws:   ## link to the JVM if giws bindings were compiled ##
+					cmd.append('-ljvm')
+
+					os.environ['LD_LIBRARY_PATH']=''
+					#for jrepath in 'include include/linux jre/lib/i386 jre/lib/i386/client/'.split():
+					for jrepath in 'include include/linux'.split():
+						cmd.append('-I%s/%s' %(os.environ['JAVA_HOME'], jrepath))
+					for jrepath in 'jre/lib/amd64 jre/lib/amd64/server/'.split():
+						cmd.append('-L%s/%s' %(os.environ['JAVA_HOME'], jrepath))
+						os.environ['LD_LIBRARY_PATH'] += ':%s/%s'%(os.environ['JAVA_HOME'], jrepath)
+					#raise RuntimeError(os.environ['LD_LIBRARY_PATH'])
+
+				#else:  ## TODO fix jvm with static c libs
+				#	cmd.append('-static')
+
+				if link:  ## c staticlibs or giws c++ wrappers ##
+					cmd.append('-L' + tempfile.gettempdir() + '/.')
+					for libname in link:
+						cmd.append('-l'+libname)
+
+			print('========== g++ : compile main ==========')
+			print(' '.join(cmd))
+			subprocess.check_call( cmd )
+			mainmod['build'] = {
+				'source':data, 
+				'binary':tempfile.gettempdir() + '/' + exename, 
+				'name':exename
+			}
+			if compile_mode == 'binary':
+				output['c++'].append( mainmod['build'] )
+				output['executeables'].append(tempfile.gettempdir() + '/' + exename)
+			else:
+				output['datafiles'][ exename ] = open(tempfile.gettempdir() + '/' + exename, 'rb').read()
 
 	if python_main['script']:
 		python_main['script'] = '\n'.join(python_main['script'])
