@@ -5,6 +5,43 @@ import os, sys, subprocess, hashlib, time
 import tempfile
 import webbrowser
 
+if '--usr-manifest' in sys.argv:
+	## generate usr.manifest for OSv image
+	proc = subprocess.Popen(['ldd',sys.argv[-1]] , stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	proc.wait()
+	if proc.returncode:
+		raise RuntimeError(proc.stderr.read())
+	else:
+		ignore = [
+			'linux-vdso.so',
+			'libgcc_s.so',
+			'/lib64/ld-linux-x86-64.so',
+			'/usr/lib/linux-vdso.so',
+			'/lib/x86_64-linux-gnu/libgcc_s.so',
+			'/lib/x86_64-linux-gnu/libc.so',
+			'libc.so',
+		]
+		print ''  ## appends newline to existing pre-generated usr.manifest
+		for line in proc.stdout.read().splitlines():
+			line = line.strip()
+			ok = True
+			for ig in ignore:
+				if line.startswith(ig):
+					ok = False
+					break
+			if not ok:
+				continue
+
+			if '=>' in line:
+				print line
+				libname, libpath = line.split('=>')
+				libname = libname.strip()
+				libpath = libpath.strip().split()[0]
+				print '/usr/lib/'+libname + ':	' + libpath
+
+	sys.exit()
+
+
 ## if installed as a symbolic link, this ensures things can still be bootstrapped from the `src` subfolder
 RUSTHON_LIB_ROOT = os.path.dirname(unicode(os.path.realpath(__file__), sys.getfilesystemencoding()))
 
@@ -575,13 +612,28 @@ def build( modules, module_path, datadirs=None ):
 						print 'rebuilding git repo: ' + tag
 						## TODO restrict the bash syntax allowed here,
 						## or build it in a sandbox or docker container.
+						env = dict(os.environ)
 						for line in mod['code'].splitlines():
 							if not line.strip(): continue
-							if not is_restricted_bash(line):
+							elif line.startswith('export '):
+								print line
+								for varval in line.split():
+									if varval=='export':
+										continue
+									elif ':=' in varval:
+										var,val = varval.split(':=')
+										env[var]=val
+									elif '=' in varval:
+										var,val = varval.split('=')
+										env[var]=val
+									else:
+										raise SyntaxError('invalid restricted bash environment variable syntax')
+
+							elif not is_restricted_bash(line):
 								raise SyntaxError('bash build script syntax is restricted:\n'+line)
 							else:
 								print '>>'+line
-							subprocess.check_call( line.split(), cwd=projectdir )
+								subprocess.check_call( line.split(), cwd=projectdir, env=env )
 
 				else:
 					output['datafiles'][tag] = mod['code']
@@ -1346,21 +1398,44 @@ def build( modules, module_path, datadirs=None ):
 		data = '\n'.join(source)
 		open(tmpfile, 'wb').write( data )
 		if '--osv' in sys.argv:
+			if os.path.isfile(builddir+'/myapp.so'):
+				os.unlink(builddir+'/myapp.so')
+
+			linklibs = ''
+			if links:
+				for lib in links:
+					linklibs += ' -l'+lib
+
 			makefile = [
 				'.PHONY: module',
 				'module: myapp.so',
 				'myapp.so:',
-				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp',
+				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s' %linklibs,
+				'	pythia --usr-manifest myapp.so >> usr.manifest',
 				'.PHONY: clean',
 				'clean:',
 				'	rm -f myapp.so',
 			]
 			open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
 			## how come myapp.so is not copied to osv/build/last ?
-			open(builddir+'/usr.manifest', 'wb').write('/tools/myapp.so: ../../apps/pythia_build/myapp.so')
-
+			usrmanifest = [
+				'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
+				#'/usr/lib/libcivetweb.so.1: /usr/local/lib/libcivetweb.so.1',
+				#'/usr/lib/libm.so.6: /lib/x86_64-linux-gnu/libm.so.6',
+				#'/usr/lib/libstdc++.so.6: /usr/lib/x86_64-linux-gnu/libstdc++.so.6',
+			]
+			open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
+			modulepy = [
+				'from osv.modules import api',
+				'default = api.run("/tools/myapp.so")'
+			]
+			open(builddir+'/module.py', 'wb').write('\n'.join(modulepy))
 			subprocess.check_call(['./scripts/build', 'image=pythia_build'], cwd=OSV_ROOT)
-			subprocess.check_call(['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--execute', '/tools/myapp.so'], cwd=OSV_ROOT)
+			#subprocess.check_call(['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--execute', '/tools/myapp.so'], cwd=OSV_ROOT)
+			subprocess.check_call(
+				['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--with-signals'], 
+				cwd=OSV_ROOT
+			)
 			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
 
 		else:

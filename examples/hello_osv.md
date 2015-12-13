@@ -15,8 +15,16 @@ pythia ./examples/hello_osv.md --osv
 
 ```pythia
 #backend:c++
-
+from runtime import *
+from time import sleep
+class A:
+	def __init__(self, txt:string ):
+		self.txt = txt
+	def foo(self):
+		print self.txt
 def main():
-	print 'hello world'
+	a = A('hello world xxx')
+	a.foo()
+	sleep(1)
 
 ```
