@@ -15,11 +15,14 @@ if '--usr-manifest' in sys.argv:
 		ignore = [
 			'linux-vdso.so',
 			'libgcc_s.so',
-			'/lib64/ld-linux-x86-64.so',
-			'/usr/lib/linux-vdso.so',
-			'/lib/x86_64-linux-gnu/libgcc_s.so',
-			'/lib/x86_64-linux-gnu/libc.so',
+			#'/lib64/ld-linux-x86-64.so',
+			#'/usr/lib/linux-vdso.so',
+			#'/lib/x86_64-linux-gnu/libgcc_s.so',
+			#'/lib/x86_64-linux-gnu/libc.so',
+			#'/lib/x86_64-linux-gnu/',
 			'libc.so',
+			'libdl.so',
+			'libpthread.so'
 		]
 		print ''  ## appends newline to existing pre-generated usr.manifest
 		for line in proc.stdout.read().splitlines():
@@ -29,15 +32,19 @@ if '--usr-manifest' in sys.argv:
 				if line.startswith(ig):
 					ok = False
 					break
+				#elif '=>' in line and '/lib/x86_64-linux-gnu/' in line.split('=>')[-1]:
+				#	ok = False
+				#	break
+
 			if not ok:
 				continue
 
 			if '=>' in line:
-				print line
+				#print line
 				libname, libpath = line.split('=>')
 				libname = libname.strip()
 				libpath = libpath.strip().split()[0]
-				print '/usr/lib/'+libname + ':	' + libpath
+				print '/usr/lib/'+libname + ': \t' + libpath
 
 	sys.exit()
 
@@ -1400,6 +1407,16 @@ def build( modules, module_path, datadirs=None ):
 		if '--osv' in sys.argv:
 			if os.path.isfile(builddir+'/myapp.so'):
 				os.unlink(builddir+'/myapp.so')
+			if os.path.isfile(builddir+'/myapp-stripped.so'):
+				os.unlink(builddir+'/myapp-stripped.so')
+			if os.path.isfile(os.path.join(OSV_ROOT,'build/last/usr.img')):
+				os.unlink(os.path.join(OSV_ROOT,'build/last/usr.img'))
+
+			linkdirs = ''
+			if idirs:
+				for idir in idirs:
+					linkdirs += ' -I'+idir
+
 
 			linklibs = ''
 			if links:
@@ -1410,7 +1427,7 @@ def build( modules, module_path, datadirs=None ):
 				'.PHONY: module',
 				'module: myapp.so',
 				'myapp.so:',
-				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s' %linklibs,
+				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs),
 				'	pythia --usr-manifest myapp.so >> usr.manifest',
 				'.PHONY: clean',
 				'clean:',
@@ -1420,9 +1437,6 @@ def build( modules, module_path, datadirs=None ):
 			## how come myapp.so is not copied to osv/build/last ?
 			usrmanifest = [
 				'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
-				#'/usr/lib/libcivetweb.so.1: /usr/local/lib/libcivetweb.so.1',
-				#'/usr/lib/libm.so.6: /lib/x86_64-linux-gnu/libm.so.6',
-				#'/usr/lib/libstdc++.so.6: /usr/lib/x86_64-linux-gnu/libstdc++.so.6',
 			]
 			open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
 			modulepy = [
