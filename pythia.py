@@ -432,6 +432,7 @@ def new_module():
 		'gyp'     : [],
 		'rapydscript':[],
 		'javascript':[],
+		'datafiles' : {}
 	}
 
 def import_md( url, modules=None, index_offset=0, force_tagname=None ):
@@ -497,6 +498,9 @@ def import_md( url, modules=None, index_offset=0, force_tagname=None ):
 						mod['name'] = tag
 
 					modules[ lang ].append( mod )
+				elif tag:
+					modules['datafiles'][tag] = '\n'.join(code)
+
 				in_code = False
 				code = []
 				code_links = []
@@ -579,7 +583,12 @@ GITCACHE = os.path.expanduser('~/rusthon_cache')
 def build( modules, module_path, datadirs=None ):
 	if '--debug-build' in sys.argv:
 		raise RuntimeError(modules)
-	output = {'executeables':[], 'rust':[], 'c':[], 'c++':[], 'c#':[], 'go':[], 'javascript':[], 'java':[], 'xml':[], 'json':[], 'python':[], 'html':[], 'verilog':[], 'nim':[], 'lua':[], 'dart':[], 'datadirs':datadirs, 'datafiles':{}}
+	output = {
+		'executeables':[], 'rust':[], 'c':[], 'c++':[], 'c#':[], 
+		'go':[], 'javascript':[], 'java':[], 'xml':[], 'json':[], 
+		'python':[], 'html':[], 'verilog':[], 'nim':[], 'lua':[], 
+		'dart':[], 'datadirs':datadirs, 'datafiles':modules['datafiles']
+	}
 	python_main = {'name':'main.py', 'script':[]}
 	go_main = {'name':'main.go', 'source':[]}
 	tagged  = {}
@@ -1438,7 +1447,11 @@ def build( modules, module_path, datadirs=None ):
 			usrmanifest = [
 				'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
 			]
+			if 'usr.manifest' in output['datafiles']:
+				usrmanifest.append( output['datafiles']['usr.manifest'] )
+
 			open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
+
 			modulepy = [
 				'from osv.modules import api',
 				'default = api.run("/tools/myapp.so")'
