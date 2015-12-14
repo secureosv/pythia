@@ -67,6 +67,7 @@ if not os.path.isdir(OSV_ROOT):
 #		cwd='/usr/local/bin'
 #	)
 
+has_seastar = False
 HAS_CPP14 = False
 try:
 	subprocess.check_call(['g++-4.9', '--version'])
@@ -1420,6 +1421,21 @@ def build( modules, module_path, datadirs=None ):
 		tmpfile = builddir + '/rusthon-c++-build.cpp'
 		data = '\n'.join(source)
 		open(tmpfile, 'wb').write( data )
+
+		global has_seastar
+		if links:
+			for lib in links:
+				if lib=='seastar':
+					has_seastar = True
+					break
+
+		if has_seastar:
+			## can not simply use -lseastar because its a static library with funky
+			## C++ static constructor trickery for self-registration of classes
+			links.remove('seastar')
+			if not HAS_CPP14:
+				raise RuntimeError('seastar requires a c++14 compatible compiler')
+
 		if '--osv' in sys.argv:
 			if os.path.isfile(builddir+'/myapp.so'):
 				os.unlink(builddir+'/myapp.so')
@@ -1478,6 +1494,14 @@ def build( modules, module_path, datadirs=None ):
 				cmd.extend(['g++-4.9', '-std=c++1y'])
 			else:
 				cmd.extend(['g++', '-std=c++11'])
+
+			if has_seastar:
+				cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
+				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
+				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
+				## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
+				cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
+				cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
 
 			if compile_mode=='binary':
 				cmd.extend(['-O3', '-fprofile-generate', '-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
@@ -1902,6 +1926,9 @@ def main():
 
 		for exe in package['executeables']:
 			print('running: %s' %exe)
+			if has_seastar:
+				exe = [exe, '--memory', '1G']  ## support older hardware for testing
+
 			subprocess.check_call(
 				exe,
 				cwd=tmpdir ## jvm needs this to find the .class files
