@@ -17,18 +17,15 @@ Main Script
 -------------
 * @link:seastar
 * @include:~/rusthon_cache/seastar
-```pythia
+```rusthon
 #backend:c++
 import core/app-template.hh
 import core/reactor.hh
 
 def main(argc:int, argv:char**):
-	#app = new app_template()
-	inline('app_template app')
+	app = new app_template()
 	def on_run():
 		print 'hello seastar'
-		with mrf as 'make_ready_future<>':
-			return mrf()
-	inline('app.run(argc, argv, on_run)')
-
+		return future
+	app.run(argc, argv, on_run)
 ```

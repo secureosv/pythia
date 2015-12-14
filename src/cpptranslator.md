@@ -34,6 +34,21 @@ TODO: make inline cpp-channel.h an option.
 
 class CppGenerator( RustGenerator, CPythonGenerator ):
 
+	def visit_Return(self, node):
+		if isinstance(node.value, ast.Tuple):
+			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
+		if node.value:
+			if isinstance(node.value, ast.Name) and node.value.id=='self':
+				v = 'std::make_shared<%s>(this);' %self._class_stack[-1].name
+			elif isinstance(node.value, ast.Name) and node.value.id=='future':  ## seastar
+				v = 'make_ready_future<>();'
+			else:
+				v = self.visit(node.value)
+			return 'return %s;' % v
+		else:
+			return 'return;'
+
+
 	def is_container_type(self, T):
 		## TODO better parsing
 		if 'std::vector' in T or 'std::map' in T:
