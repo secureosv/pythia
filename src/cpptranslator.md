@@ -63,7 +63,7 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 		includes = []
 
 		for alias in node.names:
-			name = alias.name.replace('__SLASH__', '/')
+			name = alias.name.replace('__SLASH__', '/').replace('__DASH__', '-')
 			if alias.asname:
 				self._user_class_headers[ alias.asname ] = {
 					'file':name,
@@ -78,7 +78,7 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				self._has_nuitka = True
 			elif name == 'cpython':
 				self._has_cpython = True
-			elif name.endswith('.h'):
+			elif name.endswith('.h') or name.endswith('.hh'):
 				includes.append('#include "%s"' %name)
 			else:
 				includes.append('#include <%s>' %name)

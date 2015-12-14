@@ -67,6 +67,13 @@ if not os.path.isdir(OSV_ROOT):
 #		cwd='/usr/local/bin'
 #	)
 
+HAS_CPP14 = False
+try:
+	subprocess.check_call(['g++-4.9', '--version'])
+	HAS_CPP14 = True
+except OSError:
+	print 'c++14 not enabled (g++-4.9 or newer is required)'
+
 GO_EXE = None
 if os.path.isfile('/usr/bin/go'):
 	GO_EXE = '/usr/bin/go'
@@ -567,7 +574,7 @@ def is_restricted_bash( line ):
 		'scons', 'bazel', 
 		'cd', 'mkdir', 'cp', #'pwd', 'ls',
 		'npm', 'grunt', 'gyp', 'nw-gyp',
-		'apt-get', 'yum',
+		'apt-get', 'add-apt-repository', 'yum',
 		'pip', 'docker', 'rhc',
 	]
 	cmd = line.split()[0]
@@ -1466,7 +1473,11 @@ def build( modules, module_path, datadirs=None ):
 			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
 
 		else:
-			cmd = ['g++']
+			cmd = []
+			if HAS_CPP14:
+				cmd.extend(['g++-4.9', '-std=c++1y'])
+			else:
+				cmd.extend(['g++', '-std=c++11'])
 
 			if compile_mode=='binary':
 				cmd.extend(['-O3', '-fprofile-generate', '-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
@@ -1487,9 +1498,7 @@ def build( modules, module_path, datadirs=None ):
 				exename += '.so'
 				cmd.extend(['-o', os.path.join(builddir,exename)])
 
-			cmd.extend(
-				['-pthread', '-std=c++11' ]
-			)
+			cmd.append('-pthread')
 
 			for D in defines:
 				cmd.append('-D%s' %D)

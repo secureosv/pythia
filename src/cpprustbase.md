@@ -2424,7 +2424,7 @@ TODO clean up go stuff.
 
 
 		self.pull()
-		if self._rust and is_closure:
+		if (self._rust or self._cpp) and is_closure:
 			out.append( self.indent()+'};' )
 		else:
 			if is_declare:
