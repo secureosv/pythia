@@ -1963,12 +1963,17 @@ TODO clean up go stuff.
 
 		for i, arg in enumerate(node.args.args):
 			arg_name = arg.id
+			dindex = i - offset
+			stdmove = False
 
 			if arg_name not in args_typedefs.keys()+chan_args_typedefs.keys():
 				if arg_name=='self':
 					assert i==0
 					is_method = True
 					continue
+				elif dindex >= 0 and node.args.defaults and self.visit(node.args.defaults[dindex]).startswith('move('):
+					stdmove = True
+					a = '%s = std::%s' %(arg_name, self.visit(node.args.defaults[dindex]))
 				else:
 					err =[
 						'- - - - - - - - - - - - - - - - - -',
@@ -2015,7 +2020,7 @@ TODO clean up go stuff.
 					a = '%s:%s' %(arg_name, arg_type)
 
 
-			else:
+			elif arg_name in chan_args_typedefs:
 				arg_type = chan_args_typedefs[arg_name]
 				is_sender = False
 				is_recver = False
@@ -2048,10 +2053,8 @@ TODO clean up go stuff.
 				else:
 					raise RuntimeError('TODO chan for backend')
 
-			dindex = i - offset
 
-
-			if dindex >= 0 and node.args.defaults:
+			if dindex >= 0 and node.args.defaults and not stdmove:
 				default_value = self.visit( node.args.defaults[dindex] )
 				self._kwargs_type_[ arg_name ] = arg_type
 				oargs.append( (arg_name, default_value) )
