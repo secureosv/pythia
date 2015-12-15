@@ -1923,7 +1923,7 @@ TODO clean up go stuff.
 				if 'returns_array' in options and options['returns_array']:
 					pass
 				else:
-					if return_type.endswith('&') or return_type.endswith('*'):
+					if return_type.endswith('&') or return_type.endswith('*') or return_type.endswith('>'):
 						pass
 					elif self.usertypes and 'shared' in self.usertypes:
 						return_type = self.usertypes['shared']['template'] % return_type

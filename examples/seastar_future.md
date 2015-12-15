@@ -36,7 +36,7 @@ def main(argc:int, argv:char**):
 			print 'after fast...'
 			print val
 
-		fast().then( after_fast )
+		inline('fast().then( after_fast )')
 
 		return future
 
