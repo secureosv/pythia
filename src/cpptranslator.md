@@ -39,9 +39,13 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
 		if node.value:
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
-				v = 'std::make_shared<%s>(this);' %self._class_stack[-1].name
+				v = 'std::make_shared<%s>(this)' %self._class_stack[-1].name
 			elif isinstance(node.value, ast.Name) and node.value.id=='future':  ## seastar
-				v = 'make_ready_future<>();'
+				v = 'make_ready_future<>()'
+			elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Subscript):
+				T = self.visit(node.value.func.slice)
+				F = self.visit(node.value.args[0])
+				v = 'make_ready_future<%s>(%s)' %(T,F)
 			else:
 				v = self.visit(node.value)
 			return 'return %s;' % v
