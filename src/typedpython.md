@@ -780,7 +780,7 @@ class typedpython:
 				rtype = rtype.strip()[:-1].strip()
 				if rtype.endswith('*') or rtype.endswith('&'):
 					rtype = '"%s"' %rtype
-				elif rtype.startswith('['):
+				elif rtype.startswith('[') or rtype.endswith('>'):
 					rtype = '"%s"' %rtype
 
 				if not strip:

@@ -1805,7 +1805,7 @@ TODO clean up go stuff.
 		is_closure = False
 
 		if self._function_stack[0] is node:
-
+			self._global_functions[node.name] = node
 			self._vars = set()
 			self._known_vars = set()
 			self._known_instances = dict()
@@ -2651,6 +2651,10 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 	def visit_Attribute(self, node):
 		parent_node = self._stack[-2]
 		name = self.visit(node.value)
+		fname = None
+		if isinstance(node.value, ast.Call):
+			fname = self.visit(node.value.func)
+
 		attr = node.attr
 		if attr == '__doublecolon__':
 			return '%s::' %name
@@ -2738,6 +2742,8 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 					return '%s.%s' % (name, attr)
 				elif name in self._known_instances:
 					return '%s->%s' % (name, attr)
+				elif fname in self._global_functions and fname not in self._known_vars:
+					return '%s.%s' % (name, attr)
 				elif self._shared_pointers:
 					return '__shared__(%s)->%s' % (name, attr)
 				else:

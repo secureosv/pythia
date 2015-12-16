@@ -23,7 +23,7 @@ import core/app-template.hh
 import core/reactor.hh
 import core/future.hh
 
-def fast() -> 'future<int>':
+def fast() -> future<int>:
 	print 'fast...'
 	return future[int](420)  ## returns value to after_fast
 
@@ -36,7 +36,7 @@ def main(argc:int, argv:char**):
 			print 'after fast...'
 			print val
 
-		inline('fast().then( after_fast )')
+		fast().then( after_fast )
 
 		return future
 
