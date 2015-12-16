@@ -198,7 +198,7 @@ or something that needs to be wrapped by a pointer/shared-reference.
 ```python
 
 	def is_prim_type(self, T):
-		prims = 'void bool int float double long string str char byte u32 u64 i32 i64 f32 f64 std::string cstring'.split()
+		prims = 'auto void bool int float double long string str char byte u32 u64 i32 i64 f32 f64 std::string cstring'.split()
 		if self._go:
 			prims.append( 'interface{}' )
 		if T in prims:

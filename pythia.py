@@ -1572,7 +1572,11 @@ def build( modules, module_path, datadirs=None ):
 
 			print('========== g++ : compile main ==========')
 			print(' '.join(cmd))
-			subprocess.check_call( cmd )
+			try:
+				subprocess.check_call( cmd )
+			except:
+				print(' '.join(cmd))
+
 			mainmod['build'] = {
 				'source':data, 
 				'binary':tempfile.gettempdir() + '/' + exename, 

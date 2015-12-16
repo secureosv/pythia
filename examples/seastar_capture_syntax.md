@@ -28,7 +28,11 @@ class MyOb:
 		self.x = x
 		self.y = y
 
-def do_something( a:int, ob : std::unique_ptr<MyOb> ) -> int:
+#def do_something( a:int, ob : std::unique_ptr<MyOb> ) -> int:
+#error: could not convert ‘std::move<MyOb* const&>((* & ob))’ from ‘std::remove_reference<MyOb* const&>::type {aka MyOb* const}’ to ‘std::unique_ptr<MyOb>’
+#    std::cout << do_something(a, std::move(ob)) << std::endl;
+
+def do_something( a:int, ob : auto ) -> int:
 	return ob.x + ob.y + a
 
 def fast() -> future<int>:

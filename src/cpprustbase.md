@@ -2001,6 +2001,9 @@ TODO clean up go stuff.
 			if arg_name in args_typedefs:
 				arg_type = args_typedefs[arg_name]
 				if self._cpp:
+					if arg_type=='auto':
+						self._known_instances[arg_name]='auto'
+					## rule above assumes anything marked with `auto` should not used __shared__ wrapper and directly use `a->b`
 					if arg_type in ('string', 'string*', 'string&', 'string&&'):
 						if self.usertypes and 'string' in self.usertypes:
 							if arg_type.endswith('&&'):
@@ -3509,7 +3512,9 @@ because they need some special handling in other places.
 							## TODO fix everywhere, check visit_binop
 							## raise RuntimeError(self.visit(node.value))
 							if 'std::shared_ptr' in value:
-								value = value.replace('shared_ptr', 'unique_ptr')
+								value = value.replace('shared_ptr', 'make_unique')  ## c++14
+								vh,vt = value.split('->__init__')
+								value = vh.split('((')[0] + '()->__init__' + vt[:-1]
 						return 'auto %s = %s; // new object' %(target, value)
 
 					else:  ## rust
