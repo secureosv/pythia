@@ -25,7 +25,7 @@ import core/future.hh
 
 def fast() -> future<int>:
 	print 'fast...'
-	return future[int](420)  ## returns value to after_fast
+	return future(420)  ## gets translated to make_ready_future<T>(420)
 
 def main(argc:int, argv:char**):
 	app = new app_template()

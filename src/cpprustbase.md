@@ -938,7 +938,17 @@ handles all special calls
 
 	def _visit_call_helper(self, node, force_name=None):
 		fname = force_name or self.visit(node.func)
-		if fname in self.macros:
+		if fname=='future':
+			if not len(self._function_stack):
+				raise SyntaxError('future() call used at global level')
+			elif not self._function_stack[-1].return_type.startswith('future<'):
+				raise SyntaxError('expected future<T> return type, instead got: %s' %self._function_stack[-1].return_type )
+
+			args = ','.join([self.visit(arg) for arg in node.args])
+			ftemplate = self._function_stack[-1].return_type.replace('future', 'make_ready_future')
+			return '%s(%s)' %(ftemplate, args)
+
+		elif fname in self.macros:
 			macro = self.macros[fname]
 			if '%=' in macro:  ## advanced meta programming, captures the name of the variable the macro assigns to.
 				if not self._assign_var_name:
@@ -1950,7 +1960,7 @@ TODO clean up go stuff.
 			elif self._rust:
 				return_type = 'String'
 
-
+		node.return_type = return_type
 		node._arg_names = args_names = []
 		args = []
 		oargs = []

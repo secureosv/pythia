@@ -28,8 +28,13 @@ class MyOb:
 		self.x = x
 		self.y = y
 
-def do_something( ob : unique_ptr<MyOb> ) -> int:
-	return ob.x + ob.y
+def do_something( a:int, ob : std::unique_ptr<MyOb> ) -> int:
+	return ob.x + ob.y + a
+
+def fast() -> future<int>:
+	print 'fast...'
+	return future(420)  ## gets translated to make_ready_future<T>(420)
+
 
 def main(argc:int, argv:char**):
 	app = new app_template()
@@ -37,12 +42,12 @@ def main(argc:int, argv:char**):
 		print 'enter on_run...'
 		ob = MyOb(1,2)
 
-		## c++14 capture syntax ##
-		def after( o=move(ob) ):
-			print 'after...'
-			do_something( std::move(o) )
+		## `o=move(ob)` is new c++14 capture syntax ##
+		def after( a:int, ob=move(ob) ):
+			print 'after got...', a
+			print do_something( a, std::move(ob) )
 
-		inline('fast().then( after )')
+		fast().then( after )
 
 		return future
 
