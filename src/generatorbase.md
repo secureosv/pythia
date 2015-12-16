@@ -728,7 +728,15 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id == 'pointers':
+			if node.context_expr.id == 'unique_ptr':
+				self._unique_ptr = True
+				r = []
+				for b in node.body:
+					a = self.visit(b)
+					if a: r.append(self.indent()+a)
+				self._unique_ptr = False
+				return '\n'.join(r)
+			elif node.context_expr.id == 'pointers':
 				self._shared_pointers = False
 				r = []
 				for b in node.body:
@@ -753,6 +761,8 @@ Also implements extra syntax like `switch` and `select`.
 					self._shared_pointers = False
 				elif elt.id == 'noexcept':
 					self._noexcept = True
+				elif elt.id == 'unique_ptr':
+					self._unique_ptr = True
 
 			r = []
 			for b in node.body:
@@ -764,6 +774,8 @@ Also implements extra syntax like `switch` and `select`.
 					self._shared_pointers = True
 				elif elt.id == 'noexcept':
 					self._noexcept = False
+				elif elt.id == 'unique_ptr':
+					self._unique_ptr = False
 
 			return '\n'.join(r)
 

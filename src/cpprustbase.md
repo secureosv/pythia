@@ -1971,6 +1971,8 @@ TODO clean up go stuff.
 		args_gens_indices = []
 		closures = []
 
+		has_stdmove = False
+
 		for i, arg in enumerate(node.args.args):
 			arg_name = arg.id
 			dindex = i - offset
@@ -1983,6 +1985,8 @@ TODO clean up go stuff.
 					continue
 				elif dindex >= 0 and node.args.defaults and self.visit(node.args.defaults[dindex]).startswith('move('):
 					stdmove = True
+					has_stdmove = True
+					#fails in c++11#a = 'auto %s = std::%s' %(arg_name, self.visit(node.args.defaults[dindex]))
 					a = '%s = std::%s' %(arg_name, self.visit(node.args.defaults[dindex]))
 				else:
 					err =[
@@ -2009,6 +2013,12 @@ TODO clean up go stuff.
 						else:
 							#arg_type = 'std::string'  ## standard string type in c++
 							arg_type = arg_type.replace('string', 'std::string')
+
+					if 'std::' in arg_type and arg_type.endswith('>') and ('shared_ptr' in arg_type or 'unique_ptr' in arg_type):
+						if arg_name in self._known_instances:
+							print 'nested lambda?'
+						self._known_instances[arg_name] = arg_type
+
 
 					if arg_name in func_pointers:
 						## note C has funky function pointer syntax, where the arg name is in the middle
@@ -2125,12 +2135,19 @@ TODO clean up go stuff.
 				if self._rust:
 					out.append( self.indent() + 'let %s = |%s| -> %s {\n' % (node.name, ', '.join(args), return_type) )
 				elif self._cpp:
-					out.append( self.indent() + 'auto %s = [&](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
+					if has_stdmove:
+						out.append( self.indent() + 'auto %s = [](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
+					else:
+						out.append( self.indent() + 'auto %s = [&](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
 			else:
 				if self._rust:
 					out.append( self.indent() + 'let %s = |%s| {\n' % (node.name, ', '.join(args)) )
 				elif self._cpp:
-					out.append( self.indent() + 'auto %s = [&](%s) {\n' % (node.name, ', '.join(args)) )
+					if has_stdmove:
+						out.append( self.indent() + 'auto %s = [](%s) {\n' % (node.name, ', '.join(args)) )
+					else:
+						out.append( self.indent() + 'auto %s = [&](%s) {\n' % (node.name, ', '.join(args)) )
+
 		else:
 			if return_type:
 				if self._cpp: ## c++ ##
@@ -3164,7 +3181,7 @@ because they need some special handling in other places.
 
 			if value=='None':
 				if self._cpp:
-					raise RuntimeError('invalid in c++ mode')
+					raise RuntimeError('invalid in c++ mode')  ## is this possible in c++14?
 				else:  ## TODO, this is a bad idea?  letting rust infer the type should have its own syntax like `let x;`
 					return 'let mut %s;  /* let rust infer type */' %target
 
@@ -3485,6 +3502,11 @@ because they need some special handling in other places.
 					self._known_instances[ target ] = classname
 
 					if self._cpp:
+						if self._unique_ptr:
+							## TODO fix everywhere, check visit_binop
+							## raise RuntimeError(self.visit(node.value))
+							if 'std::shared_ptr' in value:
+								value = value.replace('shared_ptr', 'unique_ptr')
 						return 'auto %s = %s; // new object' %(target, value)
 
 					else:  ## rust

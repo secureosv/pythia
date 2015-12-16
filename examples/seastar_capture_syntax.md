@@ -40,7 +40,8 @@ def main(argc:int, argv:char**):
 	app = new app_template()
 	def on_run():
 		print 'enter on_run...'
-		ob = MyOb(1,2)
+		with unique_ptr:
+			ob = MyOb(1,2)
 
 		## `o=move(ob)` is new c++14 capture syntax ##
 		def after( a:int, ob=move(ob) ):
