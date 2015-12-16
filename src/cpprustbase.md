@@ -1972,6 +1972,7 @@ TODO clean up go stuff.
 		closures = []
 
 		has_stdmove = False
+		stdmoveargs  =[]
 
 		for i, arg in enumerate(node.args.args):
 			arg_name = arg.id
@@ -2078,6 +2079,8 @@ TODO clean up go stuff.
 				default_value = self.visit( node.args.defaults[dindex] )
 				self._kwargs_type_[ arg_name ] = arg_type
 				oargs.append( (arg_name, default_value) )
+			elif stdmove:
+				stdmoveargs.append(a)
 			else:
 				args.append( a )
 				node._arg_names.append( arg_name )
@@ -2136,7 +2139,7 @@ TODO clean up go stuff.
 					out.append( self.indent() + 'let %s = |%s| -> %s {\n' % (node.name, ', '.join(args), return_type) )
 				elif self._cpp:
 					if has_stdmove:
-						out.append( self.indent() + 'auto %s = [](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
+						out.append( self.indent() + 'auto %s = [%s](%s) -> %s {\n' % (node.name, ', '.join(stdmoveargs), ', '.join(args), return_type) )
 					else:
 						out.append( self.indent() + 'auto %s = [&](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
 			else:
@@ -2144,7 +2147,7 @@ TODO clean up go stuff.
 					out.append( self.indent() + 'let %s = |%s| {\n' % (node.name, ', '.join(args)) )
 				elif self._cpp:
 					if has_stdmove:
-						out.append( self.indent() + 'auto %s = [](%s) {\n' % (node.name, ', '.join(args)) )
+						out.append( self.indent() + 'auto %s = [%s](%s) {\n' % (node.name,', '.join(stdmoveargs), ', '.join(args)) )
 					else:
 						out.append( self.indent() + 'auto %s = [&](%s) {\n' % (node.name, ', '.join(args)) )
 
