@@ -1989,6 +1989,8 @@ TODO clean up go stuff.
 					has_stdmove = True
 					#fails in c++11#a = 'auto %s = std::%s' %(arg_name, self.visit(node.args.defaults[dindex]))
 					a = '%s = std::%s' %(arg_name, self.visit(node.args.defaults[dindex]))
+				elif self._cpp:
+					args_typedefs[arg_name]='auto'  ## c++14
 				else:
 					err =[
 						'- - - - - - - - - - - - - - - - - -',

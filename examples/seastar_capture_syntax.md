@@ -1,3 +1,11 @@
+continuations
+-------------
+"Using capture-by-move in continuations, on the other hand, is valid and very useful in Seastar applications. By moving an object into a continuation, we transfer ownership of this object to the continuation, and make it easy for the object to be automatically deleted when the continuation ends."
+
+https://github.com/scylladb/seastar/blob/master/doc/tutorial.md#continuations
+
+
+
 Auto Build Seastar
 ----------
 @https://github.com/scylladb/seastar.git
@@ -32,7 +40,11 @@ class MyOb:
 #error: could not convert ‘std::move<MyOb* const&>((* & ob))’ from ‘std::remove_reference<MyOb* const&>::type {aka MyOb* const}’ to ‘std::unique_ptr<MyOb>’
 #    std::cout << do_something(a, std::move(ob)) << std::endl;
 
-def do_something( a:int, ob : auto ) -> int:
+# using `auto` is optional, if not typed then allow c++14 compiler infer the type
+#def do_something( a:int, ob : auto ) -> int:
+
+
+def do_something( a:int, ob ) -> int:
 	return ob.x + ob.y + a
 
 def fast() -> future<int>:
