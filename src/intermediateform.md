@@ -3374,6 +3374,28 @@ class PythonToPythonJS(NodeVisitorBase):
 				if a: writer.write(a)
 			writer.pull()
 
+		elif isinstance(node.context_expr, ast.Name) and node.context_expr.id.startswith('return_'):
+			writer.write('with %s:' %self.visit(node.context_expr))
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
+		elif isinstance( node.context_expr, ast.Call ) and isinstance(node.context_expr.func, ast.Name) and node.context_expr.func.id.startswith('return_'):
+			writer.write('with %s:' %self.visit(node.context_expr))
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
+		elif self.visit( node.context_expr ).startswith('return_'):
+			writer.write('with %s:' %self.visit(node.context_expr))
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
+
 		elif isinstance( node.context_expr, ast.Call ) and isinstance(node.context_expr.func, ast.Name) and node.context_expr.func.id == 'syntax':
 			writer.write('with %s:' %self.visit(node.context_expr))
 			writer.push()
@@ -3404,8 +3426,17 @@ class PythonToPythonJS(NodeVisitorBase):
 				if a: writer.write(a)
 			writer.pull()
 
+		elif isinstance(node.context_expr, ast.BoolOp) and isinstance(node.context_expr.op, ast.And):
+			writer.write('with [%s] as future:' % ','.join( [self.visit(f) for f in node.context_expr.values] ))
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
+
 		else:
-			raise SyntaxError('invalid use of "with" statement: %s' %self.visit(node.context_expr))
+			#raise SyntaxError('invalid use of "with" statement: %s' %self.visit(node.context_expr))
+			raise SyntaxError('invalid use of "with" statement: %s' %node.context_expr)
 
 EXTRA_WITH_TYPES = ('__switch__', '__default__', '__case__', '__select__')
 

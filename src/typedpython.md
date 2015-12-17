@@ -800,6 +800,9 @@ class typedpython:
 			if '\tnew ' in c:
 				c = c.replace('\tnew ', ' __new__>>')
 
+			## return-block-lambda syntax, helper syntax for c++14 seastar ##
+			if c.strip().startswith('return ') and c.strip().endswith(':'):
+				c = c.replace('return ', 'with return_')
 
 			## golang
 

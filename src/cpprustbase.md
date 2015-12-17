@@ -14,6 +14,7 @@ class CppRustBase( GoGenerator ):
 		self._global_types = {
 			'string' : set()
 		}
+		self._memory = 'HEAP'  ## affects how `.` is default translated to `->` or `.`
 		self._rust = True
 		self._go   = False
 		self._threads = []  ## c++11 threads
@@ -2773,9 +2774,9 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 			else:
 				if name in 'jvm nim cpython nuitka weak'.split():
 					return '%s->%s' % (name, attr)
-				elif name in self._known_refs:
+				elif name in self._known_refs or self._memory=='STACK':
 					return '%s.%s' % (name, attr)
-				elif name in self._known_instances:
+				elif name in self._known_instances:  ## user can use std::move to capture these in lambdas for STACK memory mode.
 					return '%s->%s' % (name, attr)
 				elif fname in self._global_functions and fname not in self._known_vars:
 					return '%s.%s' % (name, attr)

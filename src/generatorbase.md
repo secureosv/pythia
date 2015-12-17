@@ -504,8 +504,33 @@ Also implements extra syntax like `switch` and `select`.
 		is_case   = False
 		is_extern = False
 		has_default = False
+		withvalue = self.visit(node.context_expr)
+		if withvalue.startswith('return_'):
+			## STACK MODE ##
+			## all variables must be on or moved onto stack for these operations.
+			## see also: 
+			## 		`repeat(...):`
+			##		`return foo() and then(capture=[], ...):`
 
-		if isinstance(node.context_expr, ast.Name) and node.context_expr.id in ('oo', 'operator_overloading'):
+			self._memory = 'STACK'
+			has_then = 'then(' in withvalue
+			rcall = withvalue.split('return_')[-1].split('(')[0].split()[0]
+			rargs = withvalue.split('(')[-1].split(')')[0].split(',')
+			rargs = ','.join('&'+ra.strip() for ra in rargs)
+			body = ['return %s([%s] {' %(rcall, rargs)]
+
+			self.push()
+			for b in node.body: body.append(self.visit(b))
+			self.pull()
+
+			if has_then:
+				body.append('}).then([%s] {;')
+
+			body.append(self.indent()+'});')
+			self._memory = 'HEAP'
+			return '\n'.join(body)
+
+		elif isinstance(node.context_expr, ast.Name) and node.context_expr.id in ('oo', 'operator_overloading'):
 			self._with_oo = True
 			body = []
 			for b in node.body: body.append(self.visit(b))
@@ -754,6 +779,45 @@ Also implements extra syntax like `switch` and `select`.
 
 			else:
 				raise RuntimeError('TODO with syntax:%s'%node.context_expr.id)
+
+		elif isinstance(node.context_expr, ast.List) and node.optional_vars and self.visit(node.optional_vars)=='future':
+			assert self._memory=='STACK'
+			r = []
+			fut = self.visit(node.context_expr.elts[0])
+			#then_cap = self.visit(node.context_expr.elts[1].keywords[0])[ 1 ]  ## TODO more `and then(..)` chains
+			then_cap = ''
+			then_fut = ''
+
+			if len(node.context_expr.elts[1].keywords):
+				assert node.context_expr.elts[1].keywords[0].arg == 'capture'
+
+				then_cap = node.context_expr.elts[1].keywords[0].value
+				then_cap = ['&'+self.visit(a) for a in then_cap.elts ]
+
+
+				assert node.context_expr.elts[1].keywords[1].arg == 'future'
+				then_fut = node.context_expr.elts[1].keywords[1].value
+				then_fut = ['auto '+self.visit(a) for a in then_fut.elts ]
+
+
+			if fut.startswith('return_'):
+				fut = fut[len('return_'):]
+
+				r.append(
+					'return %s.then([%s] (%s){' % (fut, ','.join(then_cap), ','.join(then_fut) )
+				)
+			else:
+				raise RuntimeError('TODO `continue foo() and then:`')
+
+			self.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: r.append(self.indent()+a)
+			self.pull()
+
+			r.append(self.indent()+'});')  ## note closes: lambda{, then(, return;
+
+			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Tuple) or isinstance(node.context_expr, ast.List):
 			for elt in node.context_expr.elts:

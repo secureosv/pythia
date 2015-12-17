@@ -18,11 +18,51 @@ sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
 
 ```
 
+
+```rusthon
+#backend:c++
+def f():
+	def all_done(out):
+		out.close()
+
+	#return repeat(out, input).then( all_done ):
+	return repeat(out, input):
+		def on_read(buf):
+			def write_done():
+				print 'write done'
+				return next_iteration  ## becomes stop_iteration::no
+
+			if buf:
+				out.write(move(buf)).then( write_done )
+			else:
+				return stop_iteration
+
+			return input.read() and then( capture=[out], future=[buf] ):
+				if buf:
+					return out.write( move(buf) ) and then():
+						print 'all write done.'
+						#yield
+						return notdone
+				else:
+					return stop
+
+			#return in.read().then([&out] (auto buf) {
+			#	if (buf) {
+			#		return out.write(std::move(buf)).then([] {
+			#			return stop_iteration::no;
+			#		});
+			#	} else {
+			#		return make_ready_future<stop_iteration>(stop_iteration::yes);
+			#	}
+			#});
+
+```
+
 Main Script
 -------------
 * @link:seastar
 * @include:~/rusthon_cache/seastar
-```rusthon
+```
 #backend:c++
 import core/app-template.hh
 import core/seastar.hh
@@ -37,7 +77,10 @@ future<> handle_connection(connected_socket s, socket_address a) {
 		def all_done(out):
 			out.close()
 
-		with repeat(out, in).then( all_done ):
+		#with repeat(out, in).then( all_done ):
+		#repeat(out, in).then( all_done ):
+		return repeat(out, in).then( all_done ):
+
 			def on_read(buf):
 				def write_done():
 					print 'write done'
@@ -69,8 +112,11 @@ future<> handle_connection(connected_socket s, socket_address a) {
 future<> f() {
 	listen_options lo;
 	lo.reuse_address = true;
-	with do(listen(make_ipv4_address({1234}), lo)):
-		with loop( listener ):  ## becomes `return keep_doing([&listener])` in seastar
+
+	#with do(listen(make_ipv4_address({1234}), lo)):
+	#	with loop( listener ):  ## becomes `return keep_doing([&listener])` in seastar
+
+	with loop( listener = listen(make_ipv4_address({1234}), lo) ):
 			def on_accept():
 				handle_connection( move(s), move(a) )
 
