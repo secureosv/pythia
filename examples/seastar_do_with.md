@@ -21,7 +21,7 @@ sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
 new syntax test
 ---------------
 
-```rusthon
+```
 #backend:c++
 def f():
 
@@ -68,35 +68,34 @@ Main Script
 -------------
 * @link:seastar
 * @include:~/rusthon_cache/seastar
-```
+```rusthon
 #backend:c++
 import core/app-template.hh
 import core/seastar.hh
 import core/reactor.hh
 import core/future-util.hh
 
-def handle_connection(s:connected_socket, a:socket_address) -> future<>:
-	auto out = s.output();
-	auto in = s.input();
+with stack:
+	def handle_connection(s:connected_socket, a:socket_address) -> future<>:
+		output = s.output()
+		input = s.input()
 
-	return do_with( move=[s,out,in] ):   ## becomes `return do_with` in seastar has no then?
-		def all_done(out):
-			out.close()
+		return do_with( s, output, input ):
+			def all_done(out):
+				out.close()
 
-		#with repeat(out, in).then( all_done ):
-		#repeat(out, in).then( all_done ):
-		return repeat(out, in).then( all_done ):
+			#with repeat(out, in).then( all_done ):
+			#repeat(out, in).then( all_done ):
 
-			def on_read(buf):
-				def write_done():
-					print 'write done'
-					return next_iteration  ## becomes stop_iteration::no
+			return repeat(output, input).then( all_done ):
+				return input.read() and then( capture=[output], future=[buf] ):
+					if buf:
+						return output.write( move(buf) ) and then():
+							return continuex  ## becomes stop_iteration::no
+					else:
+						return halt          ## make_ready_future<stop_iteration>(stop_iteration::yes)
 
-				if buf:
-					out.write(move(buf)).then( write_done )
-				else:
-					return stop_iteration
-
+'''
 	return do_with(std::move(s), std::move(out), std::move(in),
 		[] (auto& s, auto& out, auto& in) {
 			return repeat([&out, &in] {
@@ -114,20 +113,29 @@ def handle_connection(s:connected_socket, a:socket_address) -> future<>:
 			});
 		});
 }
+'''
 
-future<> f() {
-	listen_options lo;
-	lo.reuse_address = true;
+with stack:
+	def f() -> future<>:
+		let lo(): listen_options
+		lo.reuse_address = True
 
-	#with do(listen(make_ipv4_address({1234}), lo)):
-	#	with loop( listener ):  ## becomes `return keep_doing([&listener])` in seastar
+		#with do(listen(make_ipv4_address({1234}), lo)):
+		#	with loop( listener ):  ## becomes `return keep_doing([&listener])` in seastar
 
-	with loop( listener = listen(make_ipv4_address({1234}), lo) ):
-			def on_accept():
-				handle_connection( move(s), move(a) )
+		return do_with( listener=listen(make_ipv4_address({1234}), lo) ):
+			#@capture( listener )  ## TODO
+			def myloop():
+				# note future=(connected_socket s, socket_address a)
+				return listener.accept() and then(capture=[], future=[s, a]):
+					#// Note we ignore, not return, the future returned by
+					#// handle_connection(), so we do not wait for one
+					#// connection to be handled before accepting the next one.
+					handle_connection( move(s), move(a) )
 
-			return listener.accept().then(on_accept)
+			return keep_doing( myloop )
 
+'''
 	return do_with(listen(make_ipv4_address({1234}), lo), [] (auto& listener) {
 		return keep_doing([&listener] () {
 			return listener.accept().then(
@@ -140,6 +148,7 @@ future<> f() {
 		});
 	});
 }
+'''
 
 def main(argc:int, argv:char**):
 	app = new app_template()

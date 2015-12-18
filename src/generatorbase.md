@@ -512,7 +512,7 @@ Also implements extra syntax like `switch` and `select`.
 			## 		`repeat(...):`
 			##		`return foo() and then(capture=[], ...):`
 
-			self._memory = 'STACK'
+			self._memory.append('STACK')
 			has_then = 'then(' in withvalue
 			rcall = withvalue.split('return_')[-1].split('(')[0].split()[0]
 			rargs = withvalue.split('(')[-1].split(')')[0].split(',')
@@ -532,7 +532,7 @@ Also implements extra syntax like `switch` and `select`.
 				body.append('}).then([%s] {;')
 
 			body.append(self.indent()+'});')
-			self._memory = 'HEAP'
+			self._memory.pop()
 			return '\n'.join(body)
 
 		elif isinstance(node.context_expr, ast.Name) and node.context_expr.id in ('oo', 'operator_overloading'):
@@ -758,7 +758,24 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id == 'unique_ptr':
+			if node.context_expr.id == 'stack':
+				self._memory.append('STACK')
+				r = []
+				for b in node.body:
+					a = self.visit(b)
+					if a: r.append(self.indent()+a)
+				self._memory.pop()
+				return '\n'.join(r)
+			elif node.context_expr.id == 'heap':
+				self._memory.append('HEAP')
+				r = []
+				for b in node.body:
+					a = self.visit(b)
+					if a: r.append(self.indent()+a)
+				self._memory.pop()
+				return '\n'.join(r)
+
+			elif node.context_expr.id == 'unique_ptr':
 				self._unique_ptr = True
 				r = []
 				for b in node.body:
@@ -786,7 +803,7 @@ Also implements extra syntax like `switch` and `select`.
 				raise RuntimeError('TODO with syntax:%s'%node.context_expr.id)
 
 		elif isinstance(node.context_expr, ast.List) and node.optional_vars and self.visit(node.optional_vars)=='future':
-			assert self._memory=='STACK'
+			assert self._memory[-1]=='STACK'
 			r = []
 			fut = self.visit(node.context_expr.elts[0])
 			#then_cap = self.visit(node.context_expr.elts[1].keywords[0])[ 1 ]  ## TODO more `and then(..)` chains
@@ -832,6 +849,10 @@ Also implements extra syntax like `switch` and `select`.
 					self._noexcept = True
 				elif elt.id == 'unique_ptr':
 					self._unique_ptr = True
+				elif elt.id == 'stack':
+					self._memory.append('STACK')
+				elif elt.id == 'heap':
+					self._memory.append('HEAP')
 
 			r = []
 			for b in node.body:
@@ -845,6 +866,10 @@ Also implements extra syntax like `switch` and `select`.
 					self._noexcept = False
 				elif elt.id == 'unique_ptr':
 					self._unique_ptr = False
+				elif elt.id == 'stack':
+					self._memory.pop()
+				elif elt.id == 'heap':
+					self._memory.pop()
 
 			return '\n'.join(r)
 
