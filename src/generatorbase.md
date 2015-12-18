@@ -260,7 +260,7 @@ Function Decorators
 						args_typedefs[ key.arg ] = key.value.s
 					elif isinstance(key.value, ast.Name):
 						T = key.value.id
-						if self.is_prim_type(T):
+						if self.is_prim_type(T) or self._memory[-1]=='STACK':
 							args_typedefs[key.arg] = T
 						elif self._cpp:
 							if self.usertypes and 'shared' in self.usertypes:
@@ -513,9 +513,12 @@ Also implements extra syntax like `switch` and `select`.
 			##		`return foo() and then(capture=[], ...):`
 
 			self._memory.append('STACK')
-			has_then = 'then(' in withvalue
+			has_then = False
+			if 'then(' in withvalue:
+				has_then = withvalue.split('.then(')[-1].split(')')[0]
+
 			rcall = withvalue.split('return_')[-1].split('(')[0].split()[0]
-			rargs = withvalue.split('(')[-1].split(')')[0].split(',')
+			rargs = withvalue.split('(')[1].split(')')[0].split(',')
 			if rcall=='do_with':
 				cargs = ','.join('auto& %s'%ra.strip() for ra in rargs)
 				rargs = ','.join('std::move(%s)'%ra.strip() for ra in rargs)
@@ -525,13 +528,15 @@ Also implements extra syntax like `switch` and `select`.
 				body = ['return %s([%s] {' %(rcall, rargs)]
 
 			self.push()
-			for b in node.body: body.append(self.visit(b))
+			for b in node.body:
+				body.append(self.indent()+self.visit(b))
 			self.pull()
 
 			if has_then:
-				body.append('}).then([%s] {;')
+				body.append(self.indent()+'}).then(%s);' %has_then)
+			else:
+				body.append(self.indent()+'});')
 
-			body.append(self.indent()+'});')
 			self._memory.pop()
 			return '\n'.join(body)
 

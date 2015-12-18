@@ -939,7 +939,11 @@ handles all special calls
 
 	def _visit_call_helper(self, node, force_name=None):
 		fname = force_name or self.visit(node.func)
-		if fname=='future':
+		if self._cpp and fname=='move':
+			args = ','.join([self.visit(arg) for arg in node.args])
+			return 'std::move(%s)' %args
+
+		elif fname=='future':
 			if not len(self._function_stack):
 				raise SyntaxError('future() call used at global level')
 			elif not self._function_stack[-1].return_type.startswith('future<'):
@@ -1934,7 +1938,7 @@ TODO clean up go stuff.
 				if 'returns_array' in options and options['returns_array']:
 					pass
 				else:
-					if return_type.endswith('&') or return_type.endswith('*') or return_type.endswith('>'):
+					if return_type.endswith('&') or return_type.endswith('*') or return_type.endswith('>') or self._memory[-1]=='STACK':
 						pass
 					elif self.usertypes and 'shared' in self.usertypes:
 						return_type = self.usertypes['shared']['template'] % return_type

@@ -40,6 +40,12 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 		if node.value:
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
 				v = 'std::make_shared<%s>(this)' %self._class_stack[-1].name
+
+			elif isinstance(node.value, ast.Name) and node.value.id=='next':  ## seastar lambda repeat
+				v = 'stop_iteration::no'
+			elif isinstance(node.value, ast.Name) and node.value.id=='stop':  ## seastar lambda repeat
+				v = 'make_ready_future<stop_iteration>(stop_iteration::yes)'
+
 			elif isinstance(node.value, ast.Name) and node.value.id=='future':  ## seastar
 				v = 'make_ready_future<>()'
 			elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Subscript):
