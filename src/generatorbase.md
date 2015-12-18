@@ -516,8 +516,13 @@ Also implements extra syntax like `switch` and `select`.
 			has_then = 'then(' in withvalue
 			rcall = withvalue.split('return_')[-1].split('(')[0].split()[0]
 			rargs = withvalue.split('(')[-1].split(')')[0].split(',')
-			rargs = ','.join('&'+ra.strip() for ra in rargs)
-			body = ['return %s([%s] {' %(rcall, rargs)]
+			if rcall=='do_with':
+				cargs = ','.join('auto& %s'%ra.strip() for ra in rargs)
+				rargs = ','.join('std::move(%s)'%ra.strip() for ra in rargs)
+				body = ['return do_with(%s, [] (%s) {' %(rargs, cargs)]
+			else:
+				rargs = ','.join('&'+ra.strip() for ra in rargs)
+				body = ['return %s([%s] {' %(rcall, rargs)]
 
 			self.push()
 			for b in node.body: body.append(self.visit(b))

@@ -18,10 +18,16 @@ sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
 
 ```
 
+new syntax test
+---------------
 
 ```rusthon
 #backend:c++
 def f():
+
+	return do_with( s, out, input ):
+		print 'do with...'
+
 	def all_done(out):
 		out.close()
 
@@ -69,11 +75,11 @@ import core/seastar.hh
 import core/reactor.hh
 import core/future-util.hh
 
-future<> handle_connection(connected_socket s, socket_address a) {
+def handle_connection(s:connected_socket, a:socket_address) -> future<>:
 	auto out = s.output();
 	auto in = s.input();
 
-	with do(s,out,in):   ## becomes `return do_with` in seastar
+	return do_with( move=[s,out,in] ):   ## becomes `return do_with` in seastar has no then?
 		def all_done(out):
 			out.close()
 
