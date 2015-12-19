@@ -1280,7 +1280,7 @@ handles all special calls
 					else:
 						T = node.args[1].id
 
-					if self.is_prim_type(T) or T.endswith('*') or T.endswith('&'):
+					if self.is_prim_type(T) or T.endswith('*') or T.endswith('&') or self._memory[-1]=='STACK':
 						return '%s  %s' %(T, node.args[0].id)
 					else:
 						if not self._shared_pointers:
