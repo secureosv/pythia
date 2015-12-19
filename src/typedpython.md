@@ -988,16 +988,36 @@ def parse_and_fix_code(r, output):
 		ast.parse(r)
 	except SyntaxError as e:
 		errmsg = str(e)
+		print errmsg
 		eline = output[e.lineno-1]
-		echar = eline[ e.offset ]
-		echar_next = None
+		print eline
+		echar = None
 		echar_prev = None
-		if e.offset+1 < len(eline):
-			echar_next = eline[ e.offset+1 ]
-		if e.offset-1 > 0:
-			echar_prev = eline[ e.offset-1 ]
+		if e.offset < len(eline):
+			echar = eline[ e.offset ]
+			print echar
+			echar_next = None
+			echar_prev = None
+			if e.offset+1 < len(eline):
+				echar_next = eline[ e.offset+1 ]
+			if e.offset-1 > 0:
+				echar_prev = eline[ e.offset-1 ]
 
-		if errmsg.startswith('invalid syntax') and echar==':' and echar_prev==':':
+		#####################################
+		if errmsg.startswith('invalid syntax (<unknown>,') and 'then(' in eline:
+			nline = []
+			hit = False
+			for c in eline:
+				if c.strip() and not hit:
+					nline.append('with ')
+					hit = True
+				nline.append(c)
+			eline = ''.join(nline)
+			output[e.lineno-1] = eline
+			parse_and_fix_code('\n'.join(output), output)
+
+
+		elif errmsg.startswith('invalid syntax') and echar==':' and echar_prev==':':
 			if eline.count('::')==1:
 				output[e.lineno-1] = eline.replace('::', '.__doublecolon__.')
 				parse_and_fix_code('\n'.join(output), output)

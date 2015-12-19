@@ -846,7 +846,17 @@ Also implements extra syntax like `switch` and `select`.
 						'return %s.then([%s] (%s){' % (fut, ','.join(then_cap), ','.join(then_fut) )
 					)
 			else:
-				raise RuntimeError('TODO `continue foo() and then:`')
+				#raise RuntimeError('TODO `continue foo() and then:`')
+
+				if then_callback:
+					r.append(
+						'%s([&] {' %fut.split('(')[0]
+					)
+				else:
+					r.append(
+						'%s.then([%s] (%s){' % (fut, ','.join(then_cap), ','.join(then_fut) )
+					)
+
 
 			self.push()
 			for b in node.body:
