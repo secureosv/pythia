@@ -5,6 +5,9 @@ https://github.com/scylladb/seastar/blob/master/doc/tutorial.md#loops
 
 Auto Build Seastar
 ----------
+the build script below for ubuntu (or linuxmint) is automatically run the first time you compile this markdown using this command:
+`pythia seastar_do_with.md`
+
 @https://github.com/scylladb/seastar.git
 ```bash
 sudo apt-get install libaio-dev ninja-build ragel libhwloc-dev libnuma-dev libpciaccess-dev libcrypto++-dev libboost-all-dev libxen-dev libxml2-dev xfslibs-dev
@@ -21,6 +24,11 @@ sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
 
 Main Script
 -------------
+Below `with stack:` is used to declare that all operations happen on the stack, and not the default heap.
+To get the best performance with seastar stack mode is used.
+
+The syntax below `return foo() and then (...):` is used to insert c++11 lambda functions and callbacks.
+
 * @link:seastar
 * @include:~/rusthon_cache/seastar
 ```rusthon
@@ -36,7 +44,7 @@ with stack:
 		input = s.input()
 
 		return do_with( s, output, input ):
-			return repeat(output, input) and then( callback=lambda:output.close() ):
+			return repeat() and then( callback=lambda:output.close() ):
 				return input.read() and then( capture=[output], future=[buf] ):
 					if buf:
 						return output.write( move(buf) ) and then():
@@ -44,33 +52,9 @@ with stack:
 					else:
 						return stop   	       ## make_ready_future<stop_iteration>(stop_iteration::yes)
 
-'''
-	return do_with(std::move(s), std::move(out), std::move(in),
-		[] (auto& s, auto& out, auto& in) {
-			return repeat([&out, &in] {
-				return in.read().then([&out] (auto buf) {
-					if (buf) {
-						return out.write(std::move(buf)).then([] {
-							return stop_iteration::no;
-						});
-					} else {
-						return make_ready_future<stop_iteration>(stop_iteration::yes);
-					}
-				});
-			}).then([&out] {
-				return out.close();
-			});
-		});
-}
-'''
-
-with stack:
 	def f() -> future<>:
 		let lo: listen_options
 		lo.reuse_address = True
-
-		#with do(listen(make_ipv4_address({1234}), lo)):
-		#	with loop( listener ):  ## becomes `return keep_doing([&listener])` in seastar
 
 		listener=listen(make_ipv4_address({1234}), lo)
 		return do_with( listener ):
@@ -83,20 +67,6 @@ with stack:
 					#// connection to be handled before accepting the next one.
 					handle_connection( move(s), move(a) )
 
-'''
-	return do_with(listen(make_ipv4_address({1234}), lo), [] (auto& listener) {
-		return keep_doing([&listener] () {
-			return listener.accept().then(
-				[] (connected_socket s, socket_address a) {
-					// Note we ignore, not return, the future returned by
-					// handle_connection(), so we do not wait for one
-					// connection to be handled before accepting the next one.
-					handle_connection(std::move(s), std::move(a));
-				});
-		});
-	});
-}
-'''
 
 def main(argc:int, argv:char**):
 	app = new app_template()
