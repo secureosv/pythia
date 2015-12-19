@@ -18,9 +18,9 @@ sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
 
 ```
 
-new syntax test
----------------
 
+Main Script
+-------------
 * @link:seastar
 * @include:~/rusthon_cache/seastar
 ```rusthon
@@ -43,43 +43,9 @@ with stack:
 				return input.read() and then( capture=[output], future=[buf] ):
 					if buf:
 						return output.write( move(buf) ) and then():
-							return next  ## becomes stop_iteration::no
+							return next  		## becomes stop_iteration::no
 					else:
-						return stop          ## make_ready_future<stop_iteration>(stop_iteration::yes)
-
-
-```
-
-Main Script
--------------
-* @link:seastar
-* @include:~/rusthon_cache/seastar
-```
-#backend:c++
-import core/app-template.hh
-import core/seastar.hh
-import core/reactor.hh
-import core/future-util.hh
-
-with stack:
-	def handle_connection(s:connected_socket, a:socket_address) -> future<>:
-		output = s.output()
-		input = s.input()
-
-		return do_with( s, output, input ):
-			def all_done(out):
-				out.close()
-
-			#with repeat(out, in).then( all_done ):
-			#repeat(out, in).then( all_done ):
-
-			return repeat(output, input).then( all_done ):
-				return input.read() and then( capture=[output], future=[buf] ):
-					if buf:
-						return output.write( move(buf) ) and then():
-							return continuex  ## becomes stop_iteration::no
-					else:
-						return halt          ## make_ready_future<stop_iteration>(stop_iteration::yes)
+						return stop   	       ## make_ready_future<stop_iteration>(stop_iteration::yes)
 
 '''
 	return do_with(std::move(s), std::move(out), std::move(in),
@@ -103,7 +69,7 @@ with stack:
 
 with stack:
 	def f() -> future<>:
-		let lo(): listen_options
+		let lo: listen_options
 		lo.reuse_address = True
 
 		#with do(listen(make_ipv4_address({1234}), lo)):
@@ -112,7 +78,8 @@ with stack:
 		listener=listen(make_ipv4_address({1234}), lo)
 		return do_with( listener ):
 			return keep_doing():
-				# note future=(connected_socket s, socket_address a)
+				# note in c++ example future=(connected_socket s, socket_address a)
+				# c++14 is able to use `auto` even in this case, so below can be pythonic and untyped
 				return listener.accept() and then(capture=[], future=[s, a]):
 					#// Note we ignore, not return, the future returned by
 					#// handle_connection(), so we do not wait for one
