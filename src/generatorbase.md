@@ -816,25 +816,35 @@ Also implements extra syntax like `switch` and `select`.
 			#then_cap = self.visit(node.context_expr.elts[1].keywords[0])[ 1 ]  ## TODO more `and then(..)` chains
 			then_cap = ''
 			then_fut = ''
+			then_callback = None
 
 			if len(node.context_expr.elts[1].keywords):
-				assert node.context_expr.elts[1].keywords[0].arg == 'capture'
+				if node.context_expr.elts[1].keywords[0].arg == 'callback':
+					then_callback = self.visit(node.context_expr.elts[1].keywords[0].value)
+				elif node.context_expr.elts[1].keywords[0].arg == 'capture':
 
-				then_cap = node.context_expr.elts[1].keywords[0].value
-				then_cap = ['&'+self.visit(a) for a in then_cap.elts ]
+					then_cap = node.context_expr.elts[1].keywords[0].value
+					then_cap = ['&'+self.visit(a) for a in then_cap.elts ]
 
 
-				assert node.context_expr.elts[1].keywords[1].arg == 'future'
-				then_fut = node.context_expr.elts[1].keywords[1].value
-				then_fut = ['auto '+self.visit(a) for a in then_fut.elts ]
+					assert node.context_expr.elts[1].keywords[1].arg == 'future'
+					then_fut = node.context_expr.elts[1].keywords[1].value
+					then_fut = ['auto '+self.visit(a) for a in then_fut.elts ]
+				else:
+					raise SyntaxError('invalid use of then() keyword option')
 
 
 			if fut.startswith('return_'):
 				fut = fut[len('return_'):]
 
-				r.append(
-					'return %s.then([%s] (%s){' % (fut, ','.join(then_cap), ','.join(then_fut) )
-				)
+				if then_callback:
+					r.append(
+						'return %s([&] {' %fut.split('(')[0]
+					)
+				else:
+					r.append(
+						'return %s.then([%s] (%s){' % (fut, ','.join(then_cap), ','.join(then_fut) )
+					)
 			else:
 				raise RuntimeError('TODO `continue foo() and then:`')
 
@@ -844,7 +854,10 @@ Also implements extra syntax like `switch` and `select`.
 				if a: r.append(self.indent()+a)
 			self.pull()
 
-			r.append(self.indent()+'});')  ## note closes: lambda{, then(, return;
+			if then_callback:
+				r.append(self.indent()+'}).then(%s);' %then_callback)
+			else:
+				r.append(self.indent()+'});')  ## note closes: lambda{, then(, return;
 
 			return '\n'.join(r)
 

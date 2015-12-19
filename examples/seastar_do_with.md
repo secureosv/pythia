@@ -36,10 +36,7 @@ with stack:
 		input = s.input()
 
 		return do_with( s, output, input ):
-			def all_done():
-				output.close()
-
-			return repeat(output, input).then( all_done ):
+			return repeat(output, input) and then( callback=lambda:output.close() ):
 				return input.read() and then( capture=[output], future=[buf] ):
 					if buf:
 						return output.write( move(buf) ) and then():
