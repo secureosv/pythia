@@ -533,6 +533,8 @@ Also implements extra syntax like `switch` and `select`.
 			self.pull()
 
 			if has_then:
+				#if rcall=='repeat':
+				#	raise RuntimeError(withvalue+':'+rargs+':'+has_then)
 				body.append(self.indent()+'}).then(%s);' %has_then)
 			else:
 				body.append(self.indent()+'});')

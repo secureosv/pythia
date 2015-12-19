@@ -36,14 +36,10 @@ with stack:
 		input = s.input()
 
 		return do_with( s, output, input ):
-			def all_done(out):
-				out.close()
+			def all_done():
+				output.close()
 
-			#with repeat(out, in).then( all_done ):
-			#repeat(out, in).then( all_done ):
-
-			#return repeat(output, input).then( all_done ):
-			return repeat(output, input):
+			return repeat(output, input).then( all_done ):
 				return input.read() and then( capture=[output], future=[buf] ):
 					if buf:
 						return output.write( move(buf) ) and then():

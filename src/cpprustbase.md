@@ -2146,20 +2146,20 @@ TODO clean up go stuff.
 
 			if return_type:
 				if self._rust:
-					out.append( self.indent() + 'let %s = |%s| -> %s {\n' % (node.name, ', '.join(args), return_type) )
+					out.append( 'let %s = |%s| -> %s {\n' % (node.name, ', '.join(args), return_type) )
 				elif self._cpp:
 					if has_stdmove:
-						out.append( self.indent() + 'auto %s = [%s](%s) -> %s {\n' % (node.name, ', '.join(stdmoveargs), ', '.join(args), return_type) )
+						out.append( 'auto %s = [%s](%s) -> %s {\n' % (node.name, ', '.join(stdmoveargs), ', '.join(args), return_type) )
 					else:
-						out.append( self.indent() + 'auto %s = [&](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
+						out.append( 'auto %s = [&](%s) -> %s {\n' % (node.name, ', '.join(args), return_type) )
 			else:
 				if self._rust:
-					out.append( self.indent() + 'let %s = |%s| {\n' % (node.name, ', '.join(args)) )
+					out.append( 'let %s = |%s| {\n' % (node.name, ', '.join(args)) )
 				elif self._cpp:
 					if has_stdmove:
-						out.append( self.indent() + 'auto %s = [%s](%s) {\n' % (node.name,', '.join(stdmoveargs), ', '.join(args)) )
+						out.append( 'auto %s = [%s](%s) {\n' % (node.name,', '.join(stdmoveargs), ', '.join(args)) )
 					else:
-						out.append( self.indent() + 'auto %s = [&](%s) {\n' % (node.name, ', '.join(args)) )
+						out.append( 'auto %s = [&](%s) {\n' % (node.name, ', '.join(args)) )
 
 		else:
 			if return_type:
