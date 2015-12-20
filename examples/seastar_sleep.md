@@ -47,6 +47,8 @@ with stack:
 	def f() -> future<>:
 		delay(1) and then():
 			print 'sleep1'
+			and then():
+				print 'sleep1.1'
 		delay(2) and then():
 			print 'sleep2'
 

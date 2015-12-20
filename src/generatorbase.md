@@ -586,7 +586,11 @@ Also implements extra syntax like `switch` and `select`.
 			#	else:
 			#		a = '%s = %s' %(name, self.visit(node.context_expr.keywords[0].value))
 
-			if node.context_expr.func.id == '__case__':
+			if node.context_expr.func.id == 'chain_then':
+				##self._lambda_functions[-1].chain_then.append(node)
+				self.chain_then.append(node)
+				return ''
+			elif node.context_expr.func.id == '__case__':
 				is_case = True
 				case_match = None
 				select_hack = None
@@ -865,9 +869,24 @@ Also implements extra syntax like `switch` and `select`.
 			self.pull()
 
 			if then_callback:
-				r.append(self.indent()+'}).then(%s);' %then_callback)
+				r.append(self.indent()+'}).then(%s)' %then_callback)
 			else:
-				r.append(self.indent()+'});')  ## note closes: lambda{, then(, return;
+				r.append(self.indent()+'})')  ## note closes: lambda{, then(, return;
+
+			if self.chain_then:
+				self.chain_then.reverse()
+				while self.chain_then:
+					n = self.chain_then.pop()
+					r[-1] += '.then([]() '
+					self.push()
+					for b in n.body:
+						a = self.visit(b)
+						if a: r.append(self.indent()+a)
+					self.pull()
+					if a: r.append(self.indent()+')')
+
+
+			r[-1] += ';'
 
 			return '\n'.join(r)
 
