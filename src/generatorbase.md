@@ -587,8 +587,8 @@ Also implements extra syntax like `switch` and `select`.
 			#		a = '%s = %s' %(name, self.visit(node.context_expr.keywords[0].value))
 
 			if node.context_expr.func.id == 'chain_then':
-				##self._lambda_functions[-1].chain_then.append(node)
-				self.chain_then.append(node)
+				self._lambda_stack[-1].chain_then.append(node)
+				#self.chain_then.append(node)
 				return ''
 			elif node.context_expr.func.id == '__case__':
 				is_case = True
@@ -815,6 +815,9 @@ Also implements extra syntax like `switch` and `select`.
 
 		elif isinstance(node.context_expr, ast.List) and node.optional_vars and self.visit(node.optional_vars)=='future':
 			assert self._memory[-1]=='STACK'
+			self._lambda_stack.append( node )
+			node.chain_then = []
+
 			r = []
 			fut = self.visit(node.context_expr.elts[0])
 			#then_cap = self.visit(node.context_expr.elts[1].keywords[0])[ 1 ]  ## TODO more `and then(..)` chains
@@ -873,20 +876,22 @@ Also implements extra syntax like `switch` and `select`.
 			else:
 				r.append(self.indent()+'})')  ## note closes: lambda{, then(, return;
 
-			if self.chain_then:
-				self.chain_then.reverse()
-				while self.chain_then:
-					n = self.chain_then.pop()
-					r[-1] += '.then([]() '
-					self.push()
-					for b in n.body:
-						a = self.visit(b)
-						if a: r.append(self.indent()+a)
-					self.pull()
-					if a: r.append(self.indent()+')')
-
+			if len(self._lambda_stack):
+				chain_then = self._lambda_stack[-1].chain_then
+				if chain_then:
+					chain_then.reverse()
+					while chain_then:
+						n = chain_then.pop()
+						r[-1] += '.then([]() {'
+						self.push()
+						for b in n.body:
+							a = self.visit(b)
+							if a: r.append(self.indent()+a)
+						self.pull()
+						r.append(self.indent()+'})')
 
 			r[-1] += ';'
+			self._lambda_stack.pop()
 
 			return '\n'.join(r)
 

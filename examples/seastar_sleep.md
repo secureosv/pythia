@@ -1,6 +1,6 @@
 Async Seastar Loops
 -------------
-https://github.com/scylladb/seastar/blob/master/doc/tutorial.md#loops
+https://github.com/scylladb/seastar/blob/master/doc/tutorial.md#introducing-futures-and-continuations
 
 
 Auto Build Seastar
@@ -41,6 +41,7 @@ import core/future-util.hh
 
 with stack:
 	def delay(seconds) -> future<>:
+		print 'sleeping', seconds
 		sleep(seconds)
 		return future
 
@@ -49,6 +50,16 @@ with stack:
 			print 'sleep1'
 			and then():
 				print 'sleep1.1'
+				delay(1) and then():
+					print 'nested 1.1:n'
+					and then():
+						print 'nested 1.1:N'
+
+			and then():
+				print 'sleep1.2'
+				and then():
+					print 'sleep1.2.1'
+
 		delay(2) and then():
 			print 'sleep2'
 

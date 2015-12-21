@@ -14,7 +14,7 @@ class CppRustBase( GoGenerator ):
 		self._global_types = {
 			'string' : set()
 		}
-		self.chain_then = []
+		self._lambda_stack = []
 		self._memory = ['HEAP']  ## affects how `.` is default translated to `->` or `.`
 		self._rust = True
 		self._go   = False
