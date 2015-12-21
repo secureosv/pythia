@@ -379,6 +379,8 @@ note: `nullptr` is c++11
 			return self._rename_hacks[ node.id ]
 		elif node.id=='self' and self._class_stack and self._cpp:
 			return 'this'
+		elif node.id=='__finally__':
+			return 'finally'
 		else:
 			return node.id
 
@@ -2697,6 +2699,9 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 			fname = self.visit(node.value.func)
 
 		attr = node.attr
+		if attr=='__finally__':
+			attr = 'finally'
+		#############################
 		if attr == '__doublecolon__':
 			return '%s::' %name
 		elif attr == '__right_arrow__':

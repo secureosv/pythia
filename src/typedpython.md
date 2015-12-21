@@ -988,6 +988,7 @@ def parse_and_fix_code(r, output):
 		ast.parse(r)
 	except SyntaxError as e:
 		errmsg = str(e)
+		#print errmsg
 		eline = output[e.lineno-1]
 		echar = None
 		echar_prev = None
@@ -1001,7 +1002,11 @@ def parse_and_fix_code(r, output):
 				echar_prev = eline[ e.offset-1 ]
 
 		#####################################
-		if errmsg.startswith('invalid syntax (<unknown>,') and 'then(' in eline:
+		if errmsg.startswith('invalid syntax (<unknown>,') and '.finally(' in eline:
+			output[e.lineno-1] = eline.replace('.finally(', '.__finally__(')
+			parse_and_fix_code('\n'.join(output), output)
+
+		elif errmsg.startswith('invalid syntax (<unknown>,') and 'then(' in eline:
 			if eline.strip().startswith('and then('):
 				output[e.lineno-1] = eline.replace('and then(', 'with chain_then(')
 				parse_and_fix_code('\n'.join(output), output)
