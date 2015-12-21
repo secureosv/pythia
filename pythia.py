@@ -53,7 +53,7 @@ if '--usr-manifest' in sys.argv:
 RUSTHON_LIB_ROOT = os.path.dirname(unicode(os.path.realpath(__file__), sys.getfilesystemencoding()))
 
 OSV_ROOT = os.path.expanduser('~/osv')
-if not os.path.isdir(OSV_ROOT):
+if not os.path.isdir(OSV_ROOT) and '--osv' in sys.argv:
 	subprocess.check_call(['git', 'clone', 'https://github.com/secureosv/osv.git'], cwd=os.path.expanduser('~/'))
 	subprocess.check_call(['scripts/setup.py'], cwd=os.path.expanduser('~/osv'))
 	subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=os.path.expanduser('~/osv'))
@@ -1459,12 +1459,36 @@ def build( modules, module_path, datadirs=None ):
 				'.PHONY: module',
 				'module: myapp.so',
 				'myapp.so:',
-				'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs),
-				'	pythia --usr-manifest myapp.so >> usr.manifest',
-				'.PHONY: clean',
-				'clean:',
-				'	rm -f myapp.so',
 			]
+			if has_seastar:
+				assert HAS_CPP14
+				cmd = []
+				cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
+				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
+				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
+				## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
+				cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
+				cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
+
+				makefile.append(
+					'	g++-4.9 -std=c++1y -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s %s' %(' '.join(cmd),linkdirs, linklibs)
+				)
+			else:
+				makefile.append(
+					'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs)
+				)
+
+
+			makefile.append(
+				'	pythia --usr-manifest myapp.so >> usr.manifest'
+			)
+			makefile.extend(
+				[
+					'.PHONY: clean',
+					'clean:',
+					'	rm -f myapp.so',
+				]
+			)
 			open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
 			## how come myapp.so is not copied to osv/build/last ?
 			usrmanifest = [

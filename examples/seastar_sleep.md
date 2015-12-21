@@ -16,8 +16,10 @@ sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 sudo apt-get install g++-4.9 gcc-4.9-multilib g++-4.9-multilib libgnutls28-dev
 ./configure.py --compiler=g++-4.9
-ninja -j 1 build/release/libseastar
+ninja -j 1 build/release/libseastar.a
 sudo cp -v ./build/release/libseastar.a /usr/local/lib/.
+ninja -t clean
+./configure.py --compiler=g++-4.9 --with-osv=~/osv
 
 ```
 
