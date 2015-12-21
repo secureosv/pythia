@@ -38,7 +38,7 @@ import core/future-util.hh
 with stack:
 	def slow() -> future<>:
 		print 'sleeping...'
-		return sleep(1)
+		return sleep(std::chrono::seconds(1))
 
 	def f() -> future<>:
 		limit = semaphore(100)
@@ -46,6 +46,7 @@ with stack:
 			return repeat() and then( capture=[limit], future=[] ):
 				return limit.wait(1) and then( capture=[limit], future=[] ):
 					def on_done():
+						print 'done'
 						limit.signal(1)
 					slow().finally( on_done )
 					return next

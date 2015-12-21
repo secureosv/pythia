@@ -844,7 +844,7 @@ Also implements extra syntax like `switch` and `select`.
 			if fut.startswith('return_'):
 				fut = fut[len('return_'):]
 
-				if then_callback:
+				if then_callback or fut.startswith('repeat('):
 					r.append(
 						'return %s([&] {' %fut.split('(')[0]
 					)
@@ -855,7 +855,7 @@ Also implements extra syntax like `switch` and `select`.
 			else:
 				#raise RuntimeError('TODO `continue foo() and then:`')
 
-				if then_callback:
+				if then_callback or fut.startswith('repeat('):
 					r.append(
 						'%s([&] {' %fut.split('(')[0]
 					)
