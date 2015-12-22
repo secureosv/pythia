@@ -1444,7 +1444,7 @@ def build( modules, module_path, datadirs=None ):
 			if os.path.isfile(os.path.join(OSV_ROOT,'build/last/usr.img')):
 				os.unlink(os.path.join(OSV_ROOT,'build/last/usr.img'))
 
-			linkdirs = ''
+			linkdirs = '-I'+OSV_ROOT+'/include'
 			if idirs:
 				for idir in idirs:
 					linkdirs += ' -I'+idir

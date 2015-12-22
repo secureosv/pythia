@@ -17,14 +17,20 @@ pythia ./examples/hello_osv.md --osv
 #backend:c++
 from runtime import *
 from time import sleep
+import osv/power.hh
+
 class A:
 	def __init__(self, txt:string ):
 		self.txt = txt
 	def foo(self):
 		print self.txt
+
 def main():
 	a = A('hello world xxx')
 	a.foo()
 	sleep(1)
+	#osv::halt()  ## hang and lock up vm
+	print 'rebooting..'
+	osv::reboot()
 
 ```
