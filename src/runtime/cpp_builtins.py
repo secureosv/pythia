@@ -14,7 +14,6 @@ def IOError( msg:string ) -> std::runtime_error*:
 	prefix = "IOError|"
 	return inline('new std::runtime_error(prefix+msg)')
 
-
 #def __split_string_py__(s:string, m:string) ->[]string:
 #	vec = []string("")
 #	for c in s:

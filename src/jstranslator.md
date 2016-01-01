@@ -571,16 +571,9 @@ TODO `finnally` for the javascript backend
 		return '\n'.join( out )
 
 	def visit_Raise(self, node):
-		if self._rust:
-			return 'panic!("%s");'  % self.visit(node.type)
-		elif self._cpp:
-			T = self.visit(node.type)
-			#if T == 'RuntimeError()': T = 'std::exception'
-			return 'throw %s;' % T
-		else:
-			## TODO - when re-raising an error, it fails because it is an Error object
-			## TODO - inject some code here to check the type at runtime.
-			return 'throw new %s;' % self.visit(node.type)
+		## TODO - when re-raising an error, it fails because it is an Error object
+		## TODO - inject some code here to check the type at runtime.
+		return 'throw new %s;' % self.visit(node.type)
 
 	def visit_ExceptHandler(self, node):
 		out = ''

@@ -1359,8 +1359,14 @@ class PythonToPythonJS(NodeVisitorBase):
 		elif isinstance(node.type, ast.Call):
 			if len(node.type.args) > 1:
 				raise SyntaxError( self.format_error('raise Error(x) can only have a single argument') )
+
 			if node.type.args:
 				writer.write( 'raise %s(%s)' %(self.visit(node.type.func), self.visit(node.type.args[0])) )
+			elif node.type.keywords:
+				kw = []
+				for k in node.type.keywords:
+					kw.append('%s=%s' %(k.arg, self.visit(k.value)))
+				writer.write( 'raise %s(%s)' %(self.visit(node.type.func), ','.join(kw)) )
 			else:
 				writer.write( 'raise %s()' %self.visit(node.type.func) )
 

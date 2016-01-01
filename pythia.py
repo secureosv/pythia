@@ -625,10 +625,16 @@ def build( modules, module_path, datadirs=None ):
 					rebuild = True
 					if gitname not in os.listdir(GITCACHE):
 						cmd = ['git', 'clone', tag]
-						subprocess.check_call(cmd, cwd=GITCACHE)
+						try:
+							subprocess.check_call(cmd, cwd=GITCACHE)
+						except:
+							rebuild = False
 					elif '--git-sync' in sys.argv:
 						cmd = ['git', 'pull']
-						subprocess.check_call(cmd, cwd=projectdir)
+						try:
+							subprocess.check_call(cmd, cwd=projectdir)
+						except:
+							rebuild = False
 					else:
 						rebuild = False
 
@@ -1460,20 +1466,22 @@ def build( modules, module_path, datadirs=None ):
 				'module: myapp.so',
 				'myapp.so:',
 			]
-			if has_seastar:
-				assert HAS_CPP14
+			if HAS_CPP14:
 				cmd = []
-				cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
-				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
-				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
-				## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
-				cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
-				cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
+				if has_seastar:
+					cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
+					cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
+					cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
+					## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
+					cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
+					cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
 
 				makefile.append(
 					'	g++-4.9 -std=c++1y -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s %s' %(' '.join(cmd),linkdirs, linklibs)
 				)
 			else:
+				if has_seastar:
+					raise RuntimeError('seastar requires g++4.9 or newer')
 				makefile.append(
 					'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs)
 				)

@@ -1729,6 +1729,27 @@ TODO remove GenerateTypeAssert, go leftover.
 TODO tuple return for c++
 
 ```python
+
+	#def visit_Num(self, node):
+	#	return node.n
+
+	def visit_Raise(self, node):
+		if self._rust:
+			return 'panic!("%s");'  % self.visit(node.type)
+		elif self._cpp:
+			if isinstance(node.type, ast.Call) and node.type.keywords:
+				self._has_rebuild = True
+				args = []
+				for k in node.type.keywords:
+					args.append( self.visit(k.value) + ' /*%s*/'%k.arg )
+				return '__request_rebuild( %s );' %','.join(args)
+			else:
+				T = self.visit(node.type)
+				return 'throw %s;' % T
+		else:
+			raise RuntimeError('unknown backend')
+
+
 	def visit_Return(self, node):
 		if isinstance(node.value, ast.Tuple):
 			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
@@ -2325,126 +2346,16 @@ TODO clean up go stuff.
 		if starargs:
 			out.append(self.indent() + 'let %s = &__vargs__;' %starargs)
 
-		## Go needs "class embedding hack" to switch on the name for generics ##
-		if generics and self._go:
-			gname = args_names[ args_names.index(args_generics.keys()[0]) ]
+		if self._cpp:
+			for b in node.body:
+				out.append(self.indent()+self.visit(b))
 
-			#panic: runtime error: invalid memory address or nil pointer dereference
-			#[signal 0xb code=0x1 addr=0x0 pc=0x402440]
-			##out.append(self.indent() + '__type__ := __gen__.(object).getclassname()')
-
-
-			out.append(self.indent() + '__type__ := "INVALID"')
-			out.append(self.indent() + '__super__, __ok__ := __gen__.(object)')
-
-			#out.append(self.indent() + '__type__ = __super__.getclassname();')        ## TODO FIX ME
-			#out.append(self.indent() + 'fmt.Println(__type__); ')
-			#out.append(self.indent() + 'if __type__=="" { fmt.Println(__gen__.(object).__class__); }')
-
-			out.append(self.indent() + 'if __ok__ { __type__ = __super__.getclassname();')
-			out.append(self.indent() + '} else { fmt.Println("Gython RuntimeError - struct must implement the `object` interface"); }')
-
-			out.append(self.indent() + 'switch __type__ {')
-			#out.append(self.indent() + 'switch __gen__.(type) {')  ## this is not always correct
-			#out.append('fmt.Println("class name: ", __type__)')
-
-			self.push()
-			gsorted = list(generics)
-			gsorted.sort()
-			gsorted.reverse()
-			#for gt in generics:
-			## this fails with a struct returned from a super method that returns self,
-			## the generic function will fail with a nil struct, while it still works when passed the instance directly.
-			for gt in gsorted:
-				assert gt in self._classes
-				#if node.name in self._classes[gt]._subclasses:
-				#if len(self._classes[gt]._parents) == 0:
-
-				## if in super class ##
-				if self._class_stack and len(self._classes[self._class_stack[-1].name]._parents) == 0:
-					if return_type=='*'+gt or not is_method: pass
-					else: continue
-				elif len(self._classes[gt]._parents) == 0: ## or if the generic is the super class skip it.
-					if return_type=='*'+gt or not is_method: pass
-					else: continue
-
-				######out.append(self.indent() + 'case *%s:' %gt)
-				out.append(self.indent() + 'case "%s":' %gt)
-				self.push()
-
-				#out.append(self.indent() + '%s,_ := __gen__.(*%s)' %(gname,gt) )  ## can not depend on the struct type, because subclasses are unions.
-				out.append(self.indent() + '%s,__ok__ := __gen__.(*%s)' %(gname,gt) )  ## can not depend on the struct type, because subclasses are unions.
-
-				out.append(self.indent() + 'if __ok__ {')
-
-				for b in node.body:
-					v = self.visit(b)
-					if v:
-						if returns_self:
-							v = self._hack_return(v, return_type, gname, gt, node)
-						out.append( self.indent() + v )
-
-				out.append(self.indent() + '} else {' )
-				if generic_base_class == gt or returns_self:
-					out.append(' fmt.Println("Generics RuntimeError - generic argument is not a pointer to a struct", %s);' %gname)
-					out.append(' fmt.Println("struct: ",__gen__);' )
-				else:
-					# __gen__.(C).foo();
-					# this fails because the go compiler thinks that __gen__ is *B, when infact its *C
-					# panic: interface conversion: interface is *main.B, not *main.C,
-					# workaround: switch on type go thinks it is, and then recast to the real type.
-					# s := C( *__gen__.(*B) )
-					self.push()
-					out.append( self.indent() + 'switch __gen__.(type) {' )
-					self.push()
-					for gt2 in gsorted:
-						if gt2 != gt:
-							out.append(self.indent() + 'case *%s:' %gt2)
-							self.push()
-							if gt2 == generic_base_class:
-								## TODO panic here
-								out.append(' fmt.Println("Generics RuntimeError - can not cast base class to a subclass type", %s);' %gname)
-							else:
-								out.append(self.indent() + '%s := %s( *__gen__.(*%s) )' %(gname, gt, gt2) )
-								for b2 in node.body:
-									v = self.visit(b2)
-									if v:
-										#if returns_self:
-										#	v = self._hack_return(v, return_type, gname, gt, node)
-										out.append( self.indent() + v )
-
-							self.pull()
-
-					self.pull()
-					out.append(self.indent() + '}')
-					self.pull()
-				out.append(self.indent() + '}')
-				self.pull()
-			self.pull()
-			out.append(self.indent() + '}')
-
-			## this only helps with debugging when the generic function is expected to return something
-			if return_type:
-				out.append(self.indent() + 'fmt.Println("Generics RuntimeError - failed to convert type to:", __type__, __gen__)')
-
-			if return_type == 'int':
-				out.append(self.indent() + 'return 0')
-			elif return_type == 'float':
-				out.append(self.indent() + 'return 0.0')
-			elif return_type == 'string':
-				out.append(self.indent() + 'return ""')
-			elif return_type == 'bool':
-				out.append(self.indent() + 'return false')
-			elif return_type:
-				#raise NotImplementedError('TODO other generic function return types', return_type)
-				out.append(self.indent() + 'return %s' %(return_type.replace('*','&')+'{}'))
-
-		else:
+		else:  ## the rust backend requires this?
 			body = node.body[:]
 			body.reverse()
-			#self._scope_stack.append( (self._vars, self._known_vars))
 			self.generate_generic_branches( body, out, self._vars, self._known_vars )
-			#for b in node.body:
+
+
 		self._scope_stack = []
 
 		if self._threads:
@@ -2790,10 +2701,12 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 					return '%s->%s' % (name, attr)
 				elif fname in self._global_functions and fname not in self._known_vars:
 					return '%s.%s' % (name, attr)
-				elif self._shared_pointers:
-					return '__shared__(%s)->%s' % (name, attr)
+				#elif self._shared_pointers:
+				#	return '__shared__(%s)->%s' % (name, attr)
+				#else:
+				#	return '__pointer__(%s)->%s' % (name, attr)
 				else:
-					return '__pointer__(%s)->%s' % (name, attr)
+					return '%s->%s' % (name, attr)
 
 		else:
 			return '%s.%s' % (name, attr)
