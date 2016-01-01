@@ -11,6 +11,11 @@ The script below is marked with `@embed` which turns it into a static string in 
 and is run after `cpython.initalize()` is called.
 
 
+@/myfolder/somefile.json
+```
+my-data
+```
+
 @embed
 ```python
 
@@ -27,6 +32,7 @@ class A():
 
 def foo():
 	print 'foo'
+	print open('myfolder/somefile.json', 'r').read()
 	return A()
 
 ```

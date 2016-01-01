@@ -1502,8 +1502,21 @@ def build( modules, module_path, datadirs=None ):
 			usrmanifest = [
 				'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
 			]
-			if 'usr.manifest' in output['datafiles']:
-				usrmanifest.append( output['datafiles']['usr.manifest'] )
+			## copy all datafiles into osv image
+			for n in output['datafiles'].keys():
+				if n=='usr.manifest':
+					usrmanifest.append( output['datafiles']['usr.manifest'] )
+				else:
+					if '/' in n:
+						p,f = os.path.split(n)
+						if not os.path.isdir('/tmp/'+p):
+							os.makedirs('/tmp/'+p)
+
+					d = output['datafiles'][n]
+					open('/tmp/%s' %n, 'wb').write(d)
+					usrmanifest.append('/%s: /tmp/%s' %(n,n))
+
+			print '\n'.join(usrmanifest)
 
 			open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
 
@@ -1521,6 +1534,15 @@ def build( modules, module_path, datadirs=None ):
 			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
 
 		else:
+
+			for n in output['datafiles'].keys():
+				if '/' in n:
+					p,f = os.path.split(n)
+					if not os.path.isdir('/tmp/'+p):
+						os.makedirs('/tmp/'+p)
+				d = output['datafiles'][n]
+				open('/tmp/%s' %n, 'wb').write(d)
+
 			cmd = []
 			if HAS_CPP14:
 				cmd.extend(['g++-4.9', '-std=c++1y'])
