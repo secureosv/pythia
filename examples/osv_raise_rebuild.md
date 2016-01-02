@@ -8,6 +8,11 @@ What is OSv? http://osv.io/
 pythia ./examples/osv_raise_rebuild.md --osv
 ```
 
+@reboot.log
+```
+0 myreboot log file
+```
+
 
 ```pythia
 #backend:c++

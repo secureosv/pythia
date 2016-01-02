@@ -9,7 +9,7 @@ def __request_rebuild( reboots, sleep_seconds ):
 
 	try:
 		print 'trying to readfile...'
-		d = readfile( open('/log.reboot.counter', 'r' ) )
+		d = readfile( open('/reboot.log', 'r' ) )
 		print d
 		#counter = int( d )
 		counter = inline('(int)(d[0])')
@@ -20,7 +20,7 @@ def __request_rebuild( reboots, sleep_seconds ):
 
 	counter += 1
 	print counter
-	f = open('/log.reboot.counter', 'w')
+	f = open('/reboot.log', 'w')
 	f.write( cstr(str(counter)), 2)
 	f.close()
 

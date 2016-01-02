@@ -90,6 +90,11 @@ PyObject_Call(
 );
 ```
 
+@reboot.log
+```
+0 myreboot log file
+```
+
 
 Build Options
 -------------
@@ -100,6 +105,8 @@ Build Options
 import cpython
 
 def main():
+	print readfile( open('myfolder/somefile.json','r'))
+	print 'init cpython...'
 	state = cpython.initalize()
 	with gil:
 		a = cpython.foo()
