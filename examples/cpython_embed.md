@@ -90,10 +90,7 @@ PyObject_Call(
 );
 ```
 
-@reboot.log
-```
-0 myreboot log file
-```
+
 
 
 Build Options
@@ -111,40 +108,40 @@ def main():
 	with gil:
 		a = cpython.foo()
 		print 'addr of a:', a
-		print a->value as int
-		a->pymethod()
+		print a..value as int
+		a..pymethod()
 
 		b = a
-		b->pymethod()
-		print b->value as int
-		v = b->value as int
+		b..pymethod()
+		print b..value as int
+		v = b..value as int
 		print v + 400
-		c = b->pymethod()
+		c = b..pymethod()
 
-		r = b->add(1, 2) as int
+		r = b..add(1, 2) as int
 		print r
-		u = b->add(
-			b->value, 
-			b->value 
+		u = b..add(
+			b..value, 
+			b..value 
 		) as int
 		print u
 
 		if hasattr(b, "value"):
 			print('builtin `hasattr` works on b')
 			print str(b)
-			b->value = 'set from c++' as pystring
-			b->pymethod()
-			b->my_dynamic_var = 'hello dynamic var' as pystring
-			a->pymethod()
+			b..value = 'set from c++' as pystring
+			b..pymethod()
+			b..my_dynamic_var = 'hello dynamic var' as pystring
+			a..pymethod()
 			setattr(a, 'my_dynamic_var', 'setattr OK' as pystring)
-			a->pymethod()
+			a..pymethod()
 
-			s = b->my_dynamic_var as string
+			s = b..my_dynamic_var as string
 			print s
 
 		pyob = cpython.foo()
-		b->my_dynamic_var = pyob
-		b->pymethod()
+		b..my_dynamic_var = pyob
+		b..pymethod()
 
 	cpython.finalize(state)
 

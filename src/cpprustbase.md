@@ -1551,7 +1551,7 @@ regular Python has no support for.
 		elif op == '<<':
 			go_hacks = ('__go__array__', '__go__arrayfixed__', '__go__map__', '__go__func__')
 
-			if isinstance(node.left, ast.Attribute) and node.left.attr=='__right_arrow__':  ## this style is deprecated
+			if isinstance(node.left, ast.Attribute) and node.left.attr=='__doubledot__':  ## this style is deprecated
 				if isinstance(node.right, ast.Call):
 					return self.gen_cpy_call(self.visit(node.left.value), node.right)
 					r = [
@@ -1565,7 +1565,7 @@ regular Python has no support for.
 
 				elif isinstance(node.right, ast.Name):
 					return 'PyObject_GetAttrString(%s,"%s")' %(self.visit(node.left.value), node.right.id)
-				elif isinstance(node.right, ast.Attribute) and node.right.attr=='__right_arrow__':
+				elif isinstance(node.right, ast.Attribute) and node.right.attr=='__doubledot__':
 					return 'PyObject_GetAttrString(%s,"%s")' %(self.visit(node.left.value), self.visit(node.right.value))
 				else:
 					raise SyntaxError(self.format_error('bad use of ->'))
@@ -2615,7 +2615,7 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 		#############################
 		if attr == '__doublecolon__':
 			return '%s::' %name
-		elif attr == '__right_arrow__':
+		elif attr == '__doubledot__':
 			return 'PyObject_GetAttrString(%s,' %name
 		elif name.endswith('->') or name.endswith('::'):
 			return '%s%s' %(name,attr)
@@ -3381,7 +3381,7 @@ because they need some special handling in other places.
 					else:
 						return 'auto %s = %s;' %(target, self.visit(node.value))
 
-				elif isinstance(node.value.left, ast.Attribute) and node.value.left.attr=='__right_arrow__':
+				elif isinstance(node.value.left, ast.Attribute) and node.value.left.attr=='__doubledot__':
 					pyob = self.visit(node.value.left.value)
 					if isinstance(node.value.right, ast.Name):
 						attr = node.value.right.id

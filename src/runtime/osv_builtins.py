@@ -12,7 +12,7 @@ def __request_rebuild( reboots, sleep_seconds ):
 		d = readfile( open('/reboot.log', 'r' ) )
 		print d
 		#counter = int( d )
-		counter = inline('(int)(d[0])')
+		counter = inline('(int)(d[0])') - 48
 		print counter
 		print '--------'
 	except:
@@ -20,9 +20,9 @@ def __request_rebuild( reboots, sleep_seconds ):
 
 	counter += 1
 	print counter
-	f = open('/reboot.log', 'w')
-	f.write( cstr(str(counter)), 2)
-	f.close()
+	#f = open('/reboot.log', 'w')
+	#s=cstr(str(counter))
+	#f.close()
 
 	if counter < reboots:
 		print 'sleeping...'
