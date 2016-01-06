@@ -2686,7 +2686,8 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 		elif (name in self._known_strings) and not isinstance(parent_node, ast.Attribute):
 			## allows direct use of c++ std::string properties and methods like: at, erase, replace, swap, pop_back, etc..
 			return '%s.%s' %(name,attr)
-
+		elif isinstance(node.value, ast.Str):
+			return '%s.%s' %(name,attr)
 		elif self._cpp:
 			if name in self._classes and not isinstance(parent_node, ast.Attribute):
 				return '%s::%s' % (name, attr)
