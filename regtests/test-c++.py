@@ -21,8 +21,7 @@ for md in files:
 	if md.startswith( ignore ):
 		continue
 	subprocess.check_call([
-		'python',
-		'../rusthon.py',
+		'pythia',
 		'--c++',
 		os.path.join('./c++', md)
 	])

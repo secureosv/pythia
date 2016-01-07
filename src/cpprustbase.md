@@ -1506,12 +1506,11 @@ handles all special calls
 			elif self._unique_ptr:
 				prefix = 'std::unique_ptr<%s>' %fname
 
-
+			#########################################
+			if self._classes[fname]._requires_init:
+				return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
 			else:
-				if self._classes[fname]._requires_init:
-					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
-				else:
-					return '%s(new %s())' %(prefix,fname)
+				return '%s(new %s())' %(prefix,fname)
 		else:
 			return '%s(%s)' % (fname, args)
 ```
@@ -3465,6 +3464,10 @@ because they need some special handling in other places.
 					self._known_instances[ target ] = classname
 
 					if self._cpp:
+						value = self.visit(node.value)
+						if value is None:
+							raise RuntimeError(node.value.func.id)
+
 						if self._unique_ptr:
 							## TODO fix everywhere, check visit_binop
 							## raise RuntimeError(self.visit(node.value))
@@ -3472,6 +3475,7 @@ because they need some special handling in other places.
 								value = value.replace('shared_ptr', 'make_unique')  ## c++14
 								vh,vt = value.split('->__init__')
 								value = vh.split('((')[0] + '()->__init__' + vt[:-1]
+
 						return 'auto %s = %s; // new object' %(target, value)
 
 					else:  ## rust
