@@ -23,9 +23,19 @@ import core/app-template.hh
 import core/reactor.hh
 import core/future.hh
 
-def fast() -> future<int>:
-	print 'fast...'
-	return future(420)  ## gets translated to make_ready_future<T>(420)
+class Foo:
+	def __init__(self, x:int ):
+		self.x = x
+	def add(self, y) ->int:
+		return self.x + y
+
+with stack:
+	def fast() -> future<int>:
+		print 'fast...'
+		f = Foo(400)
+		r = f.add(20)
+		print f.x
+		return future(r)  ## gets translated to make_ready_future<T>(r)
 
 def main(argc:int, argv:char**):
 	app = new app_template()

@@ -1489,15 +1489,24 @@ handles all special calls
 			prefix = ''
 			if self.usertypes and 'shared' in self.usertypes:
 				prefix = self.usertypes['shared']['template'] % fname
+
+			elif self._memory[-1]=='STACK':
+				if self._classes[fname]._requires_init:
+					return '%s().__init__(%s)' %(fname,args)
+				else:
+					return '%s()' %fname
+
 			elif self._shared_pointers:
 				prefix = 'std::shared_ptr<%s>' %fname
 			elif self._unique_ptr:
 				prefix = 'std::unique_ptr<%s>' %fname
 
-			if self._classes[fname]._requires_init:
-				return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+
 			else:
-				return '%s(new %s())' %(prefix,fname)
+				if self._classes[fname]._requires_init:
+					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+				else:
+					return '%s(new %s())' %(prefix,fname)
 		else:
 			return '%s(%s)' % (fname, args)
 ```
