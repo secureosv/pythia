@@ -1,7 +1,7 @@
 import os, sys, subprocess
 
 passed = []
-ignore = ('fails_', 'giws_', 'unreal_', 'verilog', 'nuitka_', 'nim_', 'java_', 'custom_', 'cpython_', 'nodejs_')
+ignore = ('fails_', 'giws_', 'unreal_', 'verilog', 'nuitka_', 'nim_', 'java_', 'custom_', 'cpython_', 'nodejs_', 'osv_')
 ignoreosx = ['hello_cpython.md']
 
 ## rust is broken on fedora? Travis uses Debian.
@@ -23,6 +23,7 @@ TODO_FIX = (
 	'hello_sdl.md',
 	'hello_civetweb.md',
 	'hello_nw_gyp.md',
+	'hello_osv.md',
 )
 
 files = os.listdir('../examples')
@@ -40,8 +41,7 @@ for md in files:
 	if md.startswith( ignore ):
 		continue
 	subprocess.check_call([
-		'python',
-		'../rusthon.py',
+		'pythia',
 		os.path.join('../examples', md)
 	])
 	passed.append( md )

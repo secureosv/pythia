@@ -37,15 +37,18 @@ output:
 
 std::vector<std::vector<int>*>* make_array() {
 
+	
 	auto arr = (new std::vector<std::vector<int>*> {new std::vector<int> {1,2,3},new std::vector<int> {4,5,6,7,8}});			/* new variable */
 	return arr;
 }
 void test_array(std::vector<std::vector<int>*>* arr) {
 
+	
 	std::cout << (*(*arr)[0])[0] << std::endl;
 }
 int main() {
 
+	
 	auto a = make_array();			/* new variable */
 	std::cout << a->size() << std::endl;
 	std::cout << (*a)[0]->size() << std::endl;
@@ -85,11 +88,13 @@ output:
 
 std::vector<int>* make_array() {
 
+	
 	auto arr = (new std::vector<int> {1,2,3,4});			/* new variable */
 	return arr;
 }
 void test_array(std::vector<int>* arr) {
 
+	
 	std::cout << (*arr)[0] << std::endl;
 	std::cout << (*arr)[1] << std::endl;
 	std::cout << (*arr)[2] << std::endl;
@@ -97,6 +102,7 @@ void test_array(std::vector<int>* arr) {
 }
 int main() {
 
+	
 	auto a = make_array();			/* new variable */
 	std::cout << std::string("arr length:");
 std::cout << a->size();std::cout << std::endl;
@@ -144,18 +150,21 @@ output:
 
 void sender_wrapper(int a, cpp::channel<int>  send) {
 
+	
 	std::cout << std::string("sending") << std::endl;
-	auto result = 100;  /* fallback */
+	auto result = 100;  /* auto-fallback */
 	send.send(result);
 }
 int recv_wrapper(int a, cpp::channel<int> recver) {
 
+	
 	std::cout << std::string("receiving") << std::endl;
 	auto v = recver.recv();
 	return v;
 }
 int main() {
 
+	
 	std::cout << std::string("enter main") << std::endl;
 	auto c = cpp::channel<int>{};			/* new variable */
 	std::cout << std::string("new channel") << std::endl;
@@ -201,6 +210,7 @@ int f1(_KwArgs_*  __kwargs) {
 	if (__kwargs->__use__a == true) {
 	  a = __kwargs->_a_;
 	}
+	
 	return (a * 2);
 }
 int f2(_KwArgs_*  __kwargs) {
@@ -213,10 +223,12 @@ int f2(_KwArgs_*  __kwargs) {
 	if (__kwargs->__use__b == true) {
 	  b = __kwargs->_b_;
 	}
+	
 	return (a + b);
 }
 int main() {
 
+	
 	std::cout << f1((new _KwArgs_())->a(100)) << std::endl;
 	return 0;
 }
@@ -292,6 +304,7 @@ output:
 
 void somefunc() {
 
+	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4,5})) ); /* 1D Array */
 	std::cout << std::string("a addr:");
 std::cout << a;std::cout << std::endl;
@@ -385,6 +398,7 @@ std::cout << a->size();std::cout << std::endl;
 }
 int main() {
 
+	
 	std::cout << std::string("calling somefunc") << std::endl;
 	somefunc();
 	std::cout << std::string("OK") << std::endl;
@@ -458,36 +472,43 @@ class C:  public A {
 };
 	C* C::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	int C::bar() {
 
+		
 		return (this->x + 200);
 	}
 	B* B::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	int B::foo() {
 
+		
 		return (this->x * 2);
 	}
 	int A::method() {
 
+		
 		return this->x;
 	}
 	A* A::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 int main() {
 
-	auto a = std::shared_ptr<A>((new A())->__init__(0)); // new style
-	auto b = std::shared_ptr<B>((new B())->__init__(1)); // new style
-	auto c = std::shared_ptr<C>((new C())->__init__(2)); // new style
+	
+	auto a = std::shared_ptr<A>((new A())->__init__(0)); // new object
+	auto b = std::shared_ptr<B>((new B())->__init__(1)); // new object
+	auto c = std::shared_ptr<C>((new C())->__init__(2)); // new object
 	std::cout << a->getclassname() << std::endl;
 	std::cout << b->getclassname() << std::endl;
 	std::cout << c->getclassname() << std::endl;
@@ -546,6 +567,7 @@ class A {
 };
 void somefunc() {
 
+	
 	std::vector<int> _ref_a = {1,2,3,4,5};_ref_a.resize(5);std::shared_ptr<std::vector<int>> a = std::make_shared<std::vector<int>>(_ref_a);
 	std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
@@ -563,14 +585,15 @@ std::cout << b->size();std::cout << std::endl;
 	std::cout << (*c)[0] << std::endl;
 	std::cout << (*c)[1] << std::endl;
 	std::cout << (*c)[2] << std::endl;
-	auto x = std::shared_ptr<A>(new A()); // new style
-	auto y = std::shared_ptr<A>(new A()); // new style
+	auto x = std::shared_ptr<A>(new A()); // new object
+	auto y = std::shared_ptr<A>(new A()); // new object
 	std::vector<std::shared_ptr<A>> _ref_d = {x,y};_ref_d.resize(4);std::shared_ptr<std::vector<std::shared_ptr<A>>> d = std::make_shared<std::vector<std::shared_ptr<A>>>(_ref_d);
 	std::cout << (*d)[0] << std::endl;
 	std::cout << (*d)[1] << std::endl;
 }
 int main() {
 
+	
 	somefunc();
 	std::cout << std::string("OK") << std::endl;
 	return 0;
@@ -601,14 +624,17 @@ output:
 
 void myfunc(int x) {
 
+	
 	std::cout << (x * 100) << std::endl;
 }
 void myfunc(std::string x) {
 
+	
 	std::cout << (x + std::string("world")) << std::endl;
 }
 int main() {
 
+	
 	myfunc(10);
 	myfunc(std::string("hello"));
 	return 0;
@@ -660,21 +686,25 @@ class A {
 };
 	int A::bar(int a) {
 
+		
 		return (a + 1000);
 	}
 	void A::foo() {
 
+		
 		std::cout << std::string("my classmethod") << std::endl;
 	}
 	A* A::__init__(int x, int y) {
 
+		
 		this->x = x;
 		this->y = y;
 		return this;
 	}
 int main() {
 
-	auto x = std::shared_ptr<A>((new A())->__init__(1, 2)); // new style
+	
+	auto x = std::shared_ptr<A>((new A())->__init__(1, 2)); // new object
 	x->foo();
 	A::foo();
 	std::cout << x->bar(100) << std::endl;
@@ -714,6 +744,7 @@ output:
 
 int main() {
 
+	
 	std::vector<int> _comp_a;
 for (int x=0; x<10; x++) {
 	_comp_a.push_back((x * 2));
@@ -749,7 +780,8 @@ output:
 
 int main() {
 
-	auto i = 10;  /* fallback */
+	
+	auto i = 10;  /* auto-fallback */
 	while (( i > 0 )) {
 		i --;
 	}
@@ -798,6 +830,7 @@ std::shared_ptr<A>  a = nullptr;
 int b = 0;
 void check_globals() {
 
+	
 	std::cout << std::string("a addr:");
 std::cout << a;std::cout << std::endl;
 	std::cout << std::string("b value:");
@@ -805,6 +838,7 @@ std::cout << b;std::cout << std::endl;
 }
 int main() {
 
+	
 	check_globals();
 	a = std::shared_ptr<A>(new A());
 	std::cout << a << std::endl;
@@ -868,6 +902,7 @@ output:
 
 int main() {
 
+	
 	/* arr = vector of vectors to: int */	
 std::vector<int> _r__sub0_arr = {1,2,3};	
 std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
@@ -893,7 +928,7 @@ std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::mak
 		std::cout << i << std::endl;
 	}
 	std::cout << std::string("sub 1 items:") << std::endl;
-	auto sub = (*arr)[1];  /* fallback */
+	auto sub = (*arr)[1];  /* auto-fallback */
 	for (auto &i: *sub) {
 		std::cout << i << std::endl;
 	}
@@ -952,21 +987,24 @@ class A {
 };
 A* create_A() {
 
-	auto a = (new A)->__init__(1,2);  /* fallback */
+	
+	auto a = (new A)->__init__(1,2);  /* new object */
 	return a;
 }
 	A* A::__init__(int x, int y) {
 
+		
 		this->x = x;
 		this->y = y;
 		return this;
 	}
 int main() {
 
+	
 	auto x = create_A();			/* new variable */
 	std::cout << x << std::endl;
-	std::cout << __pointer__(x)->x << std::endl;
-	std::cout << __pointer__(x)->y << std::endl;
+	std::cout << x->x << std::endl;
+	std::cout << x->y << std::endl;
 	return 0;
 }
 ```
@@ -1000,6 +1038,7 @@ output:
 
 void somefunc() {
 
+	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4,5})) ); /* 1D Array */
 	std::shared_ptr<std::vector<int>> b( (new std::vector<int>({6,7,8,9,10})) ); /* 1D Array */
 	std::cout << std::string("len a:");
@@ -1017,6 +1056,7 @@ std::cout << a->size();std::cout << std::endl;
 }
 int main() {
 
+	
 	somefunc();
 	return 0;
 }
@@ -1121,8 +1161,10 @@ class Child {
  */
 	void Child::bar() {
 
-		__shared__(this->parent.lock())->say(std::string("hello parent"));
-		std::cout << __shared__(this->parent.lock())->y << std::endl;
+		
+		std::string("\n		below `self.parent` is directly used in expressions,\n		and not first assigned to a variable.\n		for each use of self.parent the weakref will be promoted\n		to a shared pointer, and then fall out of scope, \n		which is slower than above.\n		");
+		this->parent.lock()->say(std::string("hello parent"));
+		std::cout << this->parent.lock()->y << std::endl;
 	}
 /**
  * 
@@ -1132,39 +1174,46 @@ class Child {
  */
 	int Child::foo() {
 
+		
+		std::string("\n		It is also valid to use `par=self.parent`,\n		but it is more clear to use `weakref.unwrap(self.parent)`\n		");
 		auto par = this->parent.lock();			/* weak   */
 		if (( par != nullptr )) {
-			return (this->x * __shared__(par)->y);
+			return (this->x * par->y);
 		} else {
 			std::cout << std::string("parent is gone..") << std::endl;
 		}
 	}
 	Child* Child::__init__(int x, std::shared_ptr<Parent> parent) {
 
+		
 		this->x = x;
 		this->parent = parent;
 		return this;
 	}
 	void Parent::say(std::string msg) {
 
+		
 		std::cout << msg << std::endl;
 	}
 	std::shared_ptr<Child> Parent::create_child(int x, std::shared_ptr<Parent> parent) {
 
-		auto child = std::shared_ptr<Child>((new Child())->__init__(x, parent)); // new style
-		__shared__(this->children)->push_back(child);
+		
+		auto child = std::shared_ptr<Child>((new Child())->__init__(x, parent)); // new object
+		this->children->push_back(child);
 		return child;
 	}
 	Parent* Parent::__init__(int y, std::shared_ptr<std::vector<std::shared_ptr<Child>>> children) {
 
+		
 		this->children = children;
 		this->y = y;
 		return this;
 	}
 int main() {
 
+	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())->__init__(1000, children)); // new style
+	auto p = std::shared_ptr<Parent>((new Parent())->__init__(1000, children)); // new object
 	std::cout << std::string("parent:");
 std::cout << p;std::cout << std::endl;
 	auto c1 = p->create_child(1, p);			/* p   */
@@ -1208,6 +1257,7 @@ output:
 
 void somefunc() {
 
+	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4,5})) ); /* 1D Array */
 	std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
@@ -1224,6 +1274,7 @@ std::cout << a->size();std::cout << std::endl;
 }
 int main() {
 
+	
 	somefunc();
 	std::cout << std::string("OK") << std::endl;
 	return 0;
@@ -1331,74 +1382,85 @@ class C:  public A {
 };
 int my_generic(std::shared_ptr<A> g) {
 
-	return __shared__(g)->method1();
+	
+	return g->method1();
 }
 	C* C::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	void C::say_hi() {
 
+		
 		std::cout << std::string("hi from C") << std::endl;
 	}
 	int C::method1() {
 
+		
 		return (this->x + 200);
 	}
 	B* B::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	void B::method2(int y) {
 
+		
 		std::cout << (this->x + y) << std::endl;
 	}
 	int B::method1() {
 
+		
 		return (this->x * 2);
 	}
 	std::string A::getname() {
 
+		
 		return this->__class__;
 	}
 	int A::method1() {
 
+		
 		return this->x;
 	}
 	A* A::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 int main() {
 
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new style
-	auto b = std::shared_ptr<B>((new B())->__init__(200)); // new style
-	auto c = std::shared_ptr<C>((new C())->__init__(3000)); // new style
+	
+	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
+	auto b = std::shared_ptr<B>((new B())->__init__(200)); // new object
+	auto c = std::shared_ptr<C>((new C())->__init__(3000)); // new object
 	std::cout << a->__class__ << std::endl;
 	std::cout << b->__class__ << std::endl;
 	std::cout << c->__class__ << std::endl;
 	std::cout << std::string("- - - - - - -") << std::endl;
 	std::shared_ptr<std::vector<std::shared_ptr<A>>> arr( ( new std::vector<std::shared_ptr<A>>({a,b,c}) ) ); /* 1D Array */
 	for (auto &item: (*arr)) {
-		std::cout << __shared__(item)->__class__ << std::endl;
+		std::cout << item->__class__ << std::endl;
 		std::cout << my_generic(item) << std::endl;
 	}
 	std::cout << std::string("- - - - - - -") << std::endl;
 	for (auto &item: (*arr)) {
-		std::cout << __shared__(item)->getname() << std::endl;
-		std::cout << __shared__(item)->x << std::endl;
+		std::cout << item->getname() << std::endl;
+		std::cout << item->x << std::endl;
 		if ((item->__class__==std::string("B"))) {
 			auto _cast_item = std::static_pointer_cast<B>(item);
 			std::cout << std::string("item is B") << std::endl;
-			__shared__(_cast_item)->method2(20);
+			_cast_item->method2(20);
 		}
 		if ((item->__class__==std::string("C"))) {
 			auto _cast_item = std::static_pointer_cast<C>(item);
 			std::cout << std::string("item is C") << std::endl;
-			__shared__(_cast_item)->say_hi();
+			_cast_item->say_hi();
 		}
 	}
 	return 0;
@@ -1437,11 +1499,12 @@ output:
 
 int main() {
 
+	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3})) ); /* 1D Array */
-	auto index = 0;  /* fallback */
+	auto index = 0;  /* auto-fallback */
 	(*a)[index] = 100;
 	std::cout << (*a)[index] << std::endl;
-	auto s = std::string("hello world");  /* fallback */
+	auto s = std::string("hello world");  /* auto-fallback */
 	std::cout << s << std::endl;
 	std::cout << s.substr(0,1) << std::endl;
 	std::cout << s.substr(1,1) << std::endl;
@@ -1590,114 +1653,124 @@ class D:  public C {
 };
 std::shared_ptr<A> some_subclass(int x) {
 
+	
 		switch (x) {
 		case 0: {
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new style
+	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
 	return a;
 	} break;
 		case 1: {
-	auto b = std::shared_ptr<B>((new B())->__init__(2)); // new style
+	auto b = std::shared_ptr<B>((new B())->__init__(2)); // new object
 	return b;
 	} break;
 		case 2: {
-	auto c = std::shared_ptr<C>((new C())->__init__(3)); // new style
+	auto c = std::shared_ptr<C>((new C())->__init__(3)); // new object
 	return c;
 	} break;
 		case 3: {
-	auto d = std::shared_ptr<D>((new D())->__init__(4)); // new style
+	auto d = std::shared_ptr<D>((new D())->__init__(4)); // new object
 	return d;
 	} break;
 	}
 }
 	D* D::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	int D::hey() {
 
+		
 		return (this->x + 1);
 	}
 	C* C::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	int C::bar() {
 
+		
 		return (this->x + 200);
 	}
 	B* B::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 	int B::foo() {
 
+		
 		return (this->x * 2);
 	}
 	int A::method() {
 
+		
 		return this->x;
 	}
 	A* A::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 int main() {
 
+	
 	auto a = some_subclass(0);			/* new variable */
 	auto b = some_subclass(1);			/* new variable */
 	auto c = some_subclass(2);			/* new variable */
 	auto d = some_subclass(3);			/* new variable */
-	std::cout << __shared__(a)->getclassname() << std::endl;
-	std::cout << __shared__(b)->getclassname() << std::endl;
-	std::cout << __shared__(c)->getclassname() << std::endl;
-	std::cout << __shared__(d)->getclassname() << std::endl;
-	std::cout << __shared__(a)->method() << std::endl;
-	std::cout << __shared__(a)->x << std::endl;
-	std::cout << __shared__(b)->method() << std::endl;
-	std::cout << __shared__(b)->x << std::endl;
-	std::cout << __shared__(c)->method() << std::endl;
-	std::cout << __shared__(c)->x << std::endl;
-	std::cout << __shared__(d)->method() << std::endl;
-	std::cout << __shared__(d)->x << std::endl;
+	std::cout << a->getclassname() << std::endl;
+	std::cout << b->getclassname() << std::endl;
+	std::cout << c->getclassname() << std::endl;
+	std::cout << d->getclassname() << std::endl;
+	std::cout << a->method() << std::endl;
+	std::cout << a->x << std::endl;
+	std::cout << b->method() << std::endl;
+	std::cout << b->x << std::endl;
+	std::cout << c->method() << std::endl;
+	std::cout << c->x << std::endl;
+	std::cout << d->method() << std::endl;
+	std::cout << d->x << std::endl;
 	std::cout << std::string("- - - - - - - ") << std::endl;
 	if ((b->__class__==std::string("B"))) {
 		auto _cast_b = std::static_pointer_cast<B>(b);
 		std::cout << std::string("b is type B") << std::endl;
-		std::cout << __shared__(_cast_b)->method() << std::endl;
-		std::cout << __shared__(_cast_b)->foo() << std::endl;
+		std::cout << _cast_b->method() << std::endl;
+		std::cout << _cast_b->foo() << std::endl;
 	} else {
 		std::cout << std::string("error: b is not type B") << std::endl;
 	}
 	if ((c->__class__==std::string("C"))) {
 		auto _cast_c = std::static_pointer_cast<C>(c);
 		std::cout << std::string("c is type C") << std::endl;
-		std::cout << __shared__(_cast_c)->method() << std::endl;
-		std::cout << __shared__(_cast_c)->bar() << std::endl;
+		std::cout << _cast_c->method() << std::endl;
+		std::cout << _cast_c->bar() << std::endl;
 	} else {
 		std::cout << std::string("error: c is not type C") << std::endl;
 	}
 	if ((d->__class__==std::string("D"))) {
 		auto _cast_d = std::static_pointer_cast<D>(d);
 		std::cout << std::string("d is type D") << std::endl;
-		std::cout << __shared__(_cast_d)->hey() << std::endl;
+		std::cout << _cast_d->hey() << std::endl;
 	} else {
 		std::cout << std::string("error: d is not type D") << std::endl;
 	}
 	std::cout << std::string("------------------") << std::endl;
 	for (int i=0; i<3; i++) {
 		auto o = some_subclass(i);			/* new variable */
-		std::cout << __shared__(o)->method() << std::endl;
+		std::cout << o->method() << std::endl;
 		if ((o->__class__==std::string("B"))) {
 			auto _cast_o = std::static_pointer_cast<B>(o);
-			std::cout << __shared__(_cast_o)->foo() << std::endl;
+			std::cout << _cast_o->foo() << std::endl;
 		}
 		if ((o->__class__==std::string("C"))) {
 			auto _cast_o = std::static_pointer_cast<C>(o);
-			std::cout << __shared__(_cast_o)->bar() << std::endl;
+			std::cout << _cast_o->bar() << std::endl;
 		}
 	}
 	std::cout << std::string("end of test") << std::endl;
@@ -1739,16 +1812,19 @@ class A {
 };
 	A::~A() {
 
+		
 		std::cout << std::string("goodbye") << std::endl;
 	}
 	A* A::__init__(int x) {
 
+		
 		this->x = x;
 		return this;
 	}
 int main() {
 
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new style
+	
+	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
 	std::cout << a << std::endl;
 	a.reset();
 	std::cout << std::string("done") << std::endl;
@@ -1804,18 +1880,21 @@ class A {
 };
 	void A::method() {
 
+		
 		std::cout << this->id << std::endl;
 	}
 	A* A::__init__(int id) {
 
+		
 		this->id = id;
 		return this;
 	}
 int main() {
 
-	auto a1 = std::shared_ptr<A>((new A())->__init__(1)); // new style
-	auto a2 = std::shared_ptr<A>((new A())->__init__(2)); // new style
-	auto a3 = std::shared_ptr<A>((new A())->__init__(3)); // new style
+	
+	auto a1 = std::shared_ptr<A>((new A())->__init__(1)); // new object
+	auto a2 = std::shared_ptr<A>((new A())->__init__(2)); // new object
+	auto a3 = std::shared_ptr<A>((new A())->__init__(3)); // new object
 	/* arr = vector of vectors to: A */	
 std::vector<  std::shared_ptr<A>  > _r__sub0_arr = {a1,a2,a3,std::shared_ptr<A>((new A())->__init__(4))};	
 std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub0_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub0_arr);	
@@ -1833,7 +1912,7 @@ std::cout << (*arr)[1]->size();std::cout << std::endl;
 std::cout << (*arr)[2];std::cout << std::endl;
 	std::cout << std::string("subarray 0 ptr addr: ");
 std::cout << (*arr)[0];std::cout << std::endl;
-	__shared__((*(*arr)[0])[2])->method();
+	(*(*arr)[0])[2]->method();
 	return 0;
 }
 ```
@@ -1904,17 +1983,20 @@ class Child {
 };
 std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 
-	auto c = std::shared_ptr<Child>((new Child())->__init__(p)); // new style
-	__shared__(__shared__(p)->children)->push_back(c);
+	
+	auto c = std::shared_ptr<Child>((new Child())->__init__(p)); // new object
+	p->children->push_back(c);
 	return c;
 }
 	void Child::bar() {
 
-		std::cout << __shared__(this->parent.lock())->children << std::endl;
+		
+		std::cout << this->parent.lock()->children << std::endl;
 	}
 	int Child::foo() {
 
-		auto par = this->parent.lock();  /* fallback */
+		
+		auto par = this->parent.lock();  /* auto-fallback */
 		if (( par != nullptr )) {
 			return 1;
 		} else {
@@ -1923,24 +2005,27 @@ std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 	}
 	Child* Child::__init__(std::shared_ptr<Parent> parent) {
 
+		
 		this->parent = parent;
 		return this;
 	}
 	Parent* Parent::__init__(std::shared_ptr<std::vector<std::shared_ptr<Child>>> children) {
 
+		
 		this->children = children;
 		return this;
 	}
 int main() {
 
+	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())->__init__(children)); // new style
+	auto p = std::shared_ptr<Parent>((new Parent())->__init__(children)); // new object
 	auto c1 = make_child(p);			/* new variable */
 	auto c2 = make_child(p);			/* new variable */
-	std::cout << __shared__(c1)->foo() << std::endl;
-	__shared__(c1)->bar();
+	std::cout << c1->foo() << std::endl;
+	c1->bar();
 	p.reset();
-	std::cout << __shared__(c1)->foo() << std::endl;
+	std::cout << c1->foo() << std::endl;
 	return 0;
 }
 ```
@@ -1976,6 +2061,7 @@ output:
 
 std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> make_array() {
 
+	
 	/* arr = vector of vectors to: int */	
 std::vector<int> _r__sub0_arr = {1,2,3};	
 std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
@@ -1987,10 +2073,12 @@ std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::mak
 }
 void test_array(std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> arr) {
 
+	
 	std::cout << (*(*arr)[0])[0] << std::endl;
 }
 int main() {
 
+	
 	auto a = make_array();			/* new variable */
 	std::cout << a->size() << std::endl;
 	std::cout << (*a)[0]->size() << std::endl;
@@ -2070,7 +2158,8 @@ output:
 
 void myfunc() {
 
-	auto a = false;  /* fallback */
+	
+	auto a = false;  /* auto-fallback */
 	try {
 		throw RuntimeError(std::string("oops"));
 	}
@@ -2082,21 +2171,21 @@ void myfunc() {
 		}
 	}
 	if (!(( a == true ))) {throw std::runtime_error("assertion failed: ( a == true )"); }
-	auto c = false;  /* fallback */
+	auto c = false;  /* auto-fallback */
 	try {
 		throw IOError(std::string("my ioerror"));
 	}
 	catch (std::runtime_error* __error__) {
 		std::string __errorname__ = __parse_error_type__(__error__);
 		if (__errorname__ == std::string("IOError")) {
-			auto err = *__error__;
+			auto err = __error__;
 			std::cout << std::string("caught my ioerr") << std::endl;
-			std::cout << __shared__(err)->what() << std::endl;
+			std::cout << err->what() << std::endl;
 			c = true;
 		}
 	}
 	if (!(( c == true ))) {throw std::runtime_error("assertion failed: ( c == true )"); }
-	auto b = false;  /* fallback */
+	auto b = false;  /* auto-fallback */
 	bool __finally_done_1 = false;
 	try {
 		std::cout << std::string("trying something that will fail...") << std::endl;
@@ -2122,15 +2211,13 @@ void myfunc() {
 			std::cout << std::string("CAUGHT IOError OK") << std::endl;
 			return;
 		}
-		if (__errorname__ == std::string("Error")) {
-			__finally_done_1 = true;
+					__finally_done_1 = true;
 				try {		// finally block
 					std::cout << std::string("FINALLY") << std::endl;
 					b = true;
 				} catch (...) {}
 			std::cout << std::string("CAUGHT UNKNOWN EXECEPTION") << std::endl;
 			throw RuntimeError(std::string("got unknown exception"));
-		}
 	}
 	if (__finally_done_1 == false) {
 		try {		// finally block
@@ -2142,6 +2229,7 @@ void myfunc() {
 }
 int main() {
 
+	
 	myfunc();
 	return 0;
 }
@@ -2167,7 +2255,8 @@ output:
 
 int main() {
 
-	auto a = std::string("x");  /* fallback */
+	
+	auto a = std::string("x");  /* auto-fallback */
 	if (( a == std::string("x") )) {
 		std::cout << std::string("ok") << std::endl;
 	}
