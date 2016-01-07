@@ -23,13 +23,14 @@ import core/app-template.hh
 import core/reactor.hh
 import core/future.hh
 
-class Foo:
-	def __init__(self, x:int ):
-		self.x = x
-	def add(self, y) ->int:
-		return self.x + y
 
 with stack:
+	class Foo:
+		def __init__(self, x:int ):
+			self.x = x
+		def add(self, y) ->int:
+			return self.x + y
+
 	def fast() -> future<int>:
 		print 'fast...'
 		f = Foo(400)

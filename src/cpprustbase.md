@@ -760,6 +760,8 @@ note: `nullptr` is c++11
 
 				if self._polymorphic:
 					out.append('	virtual std::string getclassname() {return this->__class__;}')  ## one virtual method makes class polymorphic
+				elif self._memory[-1]=='STACK':
+					out.append('	std::string getclassname() {return __class__;}')
 				else: #not base_classes:
 					out.append('	std::string getclassname() {return this->__class__;}')
 
@@ -1346,7 +1348,10 @@ handles all special calls
 		elif fname == '__let__' and isinstance(node.args[0], ast.Attribute):
 			if isinstance(node.args[0].value, ast.Name) and node.args[0].value.id=='self':
 				if self._cpp:
-					return 'this->%s = %s' %(node.args[0].attr, self.visit(node.args[-1]))
+					if self._memory[-1]=='STACK':
+						return 'this.%s = %s' %(node.args[0].attr, self.visit(node.args[-1]))
+					else:
+						return 'this->%s = %s' %(node.args[0].attr, self.visit(node.args[-1]))
 				else:
 					return 'self.%s = %s' %(node.args[0].attr, self.visit(node.args[-1]))
 
@@ -1965,7 +1970,11 @@ TODO clean up go stuff.
 		if is_main and self._cpp:  ## g++ requires main returns an integer
 			return_type = 'int'
 		elif is_init and self._cpp:
-			return_type = '%s*' %self._class_stack[-1].name
+			if self._memory[-1]=='STACK':
+				return_type = '%s' %self._class_stack[-1].name
+			else:
+				return_type = '%s*' %self._class_stack[-1].name
+
 		elif return_type and not self.is_prim_type(return_type):
 			if self._cpp:
 				if 'returns_array' in options and options['returns_array']:
@@ -2381,7 +2390,11 @@ TODO clean up go stuff.
 				#out.append('delete __javavm__;')  ## invalid pointer - segfault.
 			out.append( self.indent() + 'return 0;' )
 		if is_init and self._cpp:
-			out.append( self.indent() + 'return this;' )
+			if self._memory[-1]=='STACK':
+				out.append( self.indent() + 'return *this;' )
+			else:
+				out.append( self.indent() + 'return this;' )
+
 			#if not self._shared_pointers:
 			#	out.append( self.indent() + 'return this;' )
 			#else:
@@ -2640,6 +2653,11 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 					return 'this->%s.%s()' %(attr, self.usertypes['weakref']['lock'])
 				else:
 					return 'this->%s.lock()' %attr
+			elif self._memory[-1]=='STACK':
+				#return 'this.%s' %attr  ## will not work
+				#return '%s' %attr  ## compiles but, but has invalid addresses at runtime
+				return '(*this).%s' %attr ## deref each time
+
 			else:
 				return 'this->%s' %attr
 
@@ -2673,6 +2691,9 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 						return '%s->%s' %(name, self.usertypes['vector']['pop'])
 					else:
 						return '%s->pop_back' %name
+
+				elif self._memory[-1]=='STACK':  ## TODO self._instances_on_stack
+					return '%s.%s' % (name, attr)
 				else:
 					return '%s->%s' % (name, attr)
 					#return 'pointer(%s)->%s' % (name, attr)
