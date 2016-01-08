@@ -21,10 +21,11 @@ class Point(object):
 		self.z /= norm
 		return self
 
-	def maximize(self, other:Point ):
+	def maximize(self, other:Point ) ->self:
 		if self.x < other.x: self.x = other.x
 		if self.y < other.y: self.y = other.y
 		if self.z < other.z: self.z = other.z
+		return self
 
 
 def maximize( points:[]Point ) ->Point:

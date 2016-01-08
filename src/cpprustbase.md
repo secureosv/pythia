@@ -2856,7 +2856,7 @@ List Comp
 			else:
 				raise SyntaxError('TODO other dimensions')
 
-			out.append('%s %s;' %(vectype,compname))
+			out.append('%s %s; /*comprehension*/' %(vectype,compname))
 
 
 			if range_n:
@@ -2876,20 +2876,24 @@ List Comp
 				out.append('	%s.push_back(%s);' %(compname, a))
 			else:
 				assert type in self._classes
-				tmp = '_tmp_'
-				constructor_args = a.strip()[ len(type)+1 :-1] ## strip to just args
-				r = '%s  _ref_%s = %s{};' %(type, tmp, type)
-				if constructor_args:
-					r += '_ref_%s.__init__(%s);\n' %(tmp, constructor_args)
+				if False:
+					tmp = '_tmp_'
+					constructor_args = a.strip()[ len(type)+1 :-1] ## strip to just args
+					r = '%s  _ref_%s = %s{};' %(type, tmp, type)
+					if constructor_args:
+						r += '_ref_%s.__init__(%s);\n' %(tmp, constructor_args)
 
-				if not self._shared_pointers:
-					r += '%s* %s = &_ref_%s;' %(type, tmp, tmp)
-				elif self._unique_ptr:
-					r += 'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(type, tmp, type, tmp)
-				else:
-					r += 'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(type, tmp, type, tmp)
-				out.append( r )
-				out.append('	%s.push_back(%s);' %(compname, tmp))
+					if not self._shared_pointers:
+						r += '%s* %s = &_ref_%s;' %(type, tmp, tmp)
+					elif self._unique_ptr:
+						r += 'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(type, tmp, type, tmp)
+					else:
+						r += 'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(type, tmp, type, tmp)
+					out.append( r )
+					out.append('	%s.push_back(%s);' %(compname, tmp))
+
+				out.append('	%s.push_back(%s);' %(compname, a))
+
 
 			out.append('}')  ## end comp for loop
 
