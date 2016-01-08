@@ -29,11 +29,11 @@ class Point(object):
 
 
 def maximize( points:[]Point ) ->Point:
-	next = points[0]
+	nxt = points[0]
 	slice = points[1:]
 	for p in slice:
-		next = next.maximize(p)
-	return next
+		nxt = nxt.maximize(p)
+	return nxt
 
 def benchmark( n:int ) -> Point:
 	points = []Point( 
@@ -53,5 +53,5 @@ def test( arg:int ) ->[]float:
 	
 def main():
 	times = test( 3 )
-	avg = sum(times) / len(times)
+	avg = sumf(times) / len(times)
 	print( avg )
