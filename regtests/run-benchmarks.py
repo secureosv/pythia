@@ -11,8 +11,7 @@ def runbench_rs(path, name, strip=False):
 
 	if strip:
 		subprocess.check_call([
-			'python',
-			'../rusthon.py',
+			'pythia',
 			'--convert2python=/tmp/input.rapyd',
 			url
 		])
@@ -46,8 +45,7 @@ def runbench_py(path, name, interp='python3'):
 	open('/tmp/input.py', 'wb').write('\n'.join(lines))
 
 	subprocess.check_call([
-		'python',
-		'../rusthon.py',
+		'pythia',
 		'--convert2python=/tmp/output.py',
 		'/tmp/input.py'
 	])
@@ -62,37 +60,42 @@ def runbench_py(path, name, interp='python3'):
 
 def runbench(path, name, backend='javascript'):
 	proc = subprocess.Popen([
-		'python',
-		'../rusthon.py',
+		'pythia',
 		'--'+backend,
 		'--v8-natives',
 		'--release',
 		os.path.join(path, name)
 	], stdout=subprocess.PIPE)
 	proc.wait()
-	T = proc.stdout.read().splitlines()[0]  ## extra lines could contain compiler warnings, etc.
+	T = None
+	data = proc.stdout.read()
+	for line in data.splitlines():
+		try:
+			T = float(line.strip())
+		except:
+			print line
+
+	#T = .splitlines()[0]  ## extra lines could contain compiler warnings, etc.
 	if backend=='javascript':
 		js = name[:-2] + 'js'
 		passed[ name ] = open('/tmp/'+js).read().split('/*end-builtins*/')[-1]
 
-	return str(float(T.strip()))
+	return str(T)
 
-BENCHES = ['richards.py'
-]
-
-[
-	'fannkuch.py',
-	'nbody.py',
-	'operator_overloading_functor.py',
-	'operator_overloading_nonfunctor.py',
-	'operator_overloading.py',
-	'add.py',
+BENCHES = [
+	#'richards.py',
+	#'fannkuch.py',
+	#'nbody.py',
+	#'operator_overloading_functor.py',
+	#'operator_overloading_nonfunctor.py',
+	#'operator_overloading.py',
+	#'add.py',
 	'float.py',
-	'pystone.py',
+	#'pystone.py',
 ]
 TYPED = [
 	#'fannkuch.py',
-	#'float.py',
+	'float.py',
 	#'pystone.py',
 ]
 
@@ -139,15 +142,15 @@ for name in BENCHES:
 	perf = [
 		'Python3 ' + times['python'],
 		'PyPy ' + times['pypy'],
-		'Rusthon->JS ' + times['javascript'],
+		'Pythia->JS ' + times['javascript'],
 	]
 	if 'rapyd' in times:
 		perf.append('RapydScript ' + times['rapyd'])
 	if 'c++' in times:
-		perf.append('Rusthon->C++ ' + times['c++'])
+		perf.append('Pythia->C++ ' + times['c++'])
 
 	if 'go' in times:
-		perf.append('Rusthon->Go ' + times['go'])
+		perf.append('Pythia->Go ' + times['go'])
 
 
 	perf_path = '/tmp/%s.perf' %name

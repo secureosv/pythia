@@ -41,6 +41,9 @@ class JSGenerator(NodeVisitorBase, GeneratorBase):
 			raise RuntimeError('empty source string')
 		NodeVisitorBase.__init__(self, source)
 
+		self._memory = ['HEAP']  ## used by c++ backend
+
+
 		self._v8 = '--v8-natives' in sys.argv
 		self._ES6 = {
 			'imports' : True

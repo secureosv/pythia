@@ -510,6 +510,14 @@ negative slice is not fully supported, only `-1` literal works.
 	def _gen_slice(self, target=None, value=None, lower=None, upper=None, step=None, type=None):
 		assert target
 		assert value
+		if type and type.startswith('[]'):
+			T = type.split(']')[-1].strip()
+			if self.is_prim_type(T):
+				type = T
+			elif type.count('[')==1:
+				type = 'std::shared_ptr<%s>' %T
+			else:
+				raise RuntimeError('TODO md-array slice')
 
 		if type:
 			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
