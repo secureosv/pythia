@@ -1769,7 +1769,10 @@ TODO tuple return for c++
 		if node.value:
 			try:
 				if isinstance(node.value, ast.Name) and node.value.id=='self' and self._cpp:
-					v = 'std::make_shared<%s>(this);' %self._class_stack[-1].name
+					if self._memory[-1]=='STACK':
+						v = '*this;'
+					else:
+						v = 'std::make_shared<%s>(this);' %self._class_stack[-1].name
 				else:
 					v = self.visit(node.value)
 			except GenerateTypeAssert as err:
@@ -3374,7 +3377,9 @@ because they need some special handling in other places.
 								#return r
 
 								## new style
-								if self._unique_ptr:
+								if self._memory[-1]=='STACK':
+									return '%s* %s = %s; /* 1D Array */' %(vectype, target, constuct )
+								elif self._unique_ptr:
 									r += 'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s); /* 1D Array */' %(vectype, target, vectype, target)
 								else:
 									#return 'std::shared_ptr<%s> %s = std::shared_ptr<%s>( new %s(%s) ); /* 1D Array */' %(vectype, target,vectype, vectype, ','.join(args) )

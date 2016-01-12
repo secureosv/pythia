@@ -39,7 +39,10 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
 		if node.value:
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
-				v = 'std::make_shared<%s>(*this)' %self._class_stack[-1].name
+				if self._memory[-1]=='STACK':
+					v = '*this;'
+				else:
+					v = 'std::make_shared<%s>(*this)' %self._class_stack[-1].name
 
 			elif isinstance(node.value, ast.Name) and node.value.id=='next':  ## seastar lambda repeat
 				v = 'stop_iteration::no'
