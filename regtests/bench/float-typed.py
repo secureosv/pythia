@@ -31,18 +31,21 @@ with stack:
 
 
 	def maximize( points:[]Point ) ->Point:
-		nxt = points[0][...]
+		nxt = points[0]
 		slice = points[1:]
 		for p in slice:
 			#nxt = nxt.maximize(p)
-			nxt = nxt.maximize(p[...])
+			nxt = nxt.maximize(p)
 		#return nxt[...]
 		return nxt
 
 	def benchmark( n:int ) -> Point:
-		points = []Point(
-			Point(i as float) for i in range(n) 
-		)
+		#points = []Point(
+		#	Point(i as float) for i in range(n) 
+		#)
+		points = []Point()
+		for i in range(n):
+			points.append(Point(i as float))
 
 		for p in points:
 			p.normalize()

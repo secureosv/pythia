@@ -291,7 +291,7 @@ Function Decorators
 							elif self._cpp:
 								## non primitive types (objects and arrays) can be None, `[]MyClass( None, None)`
 								## use a pointer or smart pointer. 
-								if not self.is_prim_type(arrtype):
+								if not self.is_prim_type(arrtype) and self._memory[-1]=='HEAP':
 									if not self._shared_pointers:
 										arrtype += '*'
 									elif self.usertypes and 'shared' in self.usertypes:
@@ -305,7 +305,7 @@ Function Decorators
 								T = []
 
 								for i in range(dims):
-									if not self._shared_pointers:
+									if not self._shared_pointers or self._memory[-1]=='STACK':
 										T.append('std::vector<')
 									elif self.usertypes and 'vector' in self.usertypes:
 										sptr = self.usertypes['shared']['type']
@@ -317,7 +317,13 @@ Function Decorators
 										T.append('std::shared_ptr<std::vector<')
 								T.append( arrtype )
 
-								if self._shared_pointers or 'vector' in self.usertypes:
+								if self._memory[-1]=='STACK':
+									for i in range(dims):
+										if i: T.append('*>')
+										else: T.append('>')
+									T.append('*')
+
+								elif self._shared_pointers or 'vector' in self.usertypes:
 									for i in range(dims):
 										T.append('>>')
 								else:

@@ -512,7 +512,7 @@ negative slice is not fully supported, only `-1` literal works.
 		assert value
 		if type and type.startswith('[]'):
 			T = type.split(']')[-1].strip()
-			if self.is_prim_type(T):
+			if self.is_prim_type(T) or self._memory[-1]=='STACK':
 				type = T
 			elif type.count('[')==1:
 				type = 'std::shared_ptr<%s>' %T
