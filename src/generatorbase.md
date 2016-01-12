@@ -270,6 +270,7 @@ Function Decorators
 							elif self._unique_ptr:
 								args_typedefs[ key.arg ] = 'std::unique_ptr<%s>' %T
 							else:
+								assert self._memory[-1]=='HEAP'
 								args_typedefs[ key.arg ] = 'std::shared_ptr<%s>' %T
 
 						else:  ## javascript runtime checked types
@@ -384,7 +385,10 @@ Function Decorators
 						options['generic_base_class'] = classname
 
 						if self._cpp:
-							if not self._shared_pointers:
+							if self._memory[-1]=='STACK':
+								#args_typedefs[key.arg] = 'const %s' %classname
+								pass
+							elif not self._shared_pointers:
 								args_typedefs[ key.arg ] = '%s*' %classname
 							elif self.usertypes and 'shared' in self.usertypes:
 								args_typedefs[ key.arg ] = self.usertypes['shared']['template'] % classname

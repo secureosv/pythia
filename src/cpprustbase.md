@@ -2636,6 +2636,8 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 		#############################
 		if attr == '__doublecolon__':
 			return '%s::' %name
+		elif attr == '__right_arrow__':
+			return '%s->' %name
 		elif attr == '__doubledot__':
 			return 'PyObject_GetAttrString(%s,' %name
 		elif name.endswith('->') or name.endswith('::'):
