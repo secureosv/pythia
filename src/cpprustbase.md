@@ -3353,9 +3353,8 @@ because they need some special handling in other places.
 									vectype = vtemplate % stemplate % T
 								return '%s %s = {%s};' %(vectype, target, ','.join(args))
 
-
 							elif self._shared_pointers:
-								if isprim:
+								if isprim or self._memory[-1]=='STACK':
 									vectype = 'std::vector<%s>' %T
 									constuct = '(new std::vector<%s>({%s}))' %(T, ','.join(args))
 								else:
