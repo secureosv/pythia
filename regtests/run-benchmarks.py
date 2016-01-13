@@ -55,27 +55,37 @@ def runbench_py(path, name, interp='python3'):
 		[interp, '/tmp/output.py',], stdout=subprocess.PIPE
 	)
 	proc.wait()
-	T = proc.stdout.read().splitlines()[0]  ## extra lines could contain compiler warnings, etc.
-	return str(float(T.strip()))
 
-def runbench(path, name, backend='javascript'):
-	proc = subprocess.Popen([
-		'pythia',
+	data = proc.stdout.read()
+	for line in data.splitlines():
+		try:
+			T = float(line.strip())
+		except ValueError:
+			print line
+
+	return str(T)
+
+def runbench(path, name, backend='javascript', pgo=False):
+	cmd = [
+		'pythia', 
 		'--'+backend,
 		'--v8-natives',
 		'--release',
 		os.path.join(path, name)
-	], stdout=subprocess.PIPE)
+	]
+	if pgo:
+		cmd.append('--gcc-pgo')
+
+	proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 	proc.wait()
 	T = None
 	data = proc.stdout.read()
 	for line in data.splitlines():
 		try:
 			T = float(line.strip())
-		except:
+		except ValueError:
 			print line
 
-	#T = .splitlines()[0]  ## extra lines could contain compiler warnings, etc.
 	if backend=='javascript':
 		js = name[:-2] + 'js'
 		passed[ name ] = open('/tmp/'+js).read().split('/*end-builtins*/')[-1]
@@ -118,7 +128,10 @@ for name in BENCHES:
 		#times['rust'] = runbench('./bench', nametyped, 'rust')
 		try: times['go']   = runbench('./bench', nametyped, 'go')
 		except: pass
-		try: times['c++']  = runbench('./bench', nametyped, 'c++')
+		try:
+			times['c++']  = runbench('./bench', nametyped, 'c++')
+			times['c++PGO']  = runbench('./bench', nametyped, 'c++', pgo=True)
+
 		except: pass
 	elif False:
 		#times['rust'] = runbench('./bench', name, 'rust')
@@ -148,6 +161,8 @@ for name in BENCHES:
 		perf.append('RapydScript ' + times['rapyd'])
 	if 'c++' in times:
 		perf.append('Pythia->C++ ' + times['c++'])
+	if 'c++PGO' in times:
+		perf.append('Pythia->C++PGO ' + times['c++PGO'])
 
 	if 'go' in times:
 		perf.append('Pythia->Go ' + times['go'])

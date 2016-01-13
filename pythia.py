@@ -1558,7 +1558,10 @@ def build( modules, module_path, datadirs=None ):
 				cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
 
 			if compile_mode=='binary':
-				cmd.extend(['-O3', '-fprofile-generate', '-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
+				cmd.append('-O3')
+				if '--gcc-pgo' in sys.argv:
+					cmd.append('-fprofile-generate')
+				cmd.extend(['-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
 
 			cmd.append('-Wl,-rpath,/usr/local/lib/')  ## extra user installed dynamic libs
 			cmd.append('-Wl,-rpath,./')  ## can not load dynamic libs from same directory without this
@@ -1636,6 +1639,21 @@ def build( modules, module_path, datadirs=None ):
 				'binary':tempfile.gettempdir() + '/' + exename, 
 				'name':exename
 			}
+
+			if '--gcc-pgo' in sys.argv and compile_mode=='binary':
+				try:
+					print '<testing binary...'
+					print mainmod['build']['binary']
+					subprocess.check_call( mainmod['build']['binary'] )
+					print '<recompile...'
+					cmd.remove('-fprofile-generate')
+					cmd.insert(2,'-fprofile-use')
+					print cmd
+					subprocess.check_call( cmd )
+					print '<gcc optimized binary compiled OK>'
+				except:
+					print '<failed run binary, to use gcc pgo have main() run test when no args given>'
+
 			if compile_mode == 'binary':
 				output['c++'].append( mainmod['build'] )
 				output['executeables'].append(tempfile.gettempdir() + '/' + exename)

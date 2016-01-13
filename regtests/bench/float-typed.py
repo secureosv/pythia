@@ -34,9 +34,7 @@ with stack:
 		nxt = points[0]
 		slice = points[1:]
 		for p in slice:
-			#nxt = nxt.maximize(p)
 			nxt = nxt.maximize(p)
-		#return nxt[...]
 		return nxt
 
 	def benchmark( n:int ) -> Point:
@@ -58,6 +56,10 @@ def test( arg:int ) ->[]float:
 	for i in range(arg):
 		t0 = clock()
 		o = benchmark(POINTS)
+		with stack:
+			print 'x:', o.x
+			print 'y:', o.y
+			print 'z:', o.z
 		tk = clock()
 		times.append(tk - t0)
 	return times
