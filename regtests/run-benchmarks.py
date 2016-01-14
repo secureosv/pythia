@@ -83,8 +83,12 @@ def runbench(path, name, backend='javascript', pgo=False):
 	for line in data.splitlines():
 		try:
 			T = float(line.strip())
+			print 'bench time: ' + line
+			print T
 		except ValueError:
 			print line
+
+	assert T is not None
 
 	if backend=='javascript':
 		js = name[:-2] + 'js'
@@ -94,18 +98,18 @@ def runbench(path, name, backend='javascript', pgo=False):
 
 BENCHES = [
 	#'richards.py',
-	#'fannkuch.py',
+	'fannkuch.py',
 	#'nbody.py',
 	#'operator_overloading_functor.py',
 	#'operator_overloading_nonfunctor.py',
 	#'operator_overloading.py',
 	#'add.py',
-	'float.py',
+	#'float.py',
 	#'pystone.py',
 ]
 TYPED = [
-	#'fannkuch.py',
-	'float.py',
+	'fannkuch.py',
+	#'float.py',
 	#'pystone.py',
 ]
 
@@ -126,13 +130,19 @@ for name in BENCHES:
 	if name in TYPED:
 		nametyped = name.replace('.py','-typed.py')
 		#times['rust'] = runbench('./bench', nametyped, 'rust')
-		try: times['go']   = runbench('./bench', nametyped, 'go')
-		except: pass
-		try:
-			times['c++']  = runbench('./bench', nametyped, 'c++')
-			times['c++PGO']  = runbench('./bench', nametyped, 'c++', pgo=True)
+		#try: times['go']   = runbench('./bench', nametyped, 'go')
+		#except: pass
 
-		except: pass
+		times['c++']  = runbench('./bench', nametyped, 'c++')
+		if os.path.isfile('rusthon-c++-build.gcda'):
+			print 'removing old .gcda (PGO dump)'
+			os.unlink('rusthon-c++-build.gcda')
+
+		#times['c++PGO']  = runbench('./bench', nametyped, 'c++', pgo=True)
+		#if not os.path.isfile('rusthon-c++-build.gcda'):
+		#	raise RuntimeError('failed to compile PGO optimized binary')
+
+
 	elif False:
 		#times['rust'] = runbench('./bench', name, 'rust')
 		try: times['go']   = runbench('./bench', name, 'go')
@@ -173,9 +183,9 @@ for name in BENCHES:
 	os.system( './bargraph.pl -eps %s > /tmp/%s.eps' %(perf_path,name))
 	subprocess.check_call([
 		'convert', 
-		'-density', '300', 
+		'-density', '400', 
 		'/tmp/%s.eps' % name, 
-		'-resize', '400x600', 
+		'-resize', '1400x1600', 
 		'-transparent', 'white',
 		'./bench/%s.png' % name
 	])

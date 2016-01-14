@@ -22,10 +22,11 @@ def fannkuch(n:int) ->int:
 	while True:
 		if check < 30:
 			check += 1
-
+		print 'check done'
 		while r != 1:
 			count[r-1] = r
 			r -= 1
+		print 'r set'
 
 		if perm1[0] != 0 and perm1[m] != m:
 			perm = perm1[:]
@@ -40,26 +41,36 @@ def fannkuch(n:int) ->int:
 
 			if flips_count > max_flips:
 				max_flips = flips_count
+		print 'flips done'
 
 		do_return = False
 		while r != n:
-			perm1.insert(r, perm1.pop(0))
+			#perm1.insert(r, perm1.pop(0))  ## TODO: in c++ vec.pop_front() returns nothing
+			#px = perm1.pop(0)
+			px = perm1[0]
+			perm1 = perm1[1:]
+
+			print 'popped', px
+			perm1.insert(r, px)
 			count[r] -= 1
 			if count[r] > 0:
 				do_return = False
 				break
 			r += 1
+		print 'while done'
 		if do_return:
+			print 'do_return'
 			return max_flips
 
 
 def main():
-
+	print 'fannkuch...'
 	times = []float()
 	for i in range(4):
 		t0 = clock()
 		res = fannkuch(DEFAULT_ARG)
 		tk = clock()
 		times.append(tk - t0)
-	avg = sum(times) / len(times)
+	print 'test OK'
+	avg = sumf(times) / len(times)
 	print(avg)

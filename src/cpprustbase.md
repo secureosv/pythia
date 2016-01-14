@@ -2978,18 +2978,17 @@ because they need some special handling in other places.
 					return '%s->insert(%s.begin()+%s, %s)' %(arrname, arrname, idx, val)
 
 				elif node.value.func.attr=='pop':
-					popindex = '0'
+					popindex = None
 					if node.value.args: popindex = self.visit(node.value.args[0])
-					else: popindex = '0'
 					if popindex == '0':
 						result.append('auto %s = (*%s)[0];' %(target, arrname))
 						#result.append('%s->pop_front();' %arrname)  ## no pop_front in c++11?
-						result.append('%s->erase(%s->begin(),%s->begin());' %(arrname,arrname,arrname))
-					elif popindex == '-1':
+						result.append('%s->erase(%s->begin(),%s->begin()+1);' %(arrname,arrname,arrname))
+					elif popindex==None or popindex == '-1':
 						result.append('auto %s = (*%s)[ %s->size()-1 ];' %(target, arrname, arrname))
 						result.append('%s->pop_back();' %arrname)
 					else:
-						raise SyntaxError('TODO', popindex)
+						raise SyntaxError('TODO array.pop(n)', popindex)
 	
 				return '\n'.join(result)
 

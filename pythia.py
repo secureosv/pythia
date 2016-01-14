@@ -1641,18 +1641,19 @@ def build( modules, module_path, datadirs=None ):
 			}
 
 			if '--gcc-pgo' in sys.argv and compile_mode=='binary':
-				try:
-					print '<testing binary...'
-					print mainmod['build']['binary']
-					subprocess.check_call( mainmod['build']['binary'] )
-					print '<recompile...'
-					cmd.remove('-fprofile-generate')
-					cmd.insert(2,'-fprofile-use')
-					print cmd
-					subprocess.check_call( cmd )
-					print '<gcc optimized binary compiled OK>'
-				except:
-					print '<failed run binary, to use gcc pgo have main() run test when no args given>'
+				print '<testing binary...'
+				print mainmod['build']['binary']
+				ok = subprocess.check_call( mainmod['build']['binary'] )
+				print ok
+				subprocess.check_call(['md5sum', mainmod['build']['binary']])
+
+				print '<recompile...'
+				cmd.remove('-fprofile-generate')
+				cmd.insert(3,'-fprofile-use')
+				print cmd
+				subprocess.check_call( cmd )
+				print '<gcc optimized binary compiled OK>'
+				subprocess.check_call(['md5sum', mainmod['build']['binary']])
 
 			if compile_mode == 'binary':
 				output['c++'].append( mainmod['build'] )
