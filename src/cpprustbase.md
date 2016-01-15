@@ -2961,6 +2961,13 @@ because they need some special handling in other places.
 					'%s->insert(%s->begin(), %s->begin(), %s->end());' %(target, target, value,value)
 				]
 				return '\n'.join(r)
+			elif slice.lower and not slice.upper:
+				r = [
+					'%s->erase(%s->begin()+%s, %s->end());' %(target,target,self.visit(slice.lower), target),
+					'%s->insert(%s->end(), %s->begin(), %s->end());' %(target, target, value,value)
+				]
+				return '\n'.join(r)
+
 			else:
 				raise RuntimeError('TODO slice assignment')
 		else:
