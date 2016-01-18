@@ -3,6 +3,11 @@ array slice syntax
 '''
 
 def somefunc():
+	w = range(10)
+	assert len(w)==10
+	assert w[0]==0
+	assert w[9]==9
+
 	r = range(10,20)
 	assert r[0]==10
 	assert r[1]==11
@@ -45,17 +50,23 @@ def somefunc():
 	assert f[2]==5
 
 	g = a[::-1]
+	print '- - - -'
+	for v in g:
+		print v
+
 	print('len g:', len(g))
 	assert len(g)==len(a)
+
+
 	assert g[0]==5
 	assert g[4]==1
 	#for i in g: print i
 
 	print('---slice---')
 	h = a[2::-1]
+	for i in h: print i
 	print('len h:', len(h))
 	assert len(h)==3
-	for i in h: print i
 
 	assert h[0]==3
 	assert h[1]==2
@@ -86,3 +97,4 @@ def main():
 	## never reached because there is a segfault at the end
 	## of somefunc when the slices go out of scope, they are free'ed twice.
 	print('OK')
+

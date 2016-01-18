@@ -525,7 +525,27 @@ negative slice is not fully supported, only `-1` literal works.
 		if type:
 			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
 
-			if step:
+			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO
+				#raise RuntimeError('xxx')
+				slice.append(self.indent()+'std::vector<%s> _ref_%s;' %(type,target))
+
+				step = step[1:]  ## strip `-`
+				if lower and not upper:
+					slice.extend([
+						'for(int _i_=%s->size()-(1+%s);_i_>=0;_i_-=%s){' %(value,lower,step),
+						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+						'}'
+					])
+				elif upper:
+					raise RuntimeError('slice todo')
+				else:
+					slice.extend([
+						'for(int _i_=%s->size()-1;_i_>=0;_i_-=%s){' %(value,step),
+						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+						'}',
+					])
+
+			elif step:
 				slice.append('std::vector<%s> _ref_%s;' %(type,target))
 				if lower and not upper:
 					slice.append( ''.join([
@@ -578,6 +598,7 @@ negative slice is not fully supported, only `-1` literal works.
 			return '\n'.join(slice)
 
 		else:  ## SEGFAULTS - TODO FIXME
+			raise RuntimeError('todo fix slice unknown type')
 			## note: `auto` can not be used to make c++11 guess the type from a constructor that takes start and end iterators.
 			#return 'auto _ref_%s( %s->begin()+START, %s->end()+END ); auto %s = &_ref_%s;' %(target, val, val, target, target)
 			#return 'std::vector<int> _ref_%s( %s->begin(), %s->end() ); auto %s = &_ref_%s;' %(target, val, val, target, target)
