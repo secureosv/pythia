@@ -526,7 +526,6 @@ negative slice is not fully supported, only `-1` literal works.
 			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
 
 			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO
-				#raise RuntimeError('xxx')
 				slice.append(self.indent()+'std::vector<%s> _ref_%s;' %(type,target))
 
 				step = step[1:]  ## strip `-`

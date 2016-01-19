@@ -1103,11 +1103,11 @@ handles all special calls
 				return '%s != nullptr' %w
 
 
-		elif fname.endswith('->insert') and fname.split('->insert')[0] in self._known_arrays:  ## todo proper way to know if this is an array
-			arr = fname.split('->insert')[0]
-			idx = self.visit(node.args[0])
-			val = self.visit(node.args[1])
-			return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+		#elif fname.endswith('->insert') and fname.split('->insert')[0] in self._known_arrays:  ## todo proper way to know if this is an array
+		#	arr = fname.split('->insert')[0]
+		#	idx = self.visit(node.args[0])
+		#	val = self.visit(node.args[1])
+		#	return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
 		elif fname == 'double' and self._cpp:
 			return '__double__(%s)' %self.visit(node.args[0])
 		elif fname == 'clock' and len(node.args)==0:
@@ -2403,6 +2403,7 @@ TODO clean up go stuff.
 			#	#out.append( self.indent() + 'return std::make_shared<%s>(this);' %self._class_stack[-1].name )  ## crashes GCC
 			#	out.append( self.indent() + 'return nullptr;' )  ## the exe with PGO will crash if nothing returns
 
+		out.append( self.indent()+'/*arrays:%s*/' %','.join(self._known_arrays) )
 
 		self.pull()
 		if (self._rust or self._cpp) and is_closure:
@@ -2412,6 +2413,7 @@ TODO clean up go stuff.
 				return out[0].replace('{', ';')
 			else:
 				out.append( self.indent()+'}' )
+
 
 		if generics and self._cpp:
 			overloads = []
@@ -2952,12 +2954,15 @@ because they need some special handling in other places.
 		elif isinstance(node.targets[0], ast.Subscript) and isinstance(node.targets[0].slice, ast.Slice):
 			## slice assignment, the place sliced away is replaced with the assignment value, this happens inplace.
 			## `arr1[ :n ]=arr2` slices away all items before n, and inserts arr2 in its place.
+			## if `n` is greater than the length of the array, then the array is cleared first.
 			target = self.visit(node.targets[0].value)
 			slice = node.targets[0].slice
 			value = self.visit(node.value)
 			if not slice.lower and slice.upper:
+				s = self.visit(slice.upper)
 				r = [
-					'%s->erase(%s->begin(), %s->begin()+%s);' %(target,target,target, self.visit(slice.upper)),
+					'if (%s >= %s->size()) { %s->erase(%s->begin(), %s->end());' %(s,target, target,target,target),
+					'} else { %s->erase(%s->begin(), %s->begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
 					'%s->insert(%s->begin(), %s->begin(), %s->end());' %(target, target, value,value)
 				]
 				return '\n'.join(r)

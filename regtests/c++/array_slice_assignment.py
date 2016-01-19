@@ -14,12 +14,16 @@ def somefunc():
 	#	print i
 
 	print 'slice assign front'
-	a[:2] = b
+	lena = len(a)
+	two = 2
+	a[:two+1] = b
 	print('len a:', len(a))
-	assert len(a)==8
+	assert len(a)==(lena-(two+1))+len(b)
+	#assert len(a)==8
 	for i in a: print i
 	assert a[0]==6
-	assert a[5]==3
+	assert a[5]==4
+	assert a[6]==5
 
 	print 'slice assign back'
 	b[2:] = c
@@ -29,7 +33,15 @@ def somefunc():
 	assert b[1]==7
 	assert b[2]==100
 	assert b[3]==200
+	print 'slice out of bounds'
+	print a
+	a[:100] = b
+	for v in a:
+		print v
+	print 'len a:', len(a)
 
 
 def main():
 	somefunc()
+
+#main()
