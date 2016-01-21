@@ -6,7 +6,7 @@
 # modified by hartsantler 2014
 
 from time import clock
-#from runtime import *
+from runtime import *
 
 DEFAULT_ARG = 9
 
@@ -30,9 +30,9 @@ def fannkuch(n):
 	r = n
 	check = 0
 
-	print('--------')
-	print perm1
-	print('________')
+	#print('--------')
+	#print perm1
+	#print('________')
 
 	while True:
 		if check < 30:
@@ -43,18 +43,21 @@ def fannkuch(n):
 			r -= 1
 
 		if perm1[0] != 0 and perm1[m] != m:
-			print '>perm 1:', perm1
+			#print '>perm 1:', perm1
 			perm = perm1[:]
-			print '>perm:', perm
+			#print '>perm:', perm
 
 			flips_count = 0
 			k = perm[0]
 			#while k:  ## TODO fix for dart
 			while k != 0:
-				print 'flip', k
+				#print 'flip', k
+
 				#perm[:k+1] = perm[k::-1]
+
 				assert k < n
 				assert k < len(perm)
+
 				tmp = perm[k::-1]
 				assert len(tmp) <= len(perm)
 				#print 'tmp:', tmp
@@ -67,9 +70,9 @@ def fannkuch(n):
 				perm[:k+1] = tmp
 				assert len(perm) < n+1
 
-				print 'k+1:', k+1
-				print 'len perm:', len(perm)
-				print 'len tmp:', len(tmp)
+				#print 'k+1:', k+1
+				#print 'len perm:', len(perm)
+				#print 'len tmp:', len(tmp)
 
 				assert k+1 <= len(perm)
 
@@ -77,18 +80,14 @@ def fannkuch(n):
 				flips_count += 1
 				k = perm[0]
 
-				print 'k=', k
-				#if flips_count > 1:
-				#	print 'breaking...'
-				#	return 0
-				#	break
+				#print 'k=', k
+				if flips_count > 1:
+					#print 'breaking...'
+					break
 
 
 			if flips_count > max_flips:
 				max_flips = flips_count
-
-		#print perm1
-		#return 0
 
 		do_return = True
 		while r != n:
