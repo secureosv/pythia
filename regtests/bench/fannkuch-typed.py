@@ -33,27 +33,31 @@ def fannkuch(n:int) ->int:
 			r -= 1
 
 		if perm1[0] != 0 and perm1[m] != m:
-			print '>perm 1:'
-			for kk in perm1:
-				print kk
+
+			#print '>perm 1:'
+			#for kk in perm1:
+			#	print kk
+
 			perm = perm1[:]
-			print '>perm:', perm
-			for kkk in perm:
-				print kkk
+
+			#print '>perm:', perm
+			#for kkk in perm:
+			#	print kkk
 			flips_count = 0
 			k = perm[0]
 			while k != 0:
-				print 'flip:', k
+				#print 'flip:', k
 				assert k < n
 				assert k < len(perm)
 				#perm[:k+1] = perm[k::-1] #TODO
 				tmp = perm[k::-1]
-				print 'sliced tmp'
+				#print 'sliced tmp'
 				assert len(tmp) <= len(perm)
 				tmp.shrink_to_fit()
-				print '---tmp---'
-				for t in tmp:
-					print t
+				
+				#print '---tmp---'
+				#for t in tmp:
+				#	print t
 
 				#tmp.shrink_to_fit()
 				#print '---tmp:shrink---'
@@ -64,10 +68,11 @@ def fannkuch(n:int) ->int:
 				#print '---perm---'
 				#for pe in perm:
 				#	print pe
-				k1 = k+1
-				print 'k+1:', k1
-				print 'len perm:', len(perm)
-				print 'len tmp:', len(tmp)
+
+				#k1 = k+1
+				#print 'k+1:', k1
+				#print 'len perm:', len(perm)
+				#print 'len tmp:', len(tmp)
 
 				assert k+1 <= len(perm)
 
@@ -75,24 +80,24 @@ def fannkuch(n:int) ->int:
 				perm[:k+1] = tmp  ## TODO fix bug, length grows
 
 				#perm = perm[:k+1]  ## backwards
-				for pe in perm:
-					print pe
+				#for pe in perm:
+				#	print pe
 
 				#perm.insert(perm.begin(), tmp.begin(), tmp.end() )
-				print 'assigned tmp'
-				print 'new len perm:', len(perm)
-				for pe in perm:
-					print pe
+				#print 'assigned tmp'
+				#print 'new len perm:', len(perm)
+				#for pe in perm:
+				#	print pe
 				assert len(perm) < n+1
 
 				flips_count += 1
 				k = perm[0]
-				print 'k=', k
+				#print 'k=', k
 				if flips_count > 1:
-					print 'breaking...'
+					#print 'breaking...'
 					break
 
-			print 'flips', flips_count
+			#print 'flips', flips_count
 
 			if flips_count > max_flips:
 				max_flips = flips_count
