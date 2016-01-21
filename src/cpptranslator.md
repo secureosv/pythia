@@ -531,7 +531,8 @@ negative slice is not fully supported, only `-1` literal works.
 				step = step[1:]  ## strip `-`
 				if lower and not upper:
 					slice.extend([
-						'for(int _i_=%s->size()-(1+%s);_i_>=0;_i_-=%s){' %(value,lower,step),
+						#'for(int _i_=%s->size()-(1+%s);_i_>=0;_i_-=%s){' %(value,lower,step),
+						'for(int _i_=%s;_i_>=0;_i_-=%s){' %(lower,step),
 						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
 						'}'
 					])
