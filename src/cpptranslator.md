@@ -510,10 +510,15 @@ negative slice is not fully supported, only `-1` literal works.
 
 ```python
 
-	def _gen_slice(self, target=None, value=None, lower=None, upper=None, step=None, type=None):
+	def _gen_slice(self, target=None, value=None, lower=None, upper=None, step=None, type=None, result_size=None):
 		assert target
 		assert value
-		if type and type.startswith('[]'):
+		fixed_size = None
+		if type and isinstance(type, tuple):
+			fixed_size = type[1]
+			type = type[0]
+
+		elif type and type.startswith('[]'):
 			T = type.split(']')[-1].strip()
 			if self.is_prim_type(T) or self._memory[-1]=='STACK':
 				type = T
@@ -522,7 +527,29 @@ negative slice is not fully supported, only `-1` literal works.
 			else:
 				raise RuntimeError('TODO md-array slice')
 
-		if type:
+
+		#################################################
+		if fixed_size:
+			slice = ['/* <fixed size slice> %s : %s : %s */' %(lower, upper, step)]
+			con = []
+			if not fixed_size.isdigit():
+				raise SyntaxError('slice fixed size array requires a constant size, got: `%s`' %fixed_size)
+			fixed_size = int(fixed_size)
+			if lower and not upper:
+				for i in range(int(lower), fixed_size):
+					con.append('%s[%s]' %(value,i))
+			elif upper and not lower:
+				for i in range(0, upper):
+					con.append('%s[%s]' %(value,i))
+			else:
+				raise SyntaxError('todo slice fixed size stack array')
+
+			slice.append(
+				self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
+			)
+			return '\n'.join(slice)
+
+		elif type:
 			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
 
 			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO

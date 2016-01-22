@@ -3200,9 +3200,24 @@ because they need some special handling in other places.
 				assert self._cpp
 				msg = error[0]
 				slice_type = None  ## slice on an unknown type is broken and will segfault - TODO fix this
+				result_size = None
 				if msg['value'] in self._known_arrays:
 					slice_type = self._known_arrays[msg['value']]
-					self._known_arrays[target] = slice_type
+					new_type   = list(slice_type)
+					if msg['lower'] and not msg['upper']:
+						if new_type[1].isdigit() and msg['lower'].isdigit():
+							result_size = int(new_type[1]) - int(msg['lower'])
+							new_type[1] = str(result_size)
+						else:
+							new_type[1] += '-%s' %msg['lower']
+					elif not msg['lower'] and msg['upper']:
+						if new_type[1].isdigit() and msg['upper'].isdigit():
+							result_size = int(new_type[1]) - int(msg['upper'])
+							new_type[1] = str(result_size)
+						else:
+							new_type[1] += '-%s' %msg['upper']
+
+					self._known_arrays[target] = tuple(new_type)
 
 				return self._gen_slice(
 					target,
@@ -3211,6 +3226,7 @@ because they need some special handling in other places.
 					upper=msg['upper'],
 					step =msg['step'],
 					type=slice_type,
+					result_size = result_size
 				)
 
 

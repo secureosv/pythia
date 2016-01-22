@@ -40,6 +40,13 @@ def stackfunc():
 		print 'testing iter loop'
 		for val in a:
 			print val
+		print 'slice fixed size array'
+		b = a[1:]
+		assert b[0]
+		assert len(b)==len(a)-1
+		for val in b:
+			print val
+
 
 def main():
 	somefunc()
