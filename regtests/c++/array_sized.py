@@ -58,6 +58,9 @@ def stackfunc():
 		assert c[0]==1
 		assert c[1]==2
 
+		for N in range(1,10):
+			d = [N]int()
+
 def main():
 	somefunc()
 	stackfunc()

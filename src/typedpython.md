@@ -1072,6 +1072,10 @@ def parse_and_fix_code(r, output):
 			output[e.lineno-1] = ''.join(nline)
 			parse_and_fix_code('\n'.join(output), output)
 
+		elif echar=='(' and '[' in eline and ']' in eline:
+			output[e.lineno-1] = eline.replace(']', ',').replace('(', ',(').replace('[', '__go__arrayfixed__(').replace(')', '))')
+			parse_and_fix_code('\n'.join(output), output)
+
 		else:
 			print '-'*80
 			print 'Syntax Error on this line:'
@@ -1091,6 +1095,8 @@ def parse_and_fix_code(r, output):
 			else:
 				print eline
 			print '-'*80
+			print 'echar: ', echar
+			print 'echar-prev: ', echar_prev
 
 			raise e
 
