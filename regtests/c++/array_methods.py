@@ -16,8 +16,8 @@ def somefunc():
 	print('len a:', len(a))
 	assert len(a)==3
 	print(b)
-	#a.insert(0, 1000)
-	a.insert(a.begin(), 1000)
+	a.insert(0, 1000)
+	#a.insert(a.begin(), 1000)
 
 	print('len a:', len(a))
 	print(a[0])

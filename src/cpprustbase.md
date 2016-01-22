@@ -1108,11 +1108,21 @@ handles all special calls
 				return '%s != nullptr' %w
 
 
-		#elif fname.endswith('->insert') and fname.split('->insert')[0] in self._known_arrays:  ## todo proper way to know if this is an array
-		#	arr = fname.split('->insert')[0]
-		#	idx = self.visit(node.args[0])
-		#	val = self.visit(node.args[1])
-		#	return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+		elif fname.endswith('->insert') and fname.split('->insert')[0] in self._known_arrays and len(node.args)>=2:
+			arr = fname.split('->insert')[0]
+			idx = self.visit(node.args[0])
+			val = self.visit(node.args[1])
+			if len(node.args)==2:
+				if not idx.endswith('begin()'):
+					return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+				else:
+					return '%s->insert(%s+%s, %s)' %(arr, arr, idx, val)
+			elif len(node.args)==3:
+				end = self.visit(node.args[2])
+				return '%s->insert(%s, %s, %s)' %(arr, idx, val, end)
+
+			else:
+				raise RuntimeError('TODO .insert(...)')
 
 		elif fname == 'double' and self._cpp:
 			return '__double__(%s)' %self.visit(node.args[0])
@@ -3016,10 +3026,7 @@ because they need some special handling in other places.
 			arrname = self.visit(node.value.func.value)
 			if arrname in self._known_arrays:
 				if node.value.func.attr=='insert':
-					raise RuntimeError('insert - should not happen')
-					idx = self.visit(node.value.args[0])
-					val = self.visit(node.value.args[1])
-					return '%s->insert(%s.begin()+%s, %s)' %(arrname, arrname, idx, val)
+					raise RuntimeError('invalid assignment, array.insert returns nothing.')
 
 				elif node.value.func.attr=='pop':
 					popindex = None
