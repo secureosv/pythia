@@ -39,7 +39,7 @@ def fannkuch(n:int) ->int:
 					#perm[:k+1] = perm[k::-1] #TODO
 					tmp = perm[k::-1]
 					assert len(tmp) <= len(perm)
-					tmp.shrink_to_fit()
+					#tmp.shrink_to_fit()  ## not required in stack mem mode
 					assert k+1 <= len(perm)
 					perm[:k+1] = tmp
 					assert len(perm) < n+1
@@ -55,13 +55,12 @@ def fannkuch(n:int) ->int:
 
 			do_return = True
 			while r != n:
-				#perm1.insert(r, perm1.pop(0))  ## TODO: in c++ vec.pop_front() returns nothing
-				px = perm1.pop(0)
-
-				if r < len(perm1):
-					perm1.insert(perm1.begin()+r, px)
-				else:
-					perm1.append(px)
+				perm1.insert(r, perm1.pop(0))
+				#px = perm1.pop(0)
+				#if r < len(perm1):
+				#	perm1.insert(perm1.begin()+r, px)
+				#else:
+				#	perm1.append(px)
 
 				count[r] -= 1
 				if count[r] > 0:

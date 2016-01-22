@@ -3213,7 +3213,7 @@ because they need some special handling in other places.
 					elif not msg['lower'] and msg['upper']:
 						if new_type[1].isdigit() and msg['upper'].isdigit():
 							result_size = int(new_type[1]) - int(msg['upper'])
-							new_type[1] = str(result_size)
+							new_type[1] = str(result_size-1)
 						else:
 							new_type[1] += '-%s' %msg['upper']
 
