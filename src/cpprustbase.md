@@ -1113,7 +1113,14 @@ handles all special calls
 			idx = self.visit(node.args[0])
 			val = self.visit(node.args[1])
 			if len(node.args)==2:
-				if not idx.endswith('begin()'):
+				if '->' in val and arr == val.split('->')[0] and 'pop' in val:
+					if val.endswith('pop_back()'):
+						popidx = '%s->size()-1' %arr
+					else:
+						popidx = val.split('(')[-1].split(')')[0]
+					raise RuntimeError(popidx)
+
+				elif not idx.endswith('begin()'):
 					return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
 				else:
 					return '%s->insert(%s+%s, %s)' %(arr, arr, idx, val)
@@ -1401,6 +1408,8 @@ handles all special calls
 				elif arg.startswith('PyObject_GetAttrString(') and arg.endswith(')'):
 					return '(long)PySequence_Length(%s)' %arg
 				elif self._memory[-1]=='STACK':
+					if arg in self._known_arrays and isinstance(self._known_arrays[arg], tuple):
+						return self._known_arrays[arg][1]
 					return '%s.size()' %arg
 				elif self.usertypes and 'vector' in self.usertypes:
 					return '%s->%s()' %(arg, self.usertypes['vector']['len'])
@@ -3453,7 +3462,10 @@ because they need some special handling in other places.
 							asize = self.visit(node.value.left.args[0])
 							atype = self.visit(node.value.left.args[1])
 							self._known_arrays[ target ] = (atype,asize)
-							if self._shared_pointers:
+							if self._memory[-1]=='STACK':
+								return '%s %s[%s] = {%s};' %(atype, target, asize, ','.join(args))
+
+							elif self._shared_pointers:
 								#vectype = 'std::array<%s, %sul>' %(atype, asize)  ## what api or syntax should we use for fixed size arrays?
 								if self.is_prim_type(atype):
 									vectype = 'std::vector<%s>' %atype

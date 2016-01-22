@@ -29,6 +29,19 @@ def somefunc():
 	print d[0]
 	print d[1]
 
+def stackfunc():
+	with stack:
+		a = [5]int(1,2,3,4,5)
+		print('sizeof a:', sizeof(a))  ## says 20 bytes?
+		#a.pop()  ## not possible for stack allocated fixed size arrays
+		print('len a:', len(a))   ## translator keeps track of the array size
+		print(a[0])
+		print(a[1])
+
+		for val in a:
+			print a
+
 def main():
 	somefunc()
+	stackfunc()
 	print('OK')

@@ -34,6 +34,8 @@ def somefunc():
 	for val in a:
 		print val
 
+	a.insert(0, a.pop())
+
 def main():
 	somefunc()
 	print('OK')
