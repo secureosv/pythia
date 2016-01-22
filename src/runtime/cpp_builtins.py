@@ -110,13 +110,20 @@ std::string readfile(std::fstream* f) {
 	return c.str();
 }
 
-// a pointer version is also required for `range` because it could be called inside
-// a `with pointers:` block, in this special case return a copy and let the caller
-// take the pointer.
 std::vector<int> __range1__( int n ) {
 	std::vector<int> vec(n);
 	for (int i=0; i<n; i++) {
 		vec[i] = i;
+	}
+	return vec;
+}
+
+std::vector<int> __range2__( int start, int end ) {
+	std::vector<int> vec(end-start);
+	int index = 0;
+	for (int i=start; i<end; i++) {
+		vec[index] = i;
+		index ++;
 	}
 	return vec;
 }

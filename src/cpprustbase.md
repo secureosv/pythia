@@ -897,7 +897,12 @@ Subscript `a[n]`
 				if self._cpp:
 					## default to deference shared pointer ##
 					value = self.visit(node.value)
-					r = '(*%s)[%s]' % (value, self.visit(node.slice))
+					if self._memory[-1]=='STACK':
+						r = '%s[%s]' % (value, self.visit(node.slice))
+					else:
+						r = '(*%s)[%s]' % (value, self.visit(node.slice))
+
+					#############################################
 					if value.startswith('PyObject_GetAttrString(') and value.endswith(')'):
 						r = 'PyObject_CallFunction(PyObject_GetAttrString(%s,"__getitem__"),"i", %s)' % (value, self.visit(node.slice))
 
@@ -1108,8 +1113,10 @@ handles all special calls
 		#	idx = self.visit(node.args[0])
 		#	val = self.visit(node.args[1])
 		#	return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+
 		elif fname == 'double' and self._cpp:
 			return '__double__(%s)' %self.visit(node.args[0])
+
 		elif fname == 'clock' and len(node.args)==0:
 			## note in c++ std::clock returns clock ticks, not time
 			return '__clock__()'
@@ -1362,11 +1369,16 @@ handles all special calls
 			else:
 				return '%s.to_string()' %self.visit(node.args[0])
 
-		elif fname == 'range':  ## TODO - some syntax for mutable range
+		elif fname == 'range':
 			assert len(node.args)
-			if self._rust:
-				fname = '&mut ' + fname
-			fname += str(len(node.args))
+			if self._rust:  ## TODO - some syntax for mutable/immutable range
+				fname = '&mut ' + fname  ## default to mutable
+				fname += str(len(node.args))
+			else:
+				assert self._cpp
+				fname += str(len(node.args))
+				if self._memory[-1]=='STACK':
+					fname = '__%s__' %fname
 
 		elif fname == 'len':
 			if self._cpp:
@@ -1378,6 +1390,8 @@ handles all special calls
 						return '%s.size()' %arg
 				elif arg.startswith('PyObject_GetAttrString(') and arg.endswith(')'):
 					return '(long)PySequence_Length(%s)' %arg
+				elif self._memory[-1]=='STACK':
+					return '%s.size()' %arg
 				elif self.usertypes and 'vector' in self.usertypes:
 					return '%s->%s()' %(arg, self.usertypes['vector']['len'])
 				else:
@@ -2960,21 +2974,37 @@ because they need some special handling in other places.
 			value = self.visit(node.value)
 			if not slice.lower and slice.upper:
 				s = self.visit(slice.upper)
-				r = [
-					'if (%s >= %s->size()) { %s->erase(%s->begin(), %s->end());' %(s,target, target,target,target),
-					'} else { %s->erase(%s->begin(), %s->begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
-					'%s->insert(%s->begin(), %s->begin(), %s->end());' %(target, target, value,value)
-				]
-				return '\n'.join(r)
+				if self._memory[-1]=='STACK':
+					r = [
+						'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
+						'} else { %s.erase(%s.begin(), %s.begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
+						'%s.insert(%s.begin(), %s.begin(), %s.end());' %(target, target, value,value)
+					]
+					return '\n'.join(r)
+				else:
+					r = [
+						'if (%s >= %s->size()) { %s->erase(%s->begin(), %s->end());' %(s,target, target,target,target),
+						'} else { %s->erase(%s->begin(), %s->begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
+						'%s->insert(%s->begin(), %s->begin(), %s->end());' %(target, target, value,value)
+					]
+					return '\n'.join(r)
 			elif slice.lower and not slice.upper:
-				r = [
-					'%s->erase(%s->begin()+%s, %s->end());' %(target,target,self.visit(slice.lower), target),
-					'%s->insert(%s->end(), %s->begin(), %s->end());' %(target, target, value,value)
-				]
-				return '\n'.join(r)
+				if self._memory[-1]=='STACK':
+					r = [
+						'%s.erase(%s.begin()+%s, %s.end());' %(target,target,self.visit(slice.lower), target),
+						'%s.insert(%s.end(), %s.begin(), %s.end());' %(target, target, value,value)
+					]
+					return '\n'.join(r)
+				else:
+					r = [
+						'%s->erase(%s->begin()+%s, %s->end());' %(target,target,self.visit(slice.lower), target),
+						'%s->insert(%s->end(), %s->begin(), %s->end());' %(target, target, value,value)
+					]
+					return '\n'.join(r)
 
 			else:
-				raise RuntimeError('TODO slice assignment')
+				raise RuntimeError('TODO slice assignment lower and upper limits')
+
 		else:
 			target = self.visit( node.targets[0] )
 			self._assign_var_name = target

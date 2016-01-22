@@ -526,70 +526,139 @@ negative slice is not fully supported, only `-1` literal works.
 			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
 
 			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO
-				slice.append(self.indent()+'std::vector<%s> _ref_%s;' %(type,target))
+				if self._memory[-1]=='STACK':
+					slice.append(self.indent()+'std::vector<%s> %s;' %(type,target))
+				else:
+					slice.append(self.indent()+'std::vector<%s> _ref_%s;' %(type,target))
 
 				step = step[1:]  ## strip `-`
 				if lower and not upper:
-					slice.extend([
-						#'for(int _i_=%s->size()-(1+%s);_i_>=0;_i_-=%s){' %(value,lower,step),
-						'for(int _i_=%s;_i_>=0;_i_-=%s){' %(lower,step),
-						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
-						'}'
-					])
+					if self._memory[-1]=='STACK':
+						slice.extend([
+							'for(int _i_=%s;_i_>=0;_i_-=%s){' %(lower,step),
+							' %s.push_back(%s[_i_]);' %(target, value),
+							'}'
+						])
+					else:
+						slice.extend([
+							#'for(int _i_=%s->size()-(1+%s);_i_>=0;_i_-=%s){' %(value,lower,step),
+							'for(int _i_=%s;_i_>=0;_i_-=%s){' %(lower,step),
+							' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+							'}'
+						])
 				elif upper:
 					raise RuntimeError('slice todo')
 				else:
-					slice.extend([
-						'for(int _i_=%s->size()-1;_i_>=0;_i_-=%s){' %(value,step),
-						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
-						'}',
-					])
+					if self._memory[-1]=='STACK':
+						slice.extend([
+							'for(int _i_=%s.size()-1;_i_>=0;_i_-=%s){' %(value,step),
+							' %s.push_back(%s[_i_]);' %(target, value),
+							'}',
+						])
+					else:
+						slice.extend([
+							'for(int _i_=%s->size()-1;_i_>=0;_i_-=%s){' %(value,step),
+							' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+							'}',
+						])
 
 			elif step:
-				slice.append('std::vector<%s> _ref_%s;' %(type,target))
+				if self._memory[-1]=='STACK':
+					slice.append('std::vector<%s> %s;' %(type,target))
+				else:
+					slice.append('std::vector<%s> _ref_%s;' %(type,target))
+
 				if lower and not upper:
-					slice.append( ''.join([
-						'if(%s<0){'%step,
-						'for(int _i_=%s->size()-%s-1;_i_>=0;_i_+=%s){' %(value,lower,step),
-						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
-						'}} else {',
-						'for(int _i_=%s;_i_<%s->size();_i_+=%s){' %(lower,value,step),
-						' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
-						'}}',
-						])
-					)
+					if self._memory[-1]=='STACK':
+						slice.append( ''.join([
+							'if(%s<0){'%step,
+							'for(int _i_=%s.size()-%s-1;_i_>=0;_i_+=%s){' %(value,lower,step),
+							' %s.push_back(%s[_i_]);' %(target, value),
+							'}} else {',
+							'for(int _i_=%s;_i_<%s.size();_i_+=%s){' %(lower,value,step),
+							' %s.push_back(%s[_i_]);' %(target, value),
+							'}}',
+							])
+						)
+					else:
+						slice.append( ''.join([
+							'if(%s<0){'%step,
+							'for(int _i_=%s->size()-%s-1;_i_>=0;_i_+=%s){' %(value,lower,step),
+							' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+							'}} else {',
+							'for(int _i_=%s;_i_<%s->size();_i_+=%s){' %(lower,value,step),
+							' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+							'}}',
+							])
+						)
 				elif upper:
 					raise SyntaxError('TODO slice upper with step')
 				else:
-					slice.append( ''.join([
-						'if(%s<0){'%step,
-						'for(int _i_=%s->size()-1;_i_>=0;_i_+=%s){' %(value,step),
-						' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
-						'} else {',
-						'for(int _i_=0;_i_<%s->size();_i_+=%s){' %(value,step),
-						' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
-						'}',
-						])
-					)
+					if self._memory[-1]=='STACK':
+						slice.append( ''.join([
+							'if(%s<0){'%step,
+							'for(int _i_=%s.size()-1;_i_>=0;_i_+=%s){' %(value,step),
+							' %s.push_back(%s[_i_]);}' %(target, value),
+							'} else {',
+							'for(int _i_=0;_i_<%s.size();_i_+=%s){' %(value,step),
+							' %s.push_back(%s[_i_]);}' %(target, value),
+							'}',
+							])
+						)
+
+					else:
+						slice.append( ''.join([
+							'if(%s<0){'%step,
+							'for(int _i_=%s->size()-1;_i_>=0;_i_+=%s){' %(value,step),
+							' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
+							'} else {',
+							'for(int _i_=0;_i_<%s->size();_i_+=%s){' %(value,step),
+							' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
+							'}',
+							])
+						)
 			else:
-				slice.append('std::vector<%s> _ref_%s(' %(type,target))
+				if self._memory[-1]=='STACK':
+					slice.append('std::vector<%s> %s(' %(type,target))
+				else:
+					slice.append('std::vector<%s> _ref_%s(' %(type,target))
 
 				if lower:
-					slice.append('%s->begin()+%s,' %(value, lower))
+					if self._memory[-1]=='STACK':
+						slice.append('%s.begin()+%s,' %(value, lower))
+					else:
+						slice.append('%s->begin()+%s,' %(value, lower))
 				else:
-					slice.append('%s->begin(),' %value)
+					if self._memory[-1]=='STACK':
+						slice.append('%s.begin(),' %value)
+					else:
+						slice.append('%s->begin(),' %value)
+
 				if upper:
 					if upper < 0:
-						slice.append('%s->end() %s'%(value, upper))
+						if self._memory[-1]=='STACK':
+							slice.append('%s.end() %s'%(value, upper))
+						else:
+							slice.append('%s->end() %s'%(value, upper))
 					else:
-						slice.append('%s->begin()+%s'%(value, upper))
+						if self._memory[-1]=='STACK':
+							slice.append('%s.begin()+%s'%(value, upper))
+						else:
+							slice.append('%s->begin()+%s'%(value, upper))
+
 				else:
-					slice.append('%s->end()'%value)
+					if self._memory[-1]=='STACK':
+						slice.append('%s.end()'%value)
+					else:
+						slice.append('%s->end()'%value)
+
 				slice.append(');')
 
 			vectype = 'std::vector<%s>' %type
 
-			if not self._shared_pointers:
+			if self._memory[-1]=='STACK':
+				pass
+			elif not self._shared_pointers:
 				slice.append('%s* %s = &_ref_%s);' %(vectype, target, target))
 			elif self._unique_ptr:
 				slice.append('std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target))
