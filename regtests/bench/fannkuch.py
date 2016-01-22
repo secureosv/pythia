@@ -15,7 +15,7 @@ def main():
 	for i in range(4):
 		t0 = clock()
 		res = fannkuch(DEFAULT_ARG)
-		print( 'fannkuch flips:', res)
+		#print( 'fannkuch flips:', res)
 		tk = clock()
 		times.append(tk - t0)
 	avg = sum(times) / len(times)

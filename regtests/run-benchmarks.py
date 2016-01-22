@@ -138,17 +138,14 @@ for name in BENCHES:
 			print 'removing old .gcda (PGO dump)'
 			os.unlink('rusthon-c++-build.gcda')
 
+
+		nametyped = name.replace('.py','-typed-stack.py')
+		times['c++stack']  = runbench('./bench', nametyped, 'c++')
+
+		## only faster with if/else branches?
 		#times['c++PGO']  = runbench('./bench', nametyped, 'c++', pgo=True)
 		#if not os.path.isfile('rusthon-c++-build.gcda'):
 		#	raise RuntimeError('failed to compile PGO optimized binary')
-
-
-	elif False:
-		#times['rust'] = runbench('./bench', name, 'rust')
-		try: times['go']   = runbench('./bench', name, 'go')
-		except: pass
-		try: times['c++']  = runbench('./bench', name, 'c++')
-		except: pass
 
 	print times
 	perf_header = [
@@ -171,8 +168,13 @@ for name in BENCHES:
 		perf.append('RapydScript ' + times['rapyd'])
 	if 'c++' in times:
 		perf.append('Pythia->C++ ' + times['c++'])
+
+	if 'c++stack' in times:
+		perf.append('Pythia->C++STACK ' + times['c++stack'])
+
 	if 'c++PGO' in times:
 		perf.append('Pythia->C++PGO ' + times['c++PGO'])
+
 
 	if 'go' in times:
 		perf.append('Pythia->Go ' + times['go'])

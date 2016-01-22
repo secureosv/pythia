@@ -52,6 +52,7 @@ def fannkuch(n:int) ->int:
 				if flips_count > max_flips:
 					max_flips = flips_count
 
+
 			do_return = True
 			while r != n:
 				#perm1.insert(r, perm1.pop(0))  ## TODO: in c++ vec.pop_front() returns nothing
@@ -78,7 +79,7 @@ def main():
 	for i in range(4):
 		t0 = clock()
 		res = fannkuch(DEFAULT_ARG)
-		print 'fannkuch flips:', res
+		#print 'fannkuch flips:', res
 		tk = clock()
 		times.append(tk - t0)
 	print 'test OK'
