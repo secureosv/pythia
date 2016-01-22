@@ -152,7 +152,11 @@ hooks into bad magic hack, 2nd pass rustc compile.
 			if node.iter.is_ref:
 				if self._cpp:
 					if arrname in self._known_arrays:
-						lines.append('for (auto &%s: (*%s)) {' %(target, iter))
+						if isinstance(self._known_arrays[arrname], tuple):
+							lines.append('for (int __idx=0; __idx<%s; __idx++) {' %self._known_arrays[arrname][1])
+							lines.append(self.indent()+'%s %s = %s[__idx];' %(self._known_arrays[arrname][0], target, iter))
+						else:
+							lines.append('for (auto &%s: (*%s)) {' %(target, iter))
 					elif arrname in self._known_maps:
 						lines.append('for (auto &_pair_%s: (*%s)) {' %(target, iter))
 						lines.append('  auto %s = _pair_%s.second;')

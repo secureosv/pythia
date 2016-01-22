@@ -37,9 +37,9 @@ def stackfunc():
 		print('len a:', len(a))   ## translator keeps track of the array size
 		print(a[0])
 		print(a[1])
-
+		print 'testing iter loop'
 		for val in a:
-			print a
+			print val
 
 def main():
 	somefunc()
