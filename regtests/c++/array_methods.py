@@ -51,10 +51,19 @@ def stackfunc():
 		assert arr[1]==1
 		assert arr[4]==4
 
-		copy = arr[:]
+		arr2 = [5]int(1,2,3,4,5)
+
+		copy = arr2[:]
 		assert len(copy)==5
 
 
+		reversed = arr2[::-1]
+		assert len(reversed)==len(arr2)
+		assert reversed[0]==5
+		assert reversed[1]==4
+		assert reversed[2]==3
+		assert reversed[3]==2
+		assert reversed[4]==1
 
 def main():
 	somefunc()

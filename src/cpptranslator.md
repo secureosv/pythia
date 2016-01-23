@@ -541,8 +541,14 @@ negative slice is not fully supported, only `-1` literal works.
 					for i in range(0, int(upper)):
 						con.append('%s[%s]' %(value,i))
 				elif not lower and not upper:
-					for i in range(fixed_size):
-						con.append('%s[%s]' %(value,i))
+					if step=='-1':
+						i = fixed_size-1
+						while i >= 0:
+							con.append('%s[%s]' %(value,i))
+							i -= 1
+					else:
+						for i in range(fixed_size):
+							con.append('%s[%s]' %(value,i))
 				else:
 					raise SyntaxError('todo slice fixed size stack array')
 
