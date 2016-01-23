@@ -40,8 +40,29 @@ def somefunc():
 		print v
 	print 'len a:', len(a)
 
+def stackfunc():
+	print 'testing stack allocated arrays'
+	with stack:
+		x = [5]int(1,2,3,4,5)
+		assert len(x)==5
+		y = [5]int(6,7,8,9,10)
+		assert len(y)==5
+
+		z = y[3:]
+		assert len(z)==2
+		x[3:] = z
+
+		for item in x:
+			print item
+
+		assert x[0]==1
+		assert x[1]==2
+		assert x[2]==3
+		assert x[3]==9
+		assert x[4]==10
 
 def main():
 	somefunc()
+	stackfunc()
 
 #main()

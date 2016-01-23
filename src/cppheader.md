@@ -6,45 +6,6 @@ includes typedefs for the standard types, like `f32`.
 
 note: OSX requires cmath, because std::pow and std::round is used in the builtins.
 
-template<class T>
-std::shared_ptr<T> __shared__(T* ob) {return std::make_shared<T>(ob);}
-
-template<class T>
-std::shared_ptr<T> __shared__(T& ob) {return std::make_shared<T>(&ob);}
-
-template<class T>
-std::shared_ptr<T> __shared__(T ob) {return std::make_shared<T>(ob);}
-
-template<class T>
-std::shared_ptr<T> __shared__(std::shared_ptr<T> ob) {return ob;}
-
-
-std::shared_ptr<std::string> __shared__(std::string ob) {
-	return std::make_shared<std::string>(ob);
-}
-
-std::shared_ptr<std::runtime_error> __shared__(std::runtime_error ob) {
-	return std::make_shared<std::runtime_error>(ob);
-}
-
-
-template<class T>
-T* __pointer__(T* ob) {return ob;}
-
-template<class T>
-T* __pointer__(T& ob) {return &ob;}
-
-template<class T>
-T* __pointer__(T ob) {return &ob;}  // compiler optimizes away the copy?
-
-std::string* __pointer__(std::string ob) {
-	return &ob;
-}
-
-template<class T>
-T* __pointer__(std::shared_ptr<T> ob) {return ob.get();}
-
-
 ```python
 
 CPP_HEADER = """
@@ -67,9 +28,6 @@ typedef int    i32;
 typedef double f64;
 typedef float  f32;
 typedef const char*  cstring;
-
-
-
 
 """
 

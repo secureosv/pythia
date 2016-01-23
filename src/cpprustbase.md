@@ -3045,11 +3045,14 @@ because they need some special handling in other places.
 			if not slice.lower and slice.upper:
 				s = self.visit(slice.upper)
 				if self._memory[-1]=='STACK':
-					r = [
-						'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
-						'} else { %s.erase(%s.begin(), %s.begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
-						'%s.insert(%s.begin(), %s.begin(), %s.end());' %(target, target, value,value)
-					]
+					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
+						raise RuntimeError(self._known_arrays[target])
+					else:
+						r = [
+							'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
+							'} else { %s.erase(%s.begin(), %s.begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
+							'%s.insert(%s.begin(), %s.begin(), %s.end());' %(target, target, value,value)
+						]
 					return '\n'.join(r)
 				else:
 					r = [
@@ -3060,11 +3063,22 @@ because they need some special handling in other places.
 					return '\n'.join(r)
 			elif slice.lower and not slice.upper:
 				if self._memory[-1]=='STACK':
-					r = [
-						'%s.erase(%s.begin()+%s, %s.end());' %(target,target,self.visit(slice.lower), target),
-						'%s.insert(%s.end(), %s.begin(), %s.end());' %(target, target, value,value)
-					]
-					return '\n'.join(r)
+					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
+						fixed_size = self._known_arrays[target][1]
+						r = [
+							self.indent()+'int __L = 0;',
+							self.indent()+'for (int __i=%s; __i<%s; __i++) {' %(self.visit(slice.lower), fixed_size),
+							self.indent()+'  %s[__i] = %s[__L];' %(target, value),
+							self.indent()+'  __L ++;',
+							self.indent()+'}',
+						]
+						return '\n'.join(r)
+					else:
+						r = [
+							'%s.erase(%s.begin()+%s, %s.end());' %(target,target,self.visit(slice.lower), target),
+							'%s.insert(%s.end(), %s.begin(), %s.end());' %(target, target, value,value)
+						]
+						return '\n'.join(r)
 				else:
 					r = [
 						'%s->erase(%s->begin()+%s, %s->end());' %(target,target,self.visit(slice.lower), target),
