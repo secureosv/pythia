@@ -1121,20 +1121,55 @@ handles all special calls
 			else:
 				return '%s != nullptr' %w
 
+		elif fname.endswith('.insert') and fname.split('.insert')[0] in self._known_arrays and len(node.args)>=2:
+			arr = fname.split('.insert')[0]
+			idx = self.visit(node.args[0])
+			val = self.visit(node.args[1])
+
+			if len(node.args)==2:
+				#if '.' in val and arr == val.split('.')[0] and 'pop' in val:  ## TODO
+				if '->' in val and arr == val.split('->')[0] and 'pop' in val:
+					popidx = None
+					r = []
+					if val.endswith('pop_back()'):
+						#popidx = '%s->size()-1' %arr
+						popidx = '%s-1' %self._known_arrays[arr][1]
+						r.append('auto __back__ = %s[%s];' %(arr,popidx))
+						r.extend([  ## move elements starting from back
+							'for (int __i=%s; __i>%s; __i--) {' %(popidx, idx),
+							'  %s[__i] = %s[__i-1];' %(arr, arr),
+							'}'
+						])
+						r.append('%s[%s] = __back__;' %(arr, idx))
+
+					else:
+						popidx = val.split('(')[-1].split(')')[0].strip()
+
+					return '\n'.join(r)
+
+				else:
+					raise SyntaxError('fixed size stack allocated arrays can not use iterators to insert elements from another array')
+
+			elif len(node.args)==3:
+				end = self.visit(node.args[2])
+				return '%s->insert(%s, %s, %s)' %(arr, idx, val, end)
+
+			else:
+				raise RuntimeError('TODO .insert(...)')
+
 
 		elif fname.endswith('->insert') and fname.split('->insert')[0] in self._known_arrays and len(node.args)>=2:
 			arr = fname.split('->insert')[0]
 			idx = self.visit(node.args[0])
 			val = self.visit(node.args[1])
 			if len(node.args)==2:
-				if '->' in val and arr == val.split('->')[0] and 'pop' in val:
-					if val.endswith('pop_back()'):
-						popidx = '%s->size()-1' %arr
-					else:
-						popidx = val.split('(')[-1].split(')')[0]
-					raise RuntimeError(popidx)
+				#if '->' in val and arr == val.split('->')[0] and 'pop' in val:
+				#	if val.endswith('pop_back()'):
+				#		popidx = '%s->size()-1' %arr
+				#	else:
+				#		popidx = val.split('(')[-1].split(')')[0]
 
-				elif not idx.endswith('begin()'):
+				if not idx.endswith('begin()'):
 					return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
 				else:
 					return '%s->insert(%s+%s, %s)' %(arr, arr, idx, val)

@@ -34,8 +34,23 @@ def somefunc():
 	for val in a:
 		print val
 
-	a.insert(0, a.pop())
+	#error: invalid use of void expression a->insert(a->begin()+0, a->pop_back());
+	#a.insert(0, a.pop())  ## TODO fixme
+
+def stackfunc():
+	with stack:
+		arr = [5]int(1,2,3,4,5)
+		print('sizeof arr:', sizeof(arr))  ## says 20 bytes?
+		#val = a.pop()  ## not possible for stack allocated fixed size arrays
+
+		## pop and insert is allowed because the array remains the same size
+		## this generates a for loop that moves all elements past the insertion
+		## index forward by one index.
+		arr.insert(0, arr.pop())
+
 
 def main():
 	somefunc()
+	stackfunc()
 	print('OK')
+
