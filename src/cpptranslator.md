@@ -532,14 +532,22 @@ negative slice is not fully supported, only `-1` literal works.
 		if fixed_size:
 			slice = ['/* <fixed size slice> %s : %s : %s */' %(lower, upper, step)]
 			con = []
+			is_constant = True
+
 			if fixed_size.isdigit():
 				fixed_size = int(fixed_size)
 				if lower and not upper:
-					for i in range(int(lower), fixed_size):
-						con.append('%s[%s]' %(value,i))
+					if lower.isdigit():
+						for i in range(int(lower), fixed_size):
+							con.append('%s[%s]' %(value,i))
+					else:
+						is_constant = False
 				elif upper and not lower:
-					for i in range(0, int(upper)):
-						con.append('%s[%s]' %(value,i))
+					if upper.isdigit():
+						for i in range(0, int(upper)):
+							con.append('%s[%s]' %(value,i))
+					else:
+						is_constant = False
 				elif not lower and not upper:
 					if step=='-1':
 						i = fixed_size-1
@@ -552,19 +560,33 @@ negative slice is not fully supported, only `-1` literal works.
 				else:
 					raise SyntaxError('todo slice fixed size stack array')
 
-				slice.append(
-					self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
-				)
-			else:
+				if is_constant:
+					slice.append(
+						self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
+					)
+				else:
+					pass  ## fallback to for loop
+
+			if not is_constant:
 				if lower and not upper:
-					slice.extend([
-						self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
-						self.indent()+'int __L = 0;',
-						self.indent()+'for (int __i=%s; __i<%s; __i++) {' %(lower, fixed_size),
-						self.indent()+'  %s[__L] = %s[__i];' %(target, value),
-						self.indent()+'  __L ++;',
-						self.indent()+'}',
-					])
+					if step=='-1':
+						slice.extend([
+							self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
+							self.indent()+'int __L = 0;',
+							self.indent()+'for (int __i=%s-1; __i>=%s; __i--) {' %(fixed_size, lower),
+							self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+							self.indent()+'  __L ++;',
+							self.indent()+'}',
+						])
+					else:
+						slice.extend([
+							self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
+							self.indent()+'int __L = 0;',
+							self.indent()+'for (int __i=%s; __i<%s; __i++) {' %(lower, fixed_size),
+							self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+							self.indent()+'  __L ++;',
+							self.indent()+'}',
+						])
 				elif upper and not lower:
 					slice.extend([
 						self.indent()+'%s %s[%s];' %(type,target, upper),						

@@ -64,6 +64,14 @@ def stackfunc():
 		assert reversed[2]==3
 		assert reversed[3]==2
 		assert reversed[4]==1
+		print 'slice front and reverse'
+		k = 2
+		s = arr2[k::-1]
+		for val in s:
+			print val
+		assert s[0]==5
+		assert s[1]==4
+		assert s[2]==3
 
 def main():
 	somefunc()
