@@ -550,10 +550,19 @@ negative slice is not fully supported, only `-1` literal works.
 				if lower and not upper:
 					slice.extend([
 						self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
-						self.indent()+'int __I = 0;',
+						self.indent()+'int __L = 0;',
 						self.indent()+'for (int __i=%s; __i<%s; __i++) {' %(lower, fixed_size),
-						self.indent()+'  %s[__I] = %s[__i];' %(target, value),
-						self.indent()+'  __I ++;',
+						self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+						self.indent()+'  __L ++;',
+						self.indent()+'}',
+					])
+				elif upper and not lower:
+					slice.extend([
+						self.indent()+'%s %s[%s];' %(type,target, upper),						
+						self.indent()+'int __U = 0;',
+						self.indent()+'for (int __i=0; __i<%s; __i++) {' %upper,
+						self.indent()+'  %s[__U] = %s[__i];' %(target, value),
+						self.indent()+'  __U ++;',
 						self.indent()+'}',
 					])
 				else:

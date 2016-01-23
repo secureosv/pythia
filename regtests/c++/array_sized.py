@@ -71,7 +71,7 @@ def stackfunc():
 			for v in d:
 				print v
 
-			print 'slice...'
+			print 'slice front'
 			e = d[2:]
 			print e
 			for ev in e:
@@ -79,7 +79,15 @@ def stackfunc():
 			assert e[0]==102
 			assert e[1]==103
 
-
+			print 'len e:', len(e)
+			for index in range(len(e)):
+				e[index]=1000+index
+			assert e[0]==1000
+			print 'slice back'
+			f = d[:2]
+			print f
+			assert f[0]==100
+			assert f[1]==101
 
 def main():
 	somefunc()
