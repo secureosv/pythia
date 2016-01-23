@@ -60,6 +60,13 @@ def stackfunc():
 
 		for N in range(1,10):
 			d = [N]int()
+			for i in range(N):
+				d[i]=100 + i
+			print d
+			print 'sizeof:', sizeof(d)
+			print 'len d:', len(d)
+			for v in d:
+				print v
 
 def main():
 	somefunc()

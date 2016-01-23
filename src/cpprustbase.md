@@ -953,7 +953,17 @@ handles all special calls
 
 	def _visit_call_helper(self, node, force_name=None):
 		fname = force_name or self.visit(node.func)
-		if self._cpp and fname=='move':
+
+		if fname=='__array__':
+			if len(node.args)==4:
+				aname  = self.visit(node.args[0])
+				asize  = self.visit(node.args[1])
+				atype = self.visit(node.args[2])
+				ainit = self.visit(node.args[3])
+				self._known_arrays[aname] = (atype, asize)
+				return '%s %s[%s] = %s;' %(atype, aname, asize, ainit)
+
+		elif self._cpp and fname=='move':
 			args = ','.join([self.visit(arg) for arg in node.args])
 			return 'std::move(%s)' %args
 

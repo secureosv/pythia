@@ -1072,8 +1072,14 @@ def parse_and_fix_code(r, output):
 			output[e.lineno-1] = ''.join(nline)
 			parse_and_fix_code('\n'.join(output), output)
 
-		elif echar=='(' and '[' in eline and ']' in eline:
-			output[e.lineno-1] = eline.replace(']', ',').replace('(', ',(').replace('[', '__go__arrayfixed__(').replace(')', '))')
+		elif echar=='(' and '[' in eline and ']' in eline and '=' in eline:
+			varname = eline.strip().split()[0].split('=')[0]
+			eline = eline.replace('(', ',(').replace(varname, '__array__(%s,'%varname).replace('=','')
+			eline = eline.replace('[', '').replace(']', ',')
+			earr = list(eline)
+			earr.insert( eline.rindex(')'), ')' )
+			eline = ''.join(earr)
+			output[e.lineno-1] = eline
 			parse_and_fix_code('\n'.join(output), output)
 
 		else:
