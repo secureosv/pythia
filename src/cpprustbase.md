@@ -3261,6 +3261,9 @@ because they need some special handling in other places.
 							new_type[1] = str(result_size-1)
 						else:
 							new_type[1] += '-%s' %msg['upper']
+					elif not msg['lower'] and not msg['upper']:
+						## slice copy, same size
+						result_size = int(slice_type[1])
 					else:
 						new_type[1]= None
 					self._known_arrays[target] = tuple(new_type)

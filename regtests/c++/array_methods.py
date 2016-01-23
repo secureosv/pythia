@@ -47,6 +47,13 @@ def stackfunc():
 		## this generates a for loop that moves all elements past the insertion
 		## index forward by one index.
 		arr.insert(0, arr.pop())
+		assert arr[0]==5
+		assert arr[1]==1
+		assert arr[4]==4
+
+		copy = arr[:]
+		assert len(copy)==5
+
 
 
 def main():
