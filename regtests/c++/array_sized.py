@@ -58,15 +58,28 @@ def stackfunc():
 		assert c[0]==1
 		assert c[1]==2
 
-		for N in range(1,10):
+		for N in range(4, 10):
 			d = [N]int()
 			for i in range(N):
 				d[i]=100 + i
 			print d
+
+			# sizeof(d) -> warning: taking sizeof array of runtime bound
 			print 'sizeof:', sizeof(d)
+
 			print 'len d:', len(d)
 			for v in d:
 				print v
+
+			print 'slice...'
+			e = d[2:]
+			print e
+			for ev in e:
+				print ev
+			assert e[0]==102
+			assert e[1]==103
+
+
 
 def main():
 	somefunc()

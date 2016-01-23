@@ -514,7 +514,7 @@ negative slice is not fully supported, only `-1` literal works.
 		assert target
 		assert value
 		fixed_size = None
-		if type and isinstance(type, tuple):
+		if type and isinstance(type, tuple) and type[1]:
 			fixed_size = type[1]
 			type = type[0]
 
@@ -532,21 +532,32 @@ negative slice is not fully supported, only `-1` literal works.
 		if fixed_size:
 			slice = ['/* <fixed size slice> %s : %s : %s */' %(lower, upper, step)]
 			con = []
-			if not fixed_size.isdigit():
-				raise SyntaxError('slice fixed size array requires a constant size, got: `%s`' %fixed_size)
-			fixed_size = int(fixed_size)
-			if lower and not upper:
-				for i in range(int(lower), fixed_size):
-					con.append('%s[%s]' %(value,i))
-			elif upper and not lower:
-				for i in range(0, int(upper)):
-					con.append('%s[%s]' %(value,i))
-			else:
-				raise SyntaxError('todo slice fixed size stack array')
+			if fixed_size.isdigit():
+				fixed_size = int(fixed_size)
+				if lower and not upper:
+					for i in range(int(lower), fixed_size):
+						con.append('%s[%s]' %(value,i))
+				elif upper and not lower:
+					for i in range(0, int(upper)):
+						con.append('%s[%s]' %(value,i))
+				else:
+					raise SyntaxError('todo slice fixed size stack array')
 
-			slice.append(
-				self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
-			)
+				slice.append(
+					self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
+				)
+			else:
+				if lower and not upper:
+					slice.extend([
+						self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
+						self.indent()+'int __I = 0;',
+						self.indent()+'for (int __i=%s; __i<%s; __i++) {' %(lower, fixed_size),
+						self.indent()+'  %s[__I] = %s[__i];' %(target, value),
+						self.indent()+'  __I ++;',
+						self.indent()+'}',
+					])
+				else:
+					raise SyntaxError('\n'.join(slice))
 			return '\n'.join(slice)
 
 		elif type:

@@ -3226,7 +3226,8 @@ because they need some special handling in other places.
 							new_type[1] = str(result_size-1)
 						else:
 							new_type[1] += '-%s' %msg['upper']
-
+					else:
+						new_type[1]= None
 					self._known_arrays[target] = tuple(new_type)
 
 				return self._gen_slice(
