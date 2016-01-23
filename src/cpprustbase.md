@@ -1152,7 +1152,7 @@ handles all special calls
 
 			elif len(node.args)==3:
 				end = self.visit(node.args[2])
-				return '%s->insert(%s, %s, %s)' %(arr, idx, val, end)
+				return '%s.insert(%s, %s, %s)' %(arr, idx, val, end)
 
 			else:
 				raise RuntimeError('TODO .insert(...)')
@@ -1169,10 +1169,12 @@ handles all special calls
 				#	else:
 				#		popidx = val.split('(')[-1].split(')')[0]
 
-				if not idx.endswith('begin()'):
-					return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+				if '->begin()' in idx:
+					return '%s->insert(%s, %s)' %(arr, idx, val)
 				else:
-					return '%s->insert(%s+%s, %s)' %(arr, arr, idx, val)
+					return '%s->insert(%s->begin()+%s, %s)' %(arr, arr, idx, val)
+				#else:
+				#	return '%s->insert(%s+%s, %s)' %(arr, arr, idx, val)
 			elif len(node.args)==3:
 				end = self.visit(node.args[2])
 				return '%s->insert(%s, %s, %s)' %(arr, idx, val, end)
