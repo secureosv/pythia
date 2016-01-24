@@ -12,13 +12,24 @@ DEFAULT_ARG = 9
 
 def fannkuch(n:int) ->int:
 	with stack:
-		count = range(1, n+1)
+		#count = range(1, n+1)
+		count = [n]int()
+		i = 0
+		for j in range(1,n+1):
+			count[i]=j
+
 		max_flips = 0
 		m = n-1
 		r = n
 		check = 0
-		perm1 = range(n)
-		perm = range(n)
+		#perm1 = range(n)
+		#perm = range(n)
+
+		perm1 = [n]int()
+		perm  = [n]int()
+		for j in range(n):
+			perm[j]  = j
+			perm1[j] = j
 
 		while True:
 			if check < 30:
@@ -78,7 +89,7 @@ def main():
 	for i in range(4):
 		t0 = clock()
 		res = fannkuch(DEFAULT_ARG)
-		#print 'fannkuch flips:', res
+		print 'fannkuch flips:', res
 		tk = clock()
 		times.append(tk - t0)
 	print 'test OK'

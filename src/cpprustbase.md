@@ -3048,7 +3048,15 @@ because they need some special handling in other places.
 				s = self.visit(slice.upper)
 				if self._memory[-1]=='STACK':
 					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
-						raise RuntimeError(self._known_arrays[target])
+						atype, fixed_size = self._known_arrays[target]
+						r = [
+							#'%s %s[%s];' %(atype, target, fixed_size),
+							self.indent()+'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
+							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+							self.indent()+'}',
+						]
+						return '\n'.join(r)
+
 					else:
 						r = [
 							'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
@@ -3279,7 +3287,11 @@ because they need some special handling in other places.
 							new_type[1] += '-%s' %msg['upper']
 					elif not msg['lower'] and not msg['upper']:
 						## slice copy, same size
-						result_size = int(slice_type[1])
+						if slice_type[1].isdigit():
+							result_size = int(slice_type[1])
+						else:
+							result_size = slice_type[1]
+
 					else:
 						new_type[1]= None
 					self._known_arrays[target] = tuple(new_type)

@@ -566,9 +566,29 @@ negative slice is not fully supported, only `-1` literal works.
 					)
 				else:
 					pass  ## fallback to for loop
+			else:
+				is_constant = False
 
 			if not is_constant:
-				if lower and not upper:
+				if not lower and not upper:
+					if step=='-1':
+						slice.extend([
+							self.indent()+'%s %s[%s];' %(type,target, fixed_size),
+							self.indent()+'int __L = 0;',
+							self.indent()+'for (int __i=%s-1; __i>=%s; __i--) {' %(fixed_size, lower),
+							self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+							self.indent()+'  __L ++;',
+							self.indent()+'}',
+						])
+					else:
+						slice.extend([
+							self.indent()+'%s %s[%s];' %(type,target, fixed_size),
+							self.indent()+'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+							self.indent()+'}',
+						])
+
+				elif lower and not upper:
 					if step=='-1':
 						slice.extend([
 							self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),						
