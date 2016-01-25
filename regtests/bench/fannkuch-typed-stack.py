@@ -17,6 +17,7 @@ def fannkuch(n:int) ->int:
 		i = 0
 		for j in range(1,n+1):
 			count[i]=j
+			i += 1
 
 		max_flips = 0
 		m = n-1
@@ -45,15 +46,17 @@ def fannkuch(n:int) ->int:
 				flips_count = 0
 				k = perm[0]
 				while k != 0:
-					assert k < n
-					assert k < len(perm)
+					#assert k < n
+					#assert k < len(perm)
+
 					#perm[:k+1] = perm[k::-1] #TODO
 					tmp = perm[k::-1]
-					assert len(tmp) <= len(perm)
+					#assert len(tmp) <= len(perm)
 					#tmp.shrink_to_fit()  ## not required in stack mem mode
-					assert k+1 <= len(perm)
+
+					#assert k+1 <= len(perm)
 					perm[:k+1] = tmp
-					assert len(perm) < n+1
+					#assert len(perm) < n+1
 
 					flips_count += 1
 					k = perm[0]
@@ -67,6 +70,7 @@ def fannkuch(n:int) ->int:
 			do_return = True
 			while r != n:
 				perm1.insert(r, perm1.pop(0))
+
 				#px = perm1.pop(0)
 				#if r < len(perm1):
 				#	perm1.insert(perm1.begin()+r, px)
@@ -89,7 +93,7 @@ def main():
 	for i in range(4):
 		t0 = clock()
 		res = fannkuch(DEFAULT_ARG)
-		print 'fannkuch flips:', res
+		#print 'fannkuch flips:', res
 		tk = clock()
 		times.append(tk - t0)
 	print 'test OK'

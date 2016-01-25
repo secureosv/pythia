@@ -1559,6 +1559,13 @@ def build( modules, module_path, datadirs=None ):
 
 			if compile_mode=='binary':
 				cmd.append('-O3')
+
+				#cmd.append('-faggressive-loop-optimizations')
+				#cmd.append('-ffast-math')
+				#cmd.append('-fconserve-stack')
+				#cmd.append('-floop-nest-optimize')
+				#cmd.append('-fmove-loop-invariants')
+
 				if '--gcc-pgo' in sys.argv:
 					cmd.append('-fprofile-generate')
 				cmd.extend(['-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
