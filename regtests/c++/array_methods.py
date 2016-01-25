@@ -73,6 +73,18 @@ def stackfunc():
 		assert s[1]==4
 		assert s[2]==3
 
+		print 'testing insert/pop on stack array'
+		arr3 = [4]int(1,2,3,4)
+		#arr3.insert(k, arr.pop(0))  ## not allowed
+		arr3.insert(k, arr3.pop(0))
+		for val in arr3:
+			print val
+
+		assert arr3[0]==2
+		assert arr3[1]==3
+		assert arr3[2]==1
+		assert arr3[3]==4
+
 def main():
 	somefunc()
 	stackfunc()

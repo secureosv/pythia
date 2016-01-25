@@ -1135,15 +1135,24 @@ handles all special calls
 						#popidx = '%s->size()-1' %arr
 						popidx = '%s-1' %self._known_arrays[arr][1]
 						r.append('auto __back__ = %s[%s];' %(arr,popidx))
-						r.extend([  ## move elements starting from back
-							'for (int __i=%s; __i>%s; __i--) {' %(popidx, idx),
-							'  %s[__i] = %s[__i-1];' %(arr, arr),
-							'}'
+						r.extend([  ## move elements forward starting from back
+							self.indent()+'for (int __i=%s; __i>%s; __i--) {' %(popidx, idx),
+							self.indent()+'  %s[__i] = %s[__i-1];' %(arr, arr),
+							self.indent()+'}'
 						])
-						r.append('%s[%s] = __back__;' %(arr, idx))
+						r.append(self.indent()+'%s[%s] = __back__;' %(arr, idx))
 
 					else:
 						popidx = val.split('(')[-1].split(')')[0].strip()
+						assert popidx == '0' ## TODO other indices
+						r.append('auto __front__ = %s[%s];' %(arr,popidx))
+						r.extend([  ## move elements forward starting from insert idx
+							self.indent()+'for (int __i=1; __i<=%s; __i++) {' %idx,
+							self.indent()+'  %s[__i-1] = %s[__i];' %(arr, arr),
+							self.indent()+'}'
+						])
+						r.append(self.indent()+'%s[%s] = __front__;' %(arr, idx))
+
 
 					return '\n'.join(r)
 
