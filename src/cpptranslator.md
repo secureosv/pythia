@@ -716,13 +716,26 @@ negative slice is not fully supported, only `-1` literal works.
 							])
 						)
 			else:
-				if self._memory[-1]=='STACK':
+				isptr = False
+				#if value in self._known_arrays and isinstance(self._known_arrays[value], str):
+				#	if self._known_arrays[value].startswith('[]'):
+				#		isptr = True
+				if value in self._known_pointers:
+					isptr = True
+					self._known_pointers[target] = self._known_pointers[value]
+				################################
+
+				if isptr:
+					slice.append('auto %s = new std::vector<%s>(' %(target, type))					
+				elif self._memory[-1]=='STACK':
 					slice.append('std::vector<%s> %s(' %(type,target))
 				else:
 					slice.append('std::vector<%s> _ref_%s(' %(type,target))
 
 				if lower:
-					if self._memory[-1]=='STACK':
+					if isptr:
+						slice.append('%s->begin()+%s,' %(value, lower))
+					elif self._memory[-1]=='STACK':
 						slice.append('%s.begin()+%s,' %(value, lower))
 					else:
 						slice.append('%s->begin()+%s,' %(value, lower))
@@ -745,7 +758,9 @@ negative slice is not fully supported, only `-1` literal works.
 							slice.append('%s->begin()+%s'%(value, upper))
 
 				else:
-					if self._memory[-1]=='STACK':
+					if isptr:
+						slice.append('%s->end()'%value)
+					elif self._memory[-1]=='STACK':
 						slice.append('%s.end()'%value)
 					else:
 						slice.append('%s->end()'%value)

@@ -26,6 +26,7 @@ class CppRustBase( GoGenerator ):
 		self._java_classpaths = []
 		self._known_strings = set()
 		self._force_cstr = False
+		self._known_pointers = {}
 		self.macros = {}
 
 
@@ -901,7 +902,9 @@ Subscript `a[n]`
 				if self._cpp:
 					## default to deference shared pointer ##
 					value = self.visit(node.value)
-					if self._memory[-1]=='STACK':
+					if value in self._known_pointers:
+						r = '(*%s)[%s]' % (value, self.visit(node.slice))
+					elif self._memory[-1]=='STACK':
 						r = '%s[%s]' % (value, self.visit(node.slice))
 					else:
 						r = '(*%s)[%s]' % (value, self.visit(node.slice))
@@ -1961,6 +1964,7 @@ TODO clean up go stuff.
 			self._known_strings   = set()
 			self._known_pyobjects = dict()
 			self._known_refs      = dict()
+			self._known_pointers  = dict()
 
 		elif len(self._function_stack) > 1:
 			## do not clear self._known_* inside of closures ##
@@ -2051,6 +2055,7 @@ TODO clean up go stuff.
 				self._known_refs[name] = args_typedefs[name]
 			elif args_typedefs[name].endswith('*'):
 				self._known_instances[name]= args_typedefs[name]
+				self._known_pointers[name] = args_typedefs[name]
 
 
 		returns_self = options['returns_self']
@@ -2496,7 +2501,12 @@ TODO clean up go stuff.
 			#	#out.append( self.indent() + 'return std::make_shared<%s>(this);' %self._class_stack[-1].name )  ## crashes GCC
 			#	out.append( self.indent() + 'return nullptr;' )  ## the exe with PGO will crash if nothing returns
 
-		out.append( self.indent()+'/*arrays:%s*/' %','.join(self._known_arrays) )
+		if len(self._known_arrays.keys()):
+			out.append( self.indent()+'/* arrays:')
+			for arrname in self._known_arrays:
+				arrtype = self._known_arrays[arrname]
+				out.append(self.indent()+'	%s : %s' %(arrname, arrtype))
+			out.append('*/')
 
 		self.pull()
 		if (self._rust or self._cpp) and is_closure:
