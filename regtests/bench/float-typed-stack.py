@@ -56,10 +56,10 @@ def test( arg:int ) ->[]float:
 	for i in range(arg):
 		t0 = clock()
 		o = benchmark(POINTS)
-		with stack:
-			print 'x:', o.x
-			print 'y:', o.y
-			print 'z:', o.z
+		#with stack:
+		#	print 'x:', o.x
+		#	print 'y:', o.y
+		#	print 'z:', o.z
 		tk = clock()
 		times.append(tk - t0)
 	return times

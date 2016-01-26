@@ -2791,6 +2791,8 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 				if attr=='append' and name in self._known_arrays:
 					if self.usertypes and 'vector' in self.usertypes:
 						return '%s->%s' %(name, self.usertypes['vector']['append'])
+					elif name in self._known_pointers:
+						return '%s->push_back' %name
 					elif self._memory[-1]=='STACK':
 						return '%s.push_back' %name
 					else:
@@ -3567,6 +3569,7 @@ because they need some special handling in other places.
 
 								## new style
 								if self._memory[-1]=='STACK':
+									self._known_pointers[target] = vectype
 									return '%s* %s = %s; /* 1D Array */' %(vectype, target, constuct )
 								elif self._unique_ptr:
 									r += 'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s); /* 1D Array */' %(vectype, target, vectype, target)

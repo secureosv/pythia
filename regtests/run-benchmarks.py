@@ -98,18 +98,18 @@ def runbench(path, name, backend='javascript', pgo=False):
 
 BENCHES = [
 	#'richards.py',
-	'fannkuch.py',
+	#'fannkuch.py',
 	#'nbody.py',
 	#'operator_overloading_functor.py',
 	#'operator_overloading_nonfunctor.py',
 	#'operator_overloading.py',
 	#'add.py',
-	#'float.py',
+	'float.py',
 	#'pystone.py',
 ]
 TYPED = [
 	'fannkuch.py',
-	#'float.py',
+	'float.py',
 	#'pystone.py',
 ]
 

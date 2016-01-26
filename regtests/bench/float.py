@@ -56,10 +56,9 @@ def test(arg):
 	for i in range(arg):
 		t0 = clock()
 		o = benchmark(POINTS)
-		print( 'x:', o.x)
-		print( 'y:', o.y)
-		print( 'z:', o.z)
-
+		#print( 'x:', o.x)
+		#print( 'y:', o.y)
+		#print( 'z:', o.z)
 		tk = clock()
 		times.append(tk - t0)
 	return times
