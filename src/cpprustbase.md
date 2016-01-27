@@ -442,7 +442,6 @@ note: `nullptr` is c++11
 				out.append(' * '+line)
 			out.append(' */')
 
-		#self.interfaces[ node.name ] = set()  ## old Go interface stuff
 
 		root_classes = set()  ## subsubclasses in c++ need to inherit from the roots
 		cpp_bases = list()
@@ -748,11 +747,6 @@ note: `nullptr` is c++11
 			for impl_def in self._cpp_class_header:
 				out.append( '\t' + impl_def )
 
-			#if init:  ## DEPRECATED
-			#	## in c++ constructor args can be extended by the subclass, but the parent constructors must be called first
-			#	## in the initalizer list, this is not pythonic.
-			#	##out.append('	%s( %s ) { this->__init__( %s ); }' %(node.name, init._args_signature, ','.join(init._arg_names)) )
-			#	out.append('	%s() {}' %node.name )  ## c++ empty constructor
 
 
 			## c++ empty constructor with `struct-emeddding` the class name
@@ -2164,7 +2158,7 @@ TODO clean up go stuff.
 							else:
 								arg_type = self.usertypes['string']['type']
 						else:
-							#arg_type = 'std::string'  ## standard string type in c++
+							## standard string type in c++ std::string
 							arg_type = arg_type.replace('string', 'std::string')
 
 					if 'std::' in arg_type and arg_type.endswith('>') and ('shared_ptr' in arg_type or 'unique_ptr' in arg_type):
@@ -2271,6 +2265,11 @@ TODO clean up go stuff.
 		if operator:
 			fname = 'operator ' + operator
 
+		#if self._cpp:
+		#	for arg in args:
+		#		if arg.startswith('string '):
+		#			raise RuntimeError(args)  ## should never happen
+
 		node._args_signature = ','.join(args)
 		####
 		if is_method:
@@ -2328,7 +2327,10 @@ TODO clean up go stuff.
 									args = []
 									for oarg in oargs:
 										oname = oarg[0]
-										args.append('%s %s' %(args_typedefs[oname], oname))
+										T = args_typedefs[oname]
+										if T=='string':
+											T = 'std::string'
+										args.append('%s %s' %(T, oname))
 										okwargs.append('%s(%s)' %(oname,oname))
 
 									okwargs = '->'.join(okwargs)
