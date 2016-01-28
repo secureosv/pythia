@@ -699,7 +699,7 @@ note: `nullptr` is c++11
 							#raise RuntimeError('%s contains %s' %(otherclass, node.name))
 							weakref = True
 
-					if not self._shared_pointers:
+					if not self._shared_pointers or self._memory[-1]=='STACK':
 						out.append('	%s*  %s;' %(T, name ))
 					elif self._unique_ptr:
 						out.append('	std::unique_ptr<%s>  %s;' %(T, name ))
@@ -1412,7 +1412,10 @@ handles all special calls
 
 						return '%s  %s = %s' %(T, varname, data)
 					else:
-						if not self._shared_pointers:
+						if not self._shared_pointers or self._memory[-1]=='STACK':
+							self._known_pointers[node.args[0].id] = T
+							if not len(self._function_stack):
+								self._globals[node.args[0].id] = T + '*'
 							return '%s*  %s = %s' %(T, node.args[0].id, self.visit(node.args[2]))
 						elif self._unique_ptr:
 							return 'std::unique_ptr<%s>  %s = %s' %(T, node.args[0].id, self.visit(node.args[2]))
@@ -2223,6 +2226,15 @@ TODO clean up go stuff.
 
 			if dindex >= 0 and node.args.defaults and not stdmove:
 				default_value = self.visit( node.args.defaults[dindex] )
+				## because _KwArgs_ class has argument types that refer to user defined
+				## classes (that are forward declared), only pointers or std::shared_ptr
+				## can be used as their type, otherwise g++ will fail with this error:
+				## error: ‘MyClass’ has incomplete type
+				if not self.is_prim_type(arg_type):
+					if not arg_type.endswith('*') and not arg_type.endswith('&') and not arg_type.endswith('>') and not arg_type.startswith('std::'):
+						assert self._memory[-1]=='STACK'
+						arg_type += '*'
+
 				self._kwargs_type_[ arg_name ] = arg_type
 				oargs.append( (arg_name, default_value) )
 			elif stdmove:
@@ -2781,6 +2793,8 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 
 		elif self._cpp and (name in self._known_pyobjects) and not isinstance(parent_node, ast.Attribute):
 			return 'PyObject_GetAttrString(%s,"%s")' %(name, attr)
+		elif self._cpp and name in self._globals and self._globals[name].endswith('*'):
+			return '%s->%s' %(name, attr)
 
 		elif (name in self._known_instances or name in self._known_arrays) and not isinstance(parent_node, ast.Attribute):
 			if self._cpp:
@@ -2963,7 +2977,9 @@ List Comp
 			if dimensions == 1:
 				vectype = subvectype
 			elif dimensions == 2:
-				if not self._shared_pointers:
+				if self._memory[-1]=='STACK':
+					vectype = 'std::vector<%s>' %subvectype
+				elif not self._shared_pointers:
 					vectype = 'std::vector<%s*>' %subvectype
 				elif self._unique_ptr:
 					vectype = 'std::vector<std::unique_ptr< %s >>' %subvectype
@@ -2977,19 +2993,19 @@ List Comp
 
 			if range_n:
 				if len(range_n)==1:
-					out.append('for (int %s=0; %s<%s; %s++) {' %(b, b, range_n[0], b))
+					out.append(self.indent()+'for (int %s=0; %s<%s; %s++) {' %(b, b, range_n[0], b))
 
 				elif len(range_n)==2:
-					out.append('for (int %s=%s; %s<%s; %s++) {' %(b, range_n[0], b, range_n[1], b))
+					out.append(self.indent()+'for (int %s=%s; %s<%s; %s++) {' %(b, range_n[0], b, range_n[1], b))
 
 			else:
-				out.append('for (auto &%s: %s) {' %(b, c))
+				out.append(self.indent()+'for (auto &%s: %s) {' %(b, c))
 
 			if slice_hack:
 				out.append( slice_hack )
 
 			if isprim:
-				out.append('	%s.push_back(%s);' %(compname, a))
+				out.append(self.indent()+'	%s.push_back(%s);' %(compname, a))
 			else:
 				assert type in self._classes
 				if False:
@@ -3008,23 +3024,21 @@ List Comp
 					out.append( r )
 					out.append('	%s.push_back(%s);' %(compname, tmp))
 
-				out.append('	%s.push_back(%s);' %(compname, a))
+				out.append(self.indent()+'	%s.push_back(%s);' %(compname, a))
 
 
-			out.append('}')  ## end comp for loop
+			out.append(self.indent()+'}')  ## end comp for loop
 
-			#if isprim:
-			#	out.append('auto %s = std::make_shared<std::vector<%s>>(%s);' %(target, type, compname))
-			#else:
-			#	out.append('auto %s = std::make_shared<std::vector< std::shared_ptr<%s> >>(%s);' %(target, type, compname))
+
 			## TODO vector.resize if size is given
-
-			if not self._shared_pointers:
-				out.append('auto %s = &%s;' %(target, compname))
+			if self._memory[-1]=='STACK':
+				out.append(self.indent()+'auto %s = %s;' %(target, compname))
+			elif not self._shared_pointers:
+				out.append(self.indent()+'auto %s = &%s;' %(target, compname))
 			elif self._unique_ptr:
-				out.append('auto %s = _make_unique<%s>(%s);' %(target, vectype, compname))
+				out.append(self.indent()+'auto %s = _make_unique<%s>(%s);' %(target, vectype, compname))
 			else:
-				out.append('auto %s = std::make_shared<%s>(%s);' %(target, vectype, compname))
+				out.append(self.indent()+'auto %s = std::make_shared<%s>(%s);' %(target, vectype, compname))
 
 		else:
 			raise RuntimeError('TODO list comp for some backend')

@@ -319,8 +319,9 @@ Function Decorators
 
 								if self._memory[-1]=='STACK':
 									for i in range(dims):
-										if i: T.append('*>')
-										else: T.append('>')
+										#if i: T.append('*>')
+										#else: T.append('>')
+										T.append('>')
 									T.append('*')
 
 								elif self._shared_pointers or 'vector' in self.usertypes:
@@ -447,7 +448,7 @@ Function Decorators
 
 					T = []
 					for i in range(options['returns_array_dim']):
-						if not self._shared_pointers:
+						if not self._shared_pointers or self._memory[-1]=='STACK':
 							T.append('std::vector<')
 						elif self._unique_ptr:
 							T.append('std::unique_ptr<std::vector<')
@@ -456,7 +457,11 @@ Function Decorators
 
 					T.append(options['returns_array_type'])
 
-					if self._shared_pointers:
+					if self._memory[-1]=='STACK':
+						for i in range(options['returns_array_dim']):
+							T.append('>')
+						#T.append('*')  ## return copy
+					elif self._shared_pointers and self._memory[-1]=='HEAP':
 						for i in range(options['returns_array_dim']):
 							T.append('>>')
 					else:
