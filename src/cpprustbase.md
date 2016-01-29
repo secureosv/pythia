@@ -2460,6 +2460,12 @@ TODO clean up go stuff.
 					T = args_typedefs[n]
 					if T=='string':
 						T = 'std::string'
+					## in stack mode the user must explicitly pass a pointer
+					## when using keyword arguments and object instances.
+					## (in heap mode this is not required)
+					if n in self._kwargs_type_ and self._memory[-1]=='STACK':
+						T = self._kwargs_type_[n]
+
 					out.append(self.indent() + '%s  %s = %s;' %(T,n,v))
 					out.append(self.indent() + 'if (__kwargs->__use__%s == true) {' %n )
 					out.append(self.indent() +  '  %s = __kwargs->_%s_;' %(n,n))

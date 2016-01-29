@@ -162,8 +162,9 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			header.append('class %s;' %classname)
 
 		if len(self._kwargs_type_.keys()):
+			#header.append('class _KwArgs_;')
+
 			impl = []
-			header.append('class _KwArgs_;')  ## forward declare
 			header.append('class _KwArgs_ {')
 			header.append('	public:')
 
@@ -220,6 +221,31 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			lines = header + list(self._imports) + lines
 		else:
 			lines = list(self._imports) + lines
+
+		if len(self._kwargs_type_.keys()) and False:
+			header = []
+			impl = []
+			header.append('class _KwArgs_ {')
+			header.append('	public:')
+
+			for name in self._kwargs_type_:
+				type = self._kwargs_type_[name]
+				header.append( '  %s _%s_;' %(type,name))
+				header.append( '  bool __use__%s;' %name)
+
+			for name in self._kwargs_type_:
+				type = self._kwargs_type_[name]
+				header.append( '  _KwArgs_*  %s(%s %s);' %(name, type, name))
+
+				impl.append( '  _KwArgs_*   _KwArgs_::%s(%s %s) {' %(name, type, name))
+				impl.append( '		this->__use__%s = true;' %name)
+				impl.append( '		this->_%s_ = %s;' %(name, name))
+				impl.append( '		return this;')
+				impl.append('};')
+			header.append('};')
+			header.extend( impl )
+			lines.extend(header)
+
 
 		pak['main'] = '\n'.join( lines )
 		return pak['main']
