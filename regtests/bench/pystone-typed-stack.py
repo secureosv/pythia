@@ -218,7 +218,14 @@ with stack:
 				IntLoc3 = 5 * IntLoc1 - IntLoc2
 				IntLoc3 = Proc7(IntLoc1, IntLoc2)
 				IntLoc1 = IntLoc1 + 1
-			Proc8(Array1Glob, Array2Glob, IntLoc1, IntLoc3)
+
+			#Proc8(Array1Glob, Array2Glob, IntLoc1, IntLoc3)
+			Proc8(
+				addr(Array1Glob), 
+				addr(Array2Glob), 
+				IntLoc1, IntLoc3
+			)
+
 
 			#PtrGlb[...] = Proc1( *PtrGlb )  # C++ style works up to two stars
 			PtrGlb[...] = Proc1( PtrGlb[...] )

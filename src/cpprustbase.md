@@ -2234,6 +2234,7 @@ TODO clean up go stuff.
 					if not arg_type.endswith('*') and not arg_type.endswith('&') and not arg_type.endswith('>') and not arg_type.startswith('std::'):
 						assert self._memory[-1]=='STACK'
 						arg_type += '*'
+						args_typedefs[arg_name] = arg_type
 
 				self._kwargs_type_[ arg_name ] = arg_type
 				oargs.append( (arg_name, default_value) )

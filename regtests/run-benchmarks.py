@@ -104,13 +104,13 @@ BENCHES = [
 	#'operator_overloading_nonfunctor.py',
 	#'operator_overloading.py',
 	#'add.py',
-	'float.py',
-	#'pystone.py',
+	#'float.py',
+	'pystone.py',
 ]
 TYPED = [
 	'fannkuch.py',
 	'float.py',
-	#'pystone.py',
+	'pystone.py',
 ]
 
 for name in BENCHES:
@@ -140,7 +140,8 @@ for name in BENCHES:
 
 
 		nametyped = name.replace('.py','-typed-stack.py')
-		times['c++stack']  = runbench('./bench', nametyped, 'c++')
+		if os.path.isfile('./bench/'+nametyped):
+			times['c++stack']  = runbench('./bench', nametyped, 'c++')
 
 		## only faster with if/else branches?
 		#times['c++PGO']  = runbench('./bench', nametyped, 'c++', pgo=True)
