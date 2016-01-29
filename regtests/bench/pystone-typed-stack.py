@@ -135,7 +135,7 @@ with stack:
 
 	def Proc8(Array1Par:[]int, Array2Par:[][]int, IntParI1:int, IntParI2:int):
 		global IntGlob
-
+		print 'enter Proc8'
 		IntLoc = IntParI1 + 5
 		Array1Par[IntLoc] = IntParI2
 		Array1Par[IntLoc+1] = Array1Par[IntLoc]
@@ -145,6 +145,7 @@ with stack:
 		Array2Par[IntLoc][IntLoc-1] = Array2Par[IntLoc][IntLoc-1] + 1
 		Array2Par[IntLoc+20][IntLoc] = Array1Par[IntLoc]
 		IntGlob = 5
+		print 'proc8 ok'
 
 	def Proc3(PtrParOut:Record) ->Record:
 		global IntGlob
@@ -186,10 +187,12 @@ with stack:
 		global Array2Glob
 		global PtrGlb
 		global PtrGlbNext
-
+		print 'enter proc0'
+		print 'setting PtrGlbNext...'
 		# can not use addr(...) on Record error: taking address of temporary
-		PtrGlbNext[...] =  Record( PtrComp=None, Discr=0, EnumComp=0, IntComp=0, StringComp='\0' )
-		
+		PtrGlbNext[...] =  Record( PtrComp=None, Discr=0, EnumComp=0, IntComp=0, StringComp='\0' )  ## segfaults here
+		print 'this never prints'
+		print 'PtrGlbNext set'
 
 		PtrGlb[...] = Record(
 			PtrComp=PtrGlbNext, 
@@ -200,13 +203,17 @@ with stack:
 		)
 
 		String1Loc = "DHRYSTONE PROGRAM, 1'ST STRING"
+		print String1Loc
+
 		Array2Glob[8][7] = 10
+		#print Array2Glob
 
 		## c++ has different variable scope rules that are safer (and better)
 		## than regular Python, where IntLoc3 is created in while loop below `while IntLoc1 < IntLoc2:`
 		## IntLoc3 then bleeds into the outer scope, this is bad, what if `IntLoc1 > IntLoc2` then IntLoc3 is what?
 		IntLoc3 = -1  ## c++ scope hack
 		for i in range(loops):
+			print i
 			Proc5()
 			Proc4()
 			IntLoc1 = 2
