@@ -636,6 +636,7 @@ note: `nullptr` is c++11
 				## We require the same memory location for `__class__` because the `isinstance`
 				## hack requires on `__class__` always being valid to check an objects class type at runtime.
 				out.append( '	std::string __class__;')
+				out.append( '	bool __initialized__;')
 
 		else:
 			out.append( 'struct %s {' %node.name)
@@ -754,8 +755,14 @@ note: `nullptr` is c++11
 			## member initializer list `MyClass() : x(1) {}` only work when `x` is locally defined inside the class,
 			## it breaks on `__class__` because that is defined in the parent class, instead `__class__` is initalized in the constructors body.
 			## TODO make __class__ static const string.
+
 			if not extern_classes:
-				out.append('	%s() {__class__ = std::string("%s");}' %(node.name, node.name) )
+				out.append('	bool operator != (std::nullptr_t rhs) {return __initialized__;}' )
+				out.append('	bool operator == (std::nullptr_t rhs) {return !__initialized__;}' )
+				out.append('	%s() {__class__ = std::string("%s"); __initialized__ = true;}' %(node.name, node.name) )
+
+				## `let a:MyClass = None` is generated when in stack mode and an object is created and set to None.
+				out.append('	%s(bool init) {__class__ = std::string("%s"); __initialized__ = init;}' %(node.name, node.name) )
 
 				if self._polymorphic:
 					out.append('	virtual std::string getclassname() {return this->__class__;}')  ## one virtual method makes class polymorphic
@@ -1296,6 +1303,7 @@ handles all special calls
 				vname = node.args[0].id
 			elif len(node.args)==2 and isinstance(node.args[0], ast.Call):
 				## syntax: `let foo(bar) : SomeClass`, translates into c++11 universal constructor call
+				## used when using classes from external libraries.
 				assert self._cpp
 				if isinstance(node.args[1], ast.Str):
 					T = node.args[1].s
@@ -1412,7 +1420,12 @@ handles all special calls
 
 						return '%s  %s = %s' %(T, varname, data)
 					else:
-						if not self._shared_pointers or self._memory[-1]=='STACK':
+						if self._memory[-1]=='STACK':
+							value = self.visit(node.args[2])
+							if value == 'nullptr' and not T.endswith('*'):
+								value = T + '(false)'  ## special case, construct the class to act like `None`
+							return '%s  %s = %s' %(T, node.args[0].id, value)
+						elif not self._shared_pointers:
 							self._known_pointers[node.args[0].id] = T
 							if not len(self._function_stack):
 								self._globals[node.args[0].id] = T + '*'
@@ -2800,7 +2813,11 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 
 		elif self._cpp and (name in self._known_pyobjects) and not isinstance(parent_node, ast.Attribute):
 			return 'PyObject_GetAttrString(%s,"%s")' %(name, attr)
+
 		elif self._cpp and name in self._globals and self._globals[name].endswith('*'):
+			return '%s->%s' %(name, attr)
+
+		elif self._cpp and name in self._known_pointers:
 			return '%s->%s' %(name, attr)
 
 		elif (name in self._known_instances or name in self._known_arrays) and not isinstance(parent_node, ast.Attribute):
