@@ -104,14 +104,14 @@ with stack:
 			return IntParIO
 
 		def Proc4():
-			global Char2Glob
+			nonlocal Char2Glob
 			BoolLoc = Char1Glob == 'A'
 			BoolLoc = BoolLoc or BoolGlob
 			Char2Glob = 'B'
 
 		def Proc5():
-			global Char1Glob
-			global BoolGlob
+			nonlocal Char1Glob
+			nonlocal BoolGlob
 			Char1Glob = 'A'
 			BoolGlob = FALSE
 
@@ -140,7 +140,7 @@ with stack:
 			return IntParOut
 
 		def Proc8(Array1Par:[]int, Array2Par:[][]int, IntParI1:int, IntParI2:int):
-			global IntGlob
+			nonlocal IntGlob
 			IntLoc = IntParI1 + 5
 			Array1Par[IntLoc] = IntParI2
 			Array1Par[IntLoc+1] = Array1Par[IntLoc]
@@ -152,7 +152,7 @@ with stack:
 			IntGlob = 5
 
 		def Proc3(PtrParOut:Record) ->Record:
-			global IntGlob
+			nonlocal IntGlob
 			if PtrGlb is not None:
 				PtrParOut = PtrGlb.PtrComp
 			else:
@@ -182,16 +182,9 @@ with stack:
 
 
 		def Proc0():
-			global IntGlob
-			global BoolGlob
-			global Char1Glob
-			global Char2Glob
-			global Array1Glob
-			global Array2Glob
-			global PtrGlb
-			global PtrGlbNext
+			nonlocal IntGlob, BoolGlob, Char1Glob, Char2Glob, Array1Glob, Array2Glob, PtrGlb, PtrGlbNext
 
-			PtrGlbNext =  Record( PtrComp=None, Discr=0, EnumComp=0, IntComp=0, StringComp='\0' )  ## segfaults here
+			PtrGlbNext =  Record( PtrComp=None, Discr=0, EnumComp=0, IntComp=0, StringComp='\0' )
 
 			PtrGlb = Record(
 				PtrComp=addr(PtrGlbNext), 
