@@ -352,7 +352,9 @@ class TaskWorkArea(object):
 		self.taskTab[i] = c
 
 #global_tasks = []Task(None for i in range(10))
-global_tasks = [10]Task()
+#global_tasks = []Task()
+let global_tasks: [10]Task
+
 taskWorkArea = TaskWorkArea(global_tasks)
 
 def schedule():

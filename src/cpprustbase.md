@@ -1370,8 +1370,37 @@ handles all special calls
 				return '%s %s			/* declared - rust maybe able to infer the type */' %(V, node.args[0].id)
 			elif len(node.args) == 2:
 				if self._cpp:
+					is_array = False
 					if isinstance(node.args[1], ast.Str):
 						T = node.args[1].s
+						if '__go__array__(' in T:
+							is_array = True
+							dims = T.count('__go__array__')
+							atype = T.split('(')[-1]
+							if not self.is_prim_type(atype):
+								atype = 'std::shared_ptr<%s>' %atype
+
+							if dims==1:
+								T = 'std::vector<%s>' %atype
+							else:
+								raise RuntimeError(T)  ## TODO
+
+							## note: if a shared_ptr is created on the stack without
+							## std::make_shared it will print as `0`
+							## and if not initalized with data, will segfault if push_back is called.
+							## return '%s  %s' %(T, node.args[0].id)
+							return 'auto %s = std::make_shared<%s>()' %(node.args[0].id, T)
+
+						elif T.startswith('[') and ']' in T:
+							is_array = True
+							x,y = T.split(']')
+							if self._memory[-1]=='STACK':
+								T = y + x + ']'
+							else:
+								alen = x.split('[')[-1].strip()
+								return 'auto %s = std::make_shared<std::vector<%s>>(%s)' %(node.args[0].id, y, alen)
+
+
 					else:
 						T = node.args[1].id
 
