@@ -22,8 +22,7 @@ for md in files:
 	if md.startswith( ignore ):
 		continue
 	subprocess.check_call([
-		'python',
-		'../rusthon.py',
+		'pythia',
 		'--go',
 		os.path.join('./go', md)
 	])
