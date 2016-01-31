@@ -33,7 +33,7 @@ BUFSIZE_RANGE = range(BUFSIZE)
 
 class Packet(object):
 
-	def __init__(self,l:Packet, i:int, k:int):
+	def __init__(self,link:Packet, ident:int, kind:int):
 		self.link = l
 		self.ident = i
 		self.kind = k
@@ -171,7 +171,7 @@ class Task(TaskState):
 		#taskWorkArea.taskTab[i] = self
 		taskWorkArea.set_task(self, i)
 
-	def fn(self, pkt:*Packet, r:TaskRec) -> self:
+	def fn(self, pkt:Packet, r:TaskRec) -> self:
 		#raise NotImplementedError  ## could make function abstract in c++ TODO
 		print('NotImplementedError')
 		print(r)
@@ -232,7 +232,7 @@ class Task(TaskState):
 		return t.addPacket(pkt,self)
 
 
-	def findtcb(self,id:int) -> *Task:
+	def findtcb(self,id:int) -> Task:
 		t = taskWorkArea.taskTab[id]
 		if t is None:
 			print('Exception in findtcb')
@@ -266,7 +266,7 @@ class HandlerTask(Task):
 	def __init__(self,i:int, p:int, w:Packet, s:TaskState, r:TaskRec):
 		Task.__init__(self,i,p,w,s,r)
 
-	def fn(self, pkt:*Packet, h:HandlerTaskRec) -> self:
+	def fn(self, pkt:Packet, h:HandlerTaskRec) -> self:
 		if pkt is not None:
 			if pkt.kind == K_WORK:
 				h.workInAdd(pkt)
@@ -341,12 +341,9 @@ class WorkTask(Task):
 
 
 class TaskWorkArea(object):
-	def __init__(self):
+	def __init__(self, taskTab:[]Task ):
 		let self.task    : Task = None
-		comp = []Task(None for i in range(10))
-		#let self.taskTab : []Task  = comp  ## TODO fix me c++
-		let self.taskTab : []Task
-		self.taskTab   = comp
+		self.taskTab   = taskTab
 		self.holdCount = 0
 		self.qpktCount = 0
 
@@ -354,7 +351,9 @@ class TaskWorkArea(object):
 		self.task = c
 		self.taskTab[i] = c
 
-taskWorkArea = TaskWorkArea()
+#global_tasks = []Task(None for i in range(10))
+global_tasks = [10]Task()
+taskWorkArea = TaskWorkArea(global_tasks)
 
 def schedule():
 	t = taskWorkArea.task
@@ -376,7 +375,7 @@ class Richards(object):
 			taskWorkArea.holdCount = 0
 			taskWorkArea.qpktCount = 0
 
-			#IdleTask(I_IDLE, 1, 10000, TaskState().running(), IdleTaskRec())
+			#IdleTask(I_IDLE, 1, 10000, TaskState().running(), IdleTaskRec())  ##??
 			IdleTask(I_IDLE, 1, None, TaskState().running(), IdleTaskRec())
 
 			wkq = Packet(None, 0, K_WORK)

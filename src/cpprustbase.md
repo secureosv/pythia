@@ -1315,7 +1315,8 @@ handles all special calls
 
 			elif len(node.args) and isinstance(node.args[0], ast.Attribute): ## syntax `let self.x:T = y`
 				assert node.args[0].value.id == 'self'
-				assert len(node.args)==3
+				if not len(node.args)==3:
+					raise SyntaxError(','.join([self.visit(a) for a in node.args]))
 				T = None
 				value = self.visit(node.args[2])
 				if isinstance(node.args[1], ast.Str):
@@ -1641,6 +1642,8 @@ regular Python has no support for.
 				node.right._comp_dims = 2
 				raise err
 			else:
+				print node.left
+				print node.right
 				raise SyntaxError(self.format_error(err))
 
 		if op == '>>' and left == '__new__':
