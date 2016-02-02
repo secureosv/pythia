@@ -3254,6 +3254,10 @@ because they need some special handling in other places.
 						return '%s %s%s;' %(value[0], target, value[1] )
 					else:
 						return 'auto %s = std::make_shared<%s>(%s);' %(target, value[0], ','.join(value[1]) )
+				elif len(value)==3:
+					arrtype, arrsize, arrcon = value
+					return 'auto %s = std::make_shared<%s>(%s);' %(target, arrtype, arrsize)
+
 				else:
 					raise RuntimeError(value)
 

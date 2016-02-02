@@ -13,13 +13,16 @@ let Foos: []Foo
 let TwentyFoos : [20]Foo
 
 mycomp = []int()
+twentyints = [20]int()
 
 def main():
 	print 'len mycomp:', len(mycomp)
+	assert len(mycomp)==0
+
 	mycomp2 = []int()
 	mycomp2.append( 10 )
 	print 'len mycomp2:', len(mycomp2)
-
+	assert len(mycomp2)==1
 
 	print Foos
 
