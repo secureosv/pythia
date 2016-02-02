@@ -1749,6 +1749,8 @@ regular Python has no support for.
 						else:
 							right.append( self.visit(elt) )
 
+					rargs = right[:]
+
 					if self._rust:
 						right = '(%s)' %','.join(right)
 					elif self._cpp:
@@ -1757,7 +1759,7 @@ regular Python has no support for.
 					if node.left.func.id == '__go__array__':
 						T = self.visit(node.left.args[0])
 						if self._cpp:
-							return ('std::vector<%s>*'%T, right)   ## note special case, returns a tuple.
+							return ('std::vector<%s>'%T, rargs)   ## note special case, returns a tuple.
 
 						elif self._rust:
 							#return '&mut vec!%s' %right
@@ -1771,7 +1773,7 @@ regular Python has no support for.
 						atype = self.visit(node.left.args[1])
 						isprim = self.is_prim_type(atype)
 						if self._cpp:
-							return ('std::vector<%s>'%atype, asize, right) ## note special case, returns a tuple.
+							return ('std::vector<%s>'%atype, asize, rargs) ## note special case, returns a tuple.
 						elif self._rust:
 							#return '&vec!%s' %right
 							return 'Rc::new(RefCell::new(vec!%s))' %right
@@ -3245,7 +3247,16 @@ because they need some special handling in other places.
 
 		elif not self._function_stack:  ## global level
 			value = self.visit(node.value)
-			#return 'var %s = %s;' % (target, value)
+			if isinstance(value, tuple):
+				assert self._cpp
+				if len(value)==2:
+					if self._memory[-1]=='STACK':
+						return '%s %s%s;' %(value[0], target, value[1] )
+					else:
+						return 'auto %s = std::make_shared<%s>(%s);' %(target, value[0], ','.join(value[1]) )
+				else:
+					raise RuntimeError(value)
+
 
 
 			if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in self._classes:
