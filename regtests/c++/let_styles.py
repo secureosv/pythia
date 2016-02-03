@@ -40,3 +40,5 @@ def main():
 	assert len(Foos)==1
 
 	print len(TwentyFoos)
+	TwentyFoos[0] = f
+	print TwentyFoos[0]

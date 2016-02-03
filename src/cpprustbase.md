@@ -1411,6 +1411,8 @@ handles all special calls
 								T = y + x + ']'
 							else:
 								alen = x.split('[')[-1].strip()
+								if not self.is_prim_type(y):
+									y = 'std::shared_ptr<%s>' %y
 								return 'auto %s = std::make_shared<std::vector<%s>>(%s)' %(node.args[0].id, y, alen)
 
 
