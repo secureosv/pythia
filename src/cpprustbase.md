@@ -563,6 +563,10 @@ note: `nullptr` is c++11
 					else:
 						v = self.visit( b.value.values[i] )
 
+					if v.startswith('['):  ## swap array style to C++
+						x,y = v.split(']')
+						v = y + x + ']'
+
 					sdef[k] = v
 
 
@@ -686,7 +690,11 @@ note: `nullptr` is c++11
 			member_isprim = self.is_prim_type(T)
 			if self._cpp:
 				if T=='string': T = 'std::string'
-				if member_isprim:
+
+				if T.endswith(']'):
+					x,y = T.split('[')
+					out.append('	%s  %s[%s;' %(x, name, y ))
+				elif member_isprim:
 					out.append('	%s  %s;' %(T, name ))
 				else:
 					otherclass = T.split('<')[-1].split('>')[0]
@@ -1315,14 +1323,19 @@ handles all special calls
 
 			elif len(node.args) and isinstance(node.args[0], ast.Attribute): ## syntax `let self.x:T = y`
 				assert node.args[0].value.id == 'self'
-				if not len(node.args)==3:
-					raise SyntaxError(','.join([self.visit(a) for a in node.args]))
 				T = None
-				value = self.visit(node.args[2])
 				if isinstance(node.args[1], ast.Str):
 					T = node.args[1].s
 				else:
 					T = self.visit(node.args[1])
+
+				if len(node.args)==2:
+					#raise SyntaxError(','.join([self.visit(a) for a in node.args]))
+					if T.startswith('['):
+						return '/* %s : %s */' %(node.args[0].attr, T)
+
+
+				value = self.visit(node.args[2])
 
 				if isinstance(node.args[2], ast.Dict):
 					assert T.startswith('__go__map__')

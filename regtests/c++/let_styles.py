@@ -1,12 +1,12 @@
 '''
 let syntax example
 '''
-NUM = 100
+#NUM = 100  ## requires constant
 
 class Foo():
 	def __init__(self):
 		#let self.data : [NUM]int
-		pass
+		let self.data : [100]int
 
 let Foos: []Foo
 

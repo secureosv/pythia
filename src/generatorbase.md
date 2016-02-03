@@ -203,6 +203,8 @@ or something that needs to be wrapped by a pointer/shared-reference.
 			prims.append( 'interface{}' )
 		if T in prims:
 			return True
+		elif T.endswith(']'):  ## c-style array
+			return True
 		else:
 			return False
 
