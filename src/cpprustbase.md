@@ -3822,8 +3822,14 @@ because they need some special handling in other places.
 					if self._cpp:
 						if isinstance(node.value, ast.Expr) and isinstance(node.value.value, ast.BinOp) and self.visit(node.value.value.op)=='<<':
 							raise SyntaxError(node.value.value.left)
+						elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='new':
+							V = self.visit(node.value.args[0])
+							if isinstance(V, tuple):
+								return 'auto %s = new %s({%s});' %(target, V[0], ','.join(V[1]))
+							else:
+								return 'auto %s = %s;			/* new variable*/' % (target, value)
 						else:
-							return 'auto %s = %s;			/* new variable */' % (target, value)
+							return 'auto %s = %s;			/* new variable*/' % (target, value)
 					else:
 						return 'let %s = %s;			/* new variable */' % (target, value)
 
