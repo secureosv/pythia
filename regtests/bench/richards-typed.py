@@ -27,20 +27,18 @@ K_WORK = 1001
 
 # Packet
 
-BUFSIZE = 4
+macro('#define BUFSIZE 4')
 
 BUFSIZE_RANGE = range(BUFSIZE)
 
 class Packet(object):
 
 	def __init__(self,link:Packet, ident:int, kind:int):
-		self.link = l
-		self.ident = i
-		self.kind = k
-		self.datum = 0
-		self.data = []int()
-		for x in range(BUFSIZE):
-			self.data.append( 0 )
+		self.link = link
+		self.ident = ident
+		self.kind = kind
+		let self.datum:int = 0
+		let self.data : [BUFSIZE]int
 
 	def append_to(self, lst:Packet) ->Packet:
 		self.link = None
@@ -91,9 +89,9 @@ class WorkerTaskRec(TaskRec):
 
 class TaskState(object):
 	def __init__(self):
-		self.packet_pending = True
-		self.task_waiting = False
-		self.task_holding = False
+		let self.packet_pending:bool = True
+		let self.task_waiting:bool   = False
+		let self.task_holding:bool   = False
 
 	def packetPending(self) -> self:
 		self.packet_pending = True
@@ -219,7 +217,7 @@ class Task(TaskState):
 		t = self.findtcb(i)
 		t.task_holding = False
 		if t.priority > self.priority:
-			return go.type_assert(t, self)
+			return t
 		else:
 			return self
 
@@ -344,8 +342,8 @@ class TaskWorkArea(object):
 	def __init__(self, taskTab:[]Task ):
 		let self.task    : Task = None
 		self.taskTab   = taskTab
-		self.holdCount = 0
-		self.qpktCount = 0
+		let self.holdCount:int = 0
+		let self.qpktCount:int = 0
 
 	def set_task(self, c:Task, i:int):
 		self.task = c
@@ -407,7 +405,7 @@ class Richards(object):
 
 		return True
 
-def entry_point(iterations:int) ->float64:
+def entry_point(iterations:int) ->double:
 	r = Richards()
 	startTime = clock()
 	result = r.run(iterations)
@@ -420,6 +418,6 @@ def main():
 	#print("#Richards benchmark (Python) starting. iterations="+str(iterations))
 	total_s = entry_point(iterations)
 	#print("#Total time for %s iterations: %s secs" %(iterations,total_s))
-	s = total_s / float64(iterations)
+	s = total_s / iterations
 	#print("#Average seconds per iteration:", s)
 	print(s)
