@@ -15,7 +15,12 @@ let TwentyFoos : [20]Foo
 mycomp = []int()
 twentyints = [20]int()
 
+gFoo = Foo()
+
+
 def main():
+	print gFoo
+
 	print 'len mycomp:', len(mycomp)
 	assert len(mycomp)==0
 

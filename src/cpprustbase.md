@@ -3277,8 +3277,11 @@ because they need some special handling in other places.
 
 
 			if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in self._classes:
-				value = '__new__' + value
-				return 'let %s *%s = %s;' % (target, node.value.func.id, value)  ## rust, TODO can c++ construct globals on the heap outside of function?
+				if self._rust:
+					value = '__new__' + value
+					return 'let %s *%s = %s;' % (target, node.value.func.id, value)  ## rust, TODO can c++ construct globals on the heap outside of function?
+				else:
+					return 'auto %s = %s;' %(target, value)
 			else:
 				guesstype = 'auto'
 				if isinstance(node.value, ast.Num):
