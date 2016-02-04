@@ -589,11 +589,16 @@ note: `nullptr` is c++11
 		parent_init = None
 		overload_nodes = []
 		overloaded  = []  ## this is just for rust
+		overloaded_returns_self = []
 		if base_classes:
 			for bnode in base_classes:
 				for b in bnode.body:
 					if isinstance(b, ast.FunctionDef):
 						overload_nodes.append( b )
+						if hasattr(b, 'returns_self') and b.returns_self:
+							if b.name != '__init__':
+								overloaded_returns_self.append(b)
+
 						## catch_call trick is used to call methods on base classes from the subclass.
 						if self._cpp:
 							##self.catch_call.add( '%s->%s' %(bnode.name, b.name))
@@ -749,6 +754,9 @@ note: `nullptr` is c++11
 		for b in node.body:
 			if isinstance(b, ast.FunctionDef):
 				impl.append( self.visit(b) )
+
+		for b in overloaded_returns_self:
+			impl.append( self.visit(b) )
 
 		## required by new style because __init__ returns this which needs to be defined for each subclass type ##
 		if self._cpp and not init and parent_init:
@@ -2121,7 +2129,7 @@ TODO clean up go stuff.
 				self._known_pointers[name] = args_typedefs[name]
 
 
-		returns_self = options['returns_self']
+		node.returns_self = returns_self = options['returns_self']
 		return_type = options['returns']
 		generic_base_class = options['generic_base_class']
 		if returns_self and self._cpp:

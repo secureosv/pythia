@@ -7,6 +7,11 @@ class A:
 		self.other = other
 	def method(self) -> int:
 		return self.x
+	def get_self(self) ->self:
+		return self
+	def set_self(self):
+		#self.other.other = self  ## TODO
+		self.other.other = self.get_self()
 
 class B(A):
 	def foo(self) ->int:
@@ -43,6 +48,9 @@ def main():
 	c = some_subclass(2, b)
 	d = some_subclass(3, c)
 
+	bb = b.get_self()
+	#assert bb.foo()==4  ## this wont work here
+
 	#assert a.getclassname() == 'A'  ## TODO fix
 	#assert b.getclassname() == 'B'
 	print(c.getclassname())
@@ -64,6 +72,8 @@ def main():
 	print('- - - - - - - ')
 	if isinstance(b, B):
 		assert b.foo()==4
+		bbb = b.get_self()
+		assert bbb.foo()==4
 	else:
 		raise RuntimeError('error: b is not type B')
 
