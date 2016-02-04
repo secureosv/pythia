@@ -310,10 +310,14 @@ TODO test `if pointer:` c++
 		if isinstance_test:
 			assert self._cpp
 			self._rename_hacks[target] = '_cast_%s' %target
+			targ = target
+			if '->' in target:
+				targ = target.replace('->', '_')
+
 			if self._polymorphic:
-				out.append(self.indent()+'auto _cast_%s = std::dynamic_pointer_cast<%s>(%s);' %(target, classname, target))
+				out.append(self.indent()+'auto _cast_%s = std::dynamic_pointer_cast<%s>(%s);' %(targ, classname, target))
 			else:
-				out.append(self.indent()+'auto _cast_%s = std::static_pointer_cast<%s>(%s);' %(target, classname, target))
+				out.append(self.indent()+'auto _cast_%s = std::static_pointer_cast<%s>(%s);' %(targ, classname, target))
 
 		elif ispyinstance_test:
 			assert self._cpp
@@ -2852,6 +2856,9 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 
 			else:
 				return 'this->%s' %attr
+
+		elif name in self._rename_hacks and not isinstance(parent_node, ast.Attribute):
+			return '_cast_%s->%s' %(name.replace('->', '_'), attr)
 
 		elif name.startswith('nuitka->') and not isinstance(parent_node, ast.Attribute):
 			assert attr in ('module', 'moduledict')
