@@ -1081,6 +1081,9 @@ def parse_and_fix_code(r, output):
 			eline = ''.join(earr)
 			output[e.lineno-1] = eline
 			parse_and_fix_code('\n'.join(output), output)
+		elif echar_prev=='s' and ' as ' in eline:
+			output[e.lineno-1] = eline.replace(' as ','<<__as__<<' )
+			parse_and_fix_code('\n'.join(output), output)
 
 		else:
 			print '-'*80

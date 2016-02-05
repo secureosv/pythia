@@ -16,6 +16,8 @@ class A:
 class B(A):
 	def foo(self) ->int:
 		return self.x * 2
+	def foo(self, x:float, y:float) ->int:
+		return (x+y) as int
 
 class C(A):
 	def bar(self) ->int:
@@ -67,6 +69,14 @@ def main():
 
 	## the method not allowed here because `other` is reduced to the super class `A`
 	#assert c.other.foo()==4
+	## this works using an explicit cast
+	assert (c.other as B).foo()==4
+	## testing overloaded method
+	assert (c.other as B).foo(
+			100 as float,
+			200 as float
+		) == 300
+
 
 
 	print('- - - - - - - ')
