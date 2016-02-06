@@ -114,4 +114,10 @@ def main():
 		if isinstance(o,C):		## TODO-FIX elif isinstance(o,C)
 			print(o.bar())
 
+		switch type(o):
+			case B:
+				assert o.foo()==4
+			case C:
+				assert o.bar()==203
+
 	print('end of test')

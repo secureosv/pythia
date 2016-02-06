@@ -517,6 +517,7 @@ Also implements extra syntax like `switch` and `select`.
 		r = []
 		is_select = False
 		is_switch = False
+		is_switch_type = False
 		is_match  = False
 		is_case   = False
 		is_extern = False
@@ -577,6 +578,7 @@ Also implements extra syntax like `switch` and `select`.
 			is_select = True
 			self._match_stack.append( list() )
 			self._in_select_hack = True
+			self._with_type.append('SELECT')
 
 			if self._rust:
 				r.append(self.indent()+'select! (')
@@ -625,7 +627,8 @@ Also implements extra syntax like `switch` and `select`.
 							#self.visit(kw.value) ## TODO allow worker returned from some call
 							cid = kw.value.right.id
 							case_match = 'if (𝑾𝒐𝒓𝒌𝒆𝒓𝑷𝒐𝒐𝒍.select(%s).length) {var %s = 𝑾𝒐𝒓𝒌𝒆𝒓𝑷𝒐𝒐𝒍.select(%s).pop();' %(cid, kw.arg, cid)
-
+					elif is_switch_type:
+						raise SyntaxError('invalid switch type')
 					else:
 						case_match = '%s = %s' %(kw.arg, self.visit(kw.value))
 				else:
@@ -641,7 +644,15 @@ Also implements extra syntax like `switch` and `select`.
 					else:
 						r.append(self.indent()+'}, %s => { ' %case_match )
 				else:
-					r.append(self.indent()+'case %s: {' %case_match) ## extra scope
+					if self._with_type[-1]=='SWITCH_TYPE':
+						T = case_match
+						o = self._switch_on_type_object[-1]
+						classid = self._classes.keys().index(T)
+						r.append(self.indent()+'case %s: {' %classid) ## extra scope
+						r.append(self.indent()+'	auto _cast_%s = std::static_pointer_cast<%s>(%s);' %(o, T, o))
+						case_match = '"%s"' %case_match
+					else:
+						r.append(self.indent()+'case %s: {' %case_match) ## extra scope
 
 				if not len(self._match_stack):
 					raise SyntaxError('case statement used outside of a select or switch block')
@@ -657,7 +668,21 @@ Also implements extra syntax like `switch` and `select`.
 					r.append(self.indent()+'match (%s) {' %self.visit(node.context_expr.args[0]))
 					is_match = True
 				else:
-					r.append(self.indent()+'switch (%s) {' %self.visit(node.context_expr.args[0]))
+					switch_value = self.visit(node.context_expr.args[0])
+					if switch_value.startswith('type(') and switch_value.endswith(')'):
+						is_switch_type = True
+						switch_object = switch_value[ len('type(') : -1 ].strip()
+						self._rename_hacks[switch_object] = '_cast_' + switch_object
+						self._switch_on_type_object.append(switch_object)
+						switch_value = switch_object + '->__classid__'
+					r.append(self.indent()+'switch (%s) {' %switch_value)
+
+				if is_switch_type:
+					self._with_type.append('SWITCH_TYPE')
+				elif is_match:
+					self._with_type.append('SWITCH_MATCH')
+				else:
+					self._with_type.append('SWITCH')
 
 
 			elif node.context_expr.func.id == 'extern':
@@ -972,11 +997,16 @@ Also implements extra syntax like `switch` and `select`.
 			else:
 				r.append(self.indent()+'break; }')
 
+			self._with_type.pop()
+
 		elif is_switch:
 			if self._rust and not self._cpp:
 				r.append(self.indent()+'}}')  ## rust needs extra closing brace for the match-block
 			else:
 				r.append(self.indent()+'}')
+
+			self._with_type.pop()
+			self._rename_hacks.clear()   ## TODO properly clear
 
 		return '\n'.join(r)
 

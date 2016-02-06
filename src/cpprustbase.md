@@ -14,6 +14,8 @@ class CppRustBase( GoGenerator ):
 		self._global_types = {
 			'string' : set()
 		}
+		self._with_type = []
+		self._switch_on_type_object = []
 		self._lambda_stack = []
 		self._memory = ['HEAP']  ## affects how `.` is default translated to `->` or `.`
 		self._rust = True
@@ -650,7 +652,7 @@ note: `nullptr` is c++11
 				## hack requires on `__class__` always being valid to check an objects class type at runtime.
 				out.append( '	std::string __class__;')
 				out.append( '	bool __initialized__;')
-
+				out.append( '	int  __classid__;')
 		else:
 			out.append( 'struct %s {' %node.name)
 			## rust requires that a struct contains at least one item,
@@ -777,12 +779,13 @@ note: `nullptr` is c++11
 			## TODO make __class__ static const string.
 
 			if not extern_classes:
+				classid = self._classes.keys().index(node.name)
 				out.append('	bool operator != (std::nullptr_t rhs) {return __initialized__;}' )
 				out.append('	bool operator == (std::nullptr_t rhs) {return !__initialized__;}' )
-				out.append('	%s() {__class__ = std::string("%s"); __initialized__ = true;}' %(node.name, node.name) )
+				out.append('	%s() {__class__ = std::string("%s"); __initialized__ = true; __classid__=%s;}' %(node.name, node.name, classid) )
 
 				## `let a:MyClass = None` is generated when in stack mode and an object is created and set to None.
-				out.append('	%s(bool init) {__class__ = std::string("%s"); __initialized__ = init;}' %(node.name, node.name) )
+				out.append('	%s(bool init) {__class__ = std::string("%s"); __initialized__ = init; __classid__=%s;}' %(node.name, node.name, classid) )
 
 				if self._polymorphic:
 					out.append('	virtual std::string getclassname() {return this->__class__;}')  ## one virtual method makes class polymorphic
