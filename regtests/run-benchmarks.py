@@ -97,7 +97,7 @@ def runbench(path, name, backend='javascript', pgo=False):
 	return str(T)
 
 BENCHES = [
-	#'richards.py',
+	'richards.py',
 	#'fannkuch.py',
 	#'nbody.py',
 	#'operator_overloading_functor.py',
@@ -105,12 +105,13 @@ BENCHES = [
 	#'operator_overloading.py',
 	#'add.py',
 	#'float.py',
-	'pystone.py',
+	#'pystone.py',
 ]
 TYPED = [
 	'fannkuch.py',
 	'float.py',
 	'pystone.py',
+	'richards.py',
 ]
 
 for name in BENCHES:

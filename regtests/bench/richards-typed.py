@@ -157,7 +157,7 @@ class Task(TaskState):
 
 	# note: r:TaskRec is the super class, TODO cast to its subclass.
 	def __init__(self,ident:int, priority:int, input:Packet, initialState:TaskState, handle:TaskRec):
-		let self.link     : Task = taskWorkArea.task
+		let self.link     : Task = taskWorkArea.taskList
 		self.ident = ident
 		self.priority = priority
 		self.input = input
@@ -168,8 +168,9 @@ class Task(TaskState):
 
 		self.handle = handle  ## generic - some subclass
 
-		taskWorkArea.taskList = self
-		taskWorkArea.taskTab[ident] = self
+		with SP as 'std::shared_ptr<Task>':
+			taskWorkArea.taskList = SP(self)
+			taskWorkArea.taskTab[ident] = SP(self)
 
 
 	def addPacket(self,p:Packet, old:Task) -> Task:
@@ -343,8 +344,8 @@ class WorkTask(Task):
 
 class TaskWorkArea(object):
 	def __init__(self, taskTab:[]Task ):
-		let self.task    : Task = None
-		self.taskTab   = taskTab
+		self.taskTab = taskTab
+		let self.taskList : Task = None
 		let self.holdCount:int = 0
 		let self.qpktCount:int = 0
 
@@ -356,7 +357,7 @@ let global_tasks: [10]Task
 taskWorkArea = TaskWorkArea(global_tasks)
 
 def schedule():
-	t = taskWorkArea.task
+	t = taskWorkArea.taskList
 	while t is not None:
 		#pkt = None
 		#if tracing:

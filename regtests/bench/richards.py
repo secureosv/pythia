@@ -152,9 +152,7 @@ TASKTABSIZE = 10
 class TaskWorkArea(object):
 	def __init__(self):
 		self.taskTab = [None] * TASKTABSIZE
-
 		self.taskList = None
-
 		self.holdCount = 0
 		self.qpktCount = 0
 
