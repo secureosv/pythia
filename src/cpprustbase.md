@@ -637,7 +637,10 @@ note: `nullptr` is c++11
 				parents = ','.join(['public %s' % rname for rname in cpp_bases])
 				out.append( 'class %s:  %s {' %(node.name, parents))
 			else:
-				out.append( 'class %s {' %node.name)
+				#out.append( 'class %s {' %node.name)
+				## shared from this is required so that `self` (this) can be passed to
+				## other functions and objects that may take ownership of `self`.
+				out.append( 'class %s: public std::enable_shared_from_this<%s> {' %(node.name, node.name))
 
 			## body macros come before public ##
 			for b in node.body:
