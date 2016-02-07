@@ -572,6 +572,11 @@ note: `nullptr` is c++11
 					if v.startswith('['):  ## swap array style to C++
 						x,y = v.split(']')
 						v = y + x + ']'
+						if self._memory[-1]=='HEAP':
+							if self.is_prim_type(y):
+								v = 'std::vector<%s>' %y
+							else:
+								v = 'std::vector<std::shared_ptr<%s>>' %y
 
 					sdef[k] = v
 
@@ -1347,7 +1352,13 @@ handles all special calls
 				if len(node.args)==2:
 					#raise SyntaxError(','.join([self.visit(a) for a in node.args]))
 					if T.startswith('['):
-						return '/* %s : %s */' %(node.args[0].attr, T)
+						if self._memory[-1]=='HEAP':
+							x,y = T.split(']')
+							n = x.split('[')[-1]
+							return 'this->%s = std::make_shared<std::vector<%s>>(%s);' %(node.args[0].attr, y, n)
+
+						else:
+							return '/* %s : %s */' %(node.args[0].attr, T)
 
 
 				value = self.visit(node.args[2])
@@ -2119,6 +2130,10 @@ TODO clean up go stuff.
 				#out.append(decor.args[0].s)
 				if self._cpp:
 					self._cpp_class_header.append(decor.args[0].s)
+			elif isinstance(decor, ast.Name) and decor.id=='abstractmethod':
+				## TODO: virtual function c++
+				assert self._cpp
+				return '/* abstractmethod: %s */' %node.name
 
 		for name in arrays:
 			self._known_arrays[ name ] = arrays[ name ]

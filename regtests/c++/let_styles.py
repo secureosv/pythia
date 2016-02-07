@@ -35,6 +35,10 @@ def main():
 	assert len(Foos) == 0
 
 	f = Foo()
+	assert len(f.data)==100
+	f.data[0] = 12
+	print f.data[0]
+
 	Foos.push_back(f)
 	print len(Foos)
 	assert len(Foos)==1
