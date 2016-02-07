@@ -1030,12 +1030,8 @@ handles all special calls
 			else:
 				return '%s(%s)' %(macro,args)
 
-		if self._stack and fname in self._classes:
-			if not isinstance(self._stack, ast.Assign):
-				#if self._rust:
-				node.is_new_class_instance = True
-				#else:
-				#	raise SyntaxError('TODO create new class instance in function call argument')
+		if self._stack and fname in self._classes and not isinstance(self._stack, ast.Assign):
+			node.is_new_class_instance = True
 
 		is_append = False
 		if fname.endswith('.append'): ## TODO - deprecate append to pushX or make `.append` method reserved by not allowing methods named `append` in visit_ClassDef?
