@@ -1047,7 +1047,13 @@ handles all special calls
 
 		###########################################
 		if fname == 'macro':
-			return '%s //;' %node.args[0].s
+			if node.keywords:
+				r = []
+				for kw in node.keywords:
+					r.append('#define %s %s' %(kw.arg, self.visit(kw.value)))
+				return '\n'.join(r) + '//;'
+			else:
+				return '%s //;' %node.args[0].s
 		elif fname == 'pragma':
 			return '#pragma %s //;' %node.args[0].s
 		elif fname == 'addr':

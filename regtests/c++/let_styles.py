@@ -1,12 +1,12 @@
 '''
 let syntax example
 '''
-#NUM = 100  ## requires constant
+
+macro( NUM=100 )  ## becomes `#define NUM 100`
 
 class Foo():
 	def __init__(self):
-		#let self.data : [NUM]int
-		let self.data : [100]int
+		let self.data : [NUM]int
 
 let Foos: []Foo
 
@@ -35,7 +35,7 @@ def main():
 	assert len(Foos) == 0
 
 	f = Foo()
-	assert len(f.data)==100
+	assert len(f.data)==NUM
 	f.data[0] = 12
 	print f.data[0]
 
