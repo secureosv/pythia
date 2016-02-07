@@ -50,7 +50,10 @@ class Packet(object):
 			while next is not None:
 				p = next
 				next = p.link
-			p.link = self
+
+			with SP as 'std::shared_ptr<Packet>':
+				p.link = SP(self)
+
 			return lst
 
 # Task Records
@@ -64,8 +67,8 @@ class DeviceTaskRec(TaskRec):
 
 class IdleTaskRec(TaskRec):
 	def __init__(self):
-		self.control = 1
-		self.count = 10000
+		let self.control : int = 1
+		let self.count   : int = 10000
 
 class HandlerTaskRec(TaskRec):
 	def __init__(self):
@@ -153,40 +156,39 @@ def trace(a:string):
 class Task(TaskState):
 
 	# note: r:TaskRec is the super class, TODO cast to its subclass.
-	def __init__(self,i:int, p:int, w:Packet, initialState:TaskState, r:TaskRec):
+	def __init__(self,ident:int, priority:int, input:Packet, initialState:TaskState, handle:TaskRec):
 		let self.link     : Task = taskWorkArea.task
-		let self.ident    : int = i
-		let self.priority : int = p
-		let self.input    : Packet = w
+		self.ident = ident
+		self.priority = priority
+		self.input = input
 
 		let self.packet_pending : bool = initialState.isPacketPending()
 		let self.task_waiting   : bool = initialState.isTaskWaiting()
 		let self.task_holding   : bool = initialState.isTaskHolding()
 
-		self.handle = r  ## generic - some subclass
+		self.handle = handle  ## generic - some subclass
 
-		#taskWorkArea.taskList = self
-		#taskWorkArea.taskTab[i] = self
-		taskWorkArea.set_task(self, i)
+		taskWorkArea.taskList = self
+		taskWorkArea.taskTab[ident] = self
 
+	@abstractmethod
 	def fn(self, pkt:Packet, r:TaskRec) -> self:
-		#raise NotImplementedError  ## could make function abstract in c++ TODO
-		print('NotImplementedError')
-		print(r)
+		raise RuntimeError('NotImplementedError')
 		return self
 
-	def addPacket(self,p:Packet, old:Task) -> self:
-		if self.input is None:
-			self.input = p
-			self.packet_pending = True
-			if self.priority > old.priority:
-				return self
-		else:
-			p.append_to(self.input)
-		return old
+	def addPacket(self,p:Packet, old:Task) -> Task:
+		with SP as 'std::shared_ptr<Task>':
+			if self.input is None:
+				self.input = p
+				self.packet_pending = True
+				if self.priority > old.priority:
+					return SP(self)
+			else:
+				p.append_to(self.input)
+			return old
 
 
-	def runTask(self) -> self:
+	def runTask(self) -> Task:
 		let msg : Packet = None
 		if self.isWaitingWithPacket():
 			msg = self.input
@@ -213,21 +215,24 @@ class Task(TaskState):
 		return self.link
 
 
-	def release(self,i:int) -> self:
+	def release(self,i:int) -> Task:
 		t = self.findtcb(i)
 		t.task_holding = False
-		if t.priority > self.priority:
-			return t
-		else:
-			return self
+		with SP as 'std::shared_ptr<Task>':
+			if t.priority > self.priority:
+				return SP(t)
+			else:
+				return SP(self)
 
 
-	def qpkt(self, pkt:Packet) -> self:
+	def qpkt(self, pkt:Packet) -> Task:
 		t = self.findtcb(pkt.ident)
 		taskWorkArea.qpktCount += 1
 		pkt.link = None
 		pkt.ident = self.ident
-		return t.addPacket(pkt,self)
+		#return t.addPacket(pkt,self)
+		with SP as 'std::shared_ptr<Task>(%s)':
+			return t.addPacket(pkt,SP(self))
 
 
 	def findtcb(self,id:int) -> Task:
@@ -246,7 +251,7 @@ class DeviceTask(Task):
 		Task.__init__(self,i,p,w,s,r)
 
 	#######def fn(self,pkt:*Packet, d:TaskRec) -> self:
-	def fn(self,pkt:Packet, d:DeviceTaskRec) -> self:
+	def fn(self,pkt:Packet, d:DeviceTaskRec) -> Task:
 		if pkt is None:
 			pkt = d.pending
 			if pkt is None:
@@ -264,7 +269,7 @@ class HandlerTask(Task):
 	def __init__(self,i:int, p:int, w:Packet, s:TaskState, r:TaskRec):
 		Task.__init__(self,i,p,w,s,r)
 
-	def fn(self, pkt:Packet, h:HandlerTaskRec) -> self:
+	def fn(self, pkt:Packet, h:HandlerTaskRec) -> Task:
 		if pkt is not None:
 			if pkt.kind == K_WORK:
 				h.workInAdd(pkt)
@@ -294,7 +299,8 @@ class IdleTask(Task):
 	def __init__(self,i:int, p:int, w:Packet, s:TaskState, r:TaskRec):
 		Task.__init__(self,i,0,None,s,r)
 
-	def fn(self,pkt:Packet, i:TaskRec) -> self:
+	def fn(self,pkt:Packet, ir:TaskRec) -> Task:
+		i = ir as IdleTaskRec
 		i.count -= 1
 		if i.count == 0:
 			return self.hold()
@@ -315,7 +321,8 @@ class WorkTask(Task):
 	def __init__(self,i:int, p:int, w:Packet, s:TaskState, r:TaskRec):
 		Task.__init__(self,i,p,w,s,r)
 
-	def fn(self,pkt:Packet, w:TaskRec) -> self:
+	def fn(self,pkt:Packet, worker:TaskRec) -> Task:
+		w = worker as WorkerTaskRec
 		if pkt is None:
 			return self.waitTask()
 
@@ -345,9 +352,6 @@ class TaskWorkArea(object):
 		let self.holdCount:int = 0
 		let self.qpktCount:int = 0
 
-	def set_task(self, c:Task, i:int):
-		self.task = c
-		self.taskTab[i] = c
 
 #global_tasks = []Task(None for i in range(10))
 #global_tasks = []Task()
