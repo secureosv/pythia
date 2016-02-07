@@ -824,7 +824,7 @@ class PythonToPythonJS(NodeVisitorBase):
 			if self._with_go:
 				a = '%s /= %s' %(target, self.visit(node.value))
 			elif self._with_cpp:
-				a = '%s = std.__doublecolon__.floor(%s/%s)' %(target, target, self.visit(node.value))
+				a = '%s /= %s' %(target, self.visit(node.value))
 			else:
 				a = '%s = Math.floor(%s/%s)' %(target, target, self.visit(node.value))
 			writer.write(a)
@@ -1465,8 +1465,12 @@ class PythonToPythonJS(NodeVisitorBase):
 			else:
 				return '%s.__mul__(%s)' %(left, right)
 
-		elif op == '//' and self._with_js:
-			return 'std.__doublecolon__.floor(%s/%s)' %(left, right)
+		elif op == '//' and self._with_cpp:
+			## note: std::floor(int,int) returns a double,
+			## because in C, with typed variables there is no need for
+			## two different division operators `/` (float) and `//` (integer)
+			#return 'std.__doublecolon__.floor(%s/%s)' %(left, right)
+			return '(%s / %s)' % (left, right)
 
 		elif op == '//' and self._with_js:  ## TODO, c++ and typed modes should not set _with_js to true
 			return 'Math.floor(%s/%s)' %(left, right)
