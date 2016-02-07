@@ -603,7 +603,7 @@ note: `nullptr` is c++11
 					if isinstance(b, ast.FunctionDef):
 						overload_nodes.append( b )
 						if hasattr(b, 'returns_self') and b.returns_self:
-							if b.name != '__init__':
+							if b.name != '__init__' and not b.is_abstract:
 								overloaded_returns_self.append(b)
 
 						## catch_call trick is used to call methods on base classes from the subclass.
@@ -2041,6 +2041,7 @@ TODO clean up go stuff.
 
 		is_declare = hasattr(node, 'declare_only') and node.declare_only  ## see pythonjs.py visit_With
 		is_closure = False
+		node.is_abstract = False
 
 		if self._function_stack[0] is node:
 			self._global_functions[node.name] = node
@@ -2135,7 +2136,8 @@ TODO clean up go stuff.
 			elif isinstance(decor, ast.Name) and decor.id=='abstractmethod':
 				## TODO: virtual function c++
 				assert self._cpp
-				return '/* abstractmethod: %s */' %node.name
+				out.append('/* abstractmethod: %s */' %node.name)
+				node.is_abstract = True
 
 		for name in arrays:
 			self._known_arrays[ name ] = arrays[ name ]

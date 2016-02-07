@@ -27,7 +27,7 @@ K_WORK = 1001
 
 # Packet
 
-macro('#define BUFSIZE 4')
+macro( BUFSIZE=4 )
 
 BUFSIZE_RANGE = range(BUFSIZE)
 
@@ -171,10 +171,6 @@ class Task(TaskState):
 		taskWorkArea.taskList = self
 		taskWorkArea.taskTab[ident] = self
 
-	@abstractmethod
-	def fn(self, pkt:Packet, r:TaskRec) -> self:
-		raise RuntimeError('NotImplementedError')
-		return self
 
 	def addPacket(self,p:Packet, old:Task) -> Task:
 		with SP as 'std::shared_ptr<Task>':
@@ -187,6 +183,9 @@ class Task(TaskState):
 				p.append_to(self.input)
 			return old
 
+	@abstractmethod
+	def fn(self, pkt:Packet, r:TaskRec) -> self:
+		return self
 
 	def runTask(self) -> Task:
 		let msg : Packet = None
@@ -199,9 +198,6 @@ class Task(TaskState):
 				self.packetPending()
 
 		return self.fn(msg,self.handle)
-		#return self.run_fn( msg, self.handle )
-		#return self.fn(msg, go.type_assert(self.handle, TaskRec))  ## self.handle is generic (interface{})
-
 
 
 	def waitTask(self) -> self:
