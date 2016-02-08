@@ -2227,7 +2227,7 @@ TODO clean up go stuff.
 		closures = []
 		alt_versions = []  ## list of ([args], [body])
 		if args_super_classes:
-			alt_versions.append( ([],['{ return %s('%node.name ]) )
+			alt_versions.append( ([],[]) )
 
 		has_stdmove = False
 		stdmoveargs  =[]
@@ -2264,10 +2264,16 @@ TODO clean up go stuff.
 					if args_super_classes:
 						altargs, altbody = alt_versions[0]
 						if arg_name in args_super_classes:
-							altargs.append(
-								'std::shared_ptr<%s> %s' %(args_super_classes[arg_name][0], arg_name)
-							)
-							altbody.append('std::static_pointer_cast<%s>(%s),' %(arg_type.split('<')[-1].split('>')[0], arg_name))
+							if is_method:  ## inlined wrapper methods
+								altargs.append(
+									'std::shared_ptr<%s> %s' %(args_super_classes[arg_name][0], arg_name)
+								)
+								altbody.append('std::static_pointer_cast<%s>(%s),' %(arg_type.split('<')[-1].split('>')[0], arg_name))
+							else:  ## fully regenerated function
+								altargs.append(
+									'std::shared_ptr<%s> __%s' %(args_super_classes[arg_name][0], arg_name)
+								)
+								altbody.append('auto %s = std::static_pointer_cast<%s>(__%s);' %(arg_name, arg_type.split('<')[-1].split('>')[0], arg_name))
 						else:
 							altargs.append('%s %s' %(arg_type, arg_name))
 							altbody.append(arg_name+',')
@@ -2371,10 +2377,21 @@ TODO clean up go stuff.
 
 		##############################################
 		if args_super_classes:
-			altargs, altbody = alt_versions[0]
-			if altbody[-1][-1]==',':
-				altbody[-1] = altbody[-1][:-1]
-			altbody[-1] += ');}'
+			if is_method:
+				altargs, altbody = alt_versions[0]
+				altbody.insert(0,'{ return %s('%node.name)
+				if altbody[-1][-1]==',':
+					altbody[-1] = altbody[-1][:-1]
+				altbody[-1] += ');}'
+			else:
+				## there is a bug in gcc4.9 where a static_pointer_cast of a shared pointer
+				## can cause a segfault in the generated wrapper functions.
+				## note: the wrappers work with methods, see above.
+				altbody.insert(0,'{')
+
+				for b in node.body:
+					altbody.append(self.indent()+self.visit(b))
+				altbody.append('}')
 
 		if oargs:
 			node._arg_names.append( '__kwargs' )
@@ -2497,7 +2514,14 @@ TODO clean up go stuff.
 						else:
 							sig = '%s%s %s(%s)' % (prefix,return_type, fname, ', '.join(args))
 							out.append( self.indent() + '%s {\n' % sig )
-							if not is_main: self._cheader.append( sig + ';' )
+							if not is_main:
+								self._cheader.append( sig + ';' )
+								if alt_versions:
+									assert args_super_classes
+									for av in alt_versions:
+										altargs, altbody = av
+										asig = '%s %s(%s)' % (return_type, fname, ', '.join(altargs))
+										out.insert(0, asig + '\n'.join(altbody))
 
 				else:  ## rust ##
 					if is_method:

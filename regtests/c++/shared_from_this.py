@@ -25,19 +25,18 @@ class Sub( Foo ):
 	def sub(self) -> int:
 		return self.x -1
 	def testsub(self) -> int:
-		return callsub( self.shared_from_this() )
+		return callsub( shared_from_this() )
 
-	def test_pass_self(self) -> int:
-		return self.callsub( shared_from_this() )
+	#def test_pass_self(self) -> int:
+	#	return self.callsub( shared_from_this() )
 
-	def callsub(self, other:Sub) -> int:
-		return other.sub()
+	#def callsub(self, other:Sub) -> int:
+	#	return other.sub()
 
 def callbar( o:Foo ) -> int:
 	return o.bar()
 
-def callsub( o:Foo ) -> int:
-	s = o as Sub
+def callsub( s:Sub ) -> int:
 	return s.sub()
 
 
@@ -50,4 +49,4 @@ def main():
 	assert s.test()==100
 	assert s.submethod()==200
 	assert s.testsub()==99
-	assert s.test_pass_self()
+	#assert s.test_pass_self()
