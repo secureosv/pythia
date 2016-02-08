@@ -2085,6 +2085,7 @@ TODO clean up go stuff.
 		chan_args_typedefs = {}
 		generics = set()
 		args_generics = dict()
+		args_super_classes = {}
 		func_pointers = set()
 		arrays = dict()
 		operator = None
@@ -2130,6 +2131,7 @@ TODO clean up go stuff.
 				args_generics=args_generics,
 				func_pointers=func_pointers,
 				arrays = arrays,
+				args_super_classes=args_super_classes,
 			)
 
 			if isinstance(decor, ast.Call) and isinstance(decor.func, ast.Name) and decor.func.id == 'expression':
@@ -2168,6 +2170,7 @@ TODO clean up go stuff.
 		generic_base_class = options['generic_base_class']
 		if returns_self and self._cpp:
 			return_type = self._class_stack[-1].name
+
 
 		is_delete = node.name == '__del__'
 		is_init = node.name == '__init__'
@@ -2222,6 +2225,9 @@ TODO clean up go stuff.
 		is_method = False
 		args_gens_indices = []
 		closures = []
+		alt_versions = []  ## list of ([args], [body])
+		if args_super_classes:
+			alt_versions.append( ([],['{ return %s('%node.name ]) )
 
 		has_stdmove = False
 		stdmoveargs  =[]
@@ -2255,6 +2261,17 @@ TODO clean up go stuff.
 			if arg_name in args_typedefs:
 				arg_type = args_typedefs[arg_name]
 				if self._cpp:
+					if args_super_classes:
+						altargs, altbody = alt_versions[0]
+						if arg_name in args_super_classes:
+							altargs.append(
+								'std::shared_ptr<%s> %s' %(args_super_classes[arg_name][0], arg_name)
+							)
+							altbody.append('std::static_pointer_cast<%s>(%s),' %(arg_type.split('<')[-1].split('>')[0], arg_name))
+						else:
+							altargs.append('%s %s' %(arg_type, arg_name))
+							altbody.append(arg_name+',')
+
 					if arg_type=='auto':
 						self._known_instances[arg_name]='auto'
 					## rule above assumes anything marked with `auto` should not used __shared__ wrapper and directly use `a->b`
@@ -2353,6 +2370,12 @@ TODO clean up go stuff.
 				node._arg_names.append( arg_name )
 
 		##############################################
+		if args_super_classes:
+			altargs, altbody = alt_versions[0]
+			if altbody[-1][-1]==',':
+				altbody[-1] = altbody[-1][:-1]
+			altbody[-1] += ');}'
+
 		if oargs:
 			node._arg_names.append( '__kwargs' )
 			if self._cpp:
@@ -2442,6 +2465,14 @@ TODO clean up go stuff.
 								sig = 'virtual %s override' %sig
 
 							self._cpp_class_header.append(sig + ';')
+
+							if alt_versions:
+								assert args_super_classes
+								for av in alt_versions:
+									altargs, altbody = av
+									asig = 'inline %s %s(%s)' % (return_type, fname, ', '.join(altargs))
+									self._cpp_class_header.append( asig + '\n'.join(altbody))
+
 							if node.args.defaults:
 								if len(args)==1:  ## all args have defaults, generate plain version with no defaults ##
 									okwargs = ['(new _KwArgs_)']

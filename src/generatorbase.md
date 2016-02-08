@@ -224,7 +224,7 @@ Function Decorators
 
 ```python
 
-	def _visit_decorator(self, decor, node=None, options=None, args_typedefs=None, chan_args_typedefs=None, generics=None, args_generics=None, func_pointers=None, arrays=None ):
+	def _visit_decorator(self, decor, node=None, options=None, args_typedefs=None, chan_args_typedefs=None, generics=None, args_generics=None, func_pointers=None, arrays=None, args_super_classes=None ):
 		assert node
 		if options is None: options = dict()
 		if args_typedefs is None: args_typedefs = dict()
@@ -233,6 +233,7 @@ Function Decorators
 		if args_generics is None: args_generics = dict()
 		if func_pointers is None: func_pointers = set()
 		if arrays is None: arrays = dict()
+		if args_super_classes is None: args_super_classes = dict()
 
 		if isinstance(decor, ast.Name) and decor.id == 'classmethod':
 			options['classmethod'] = True
@@ -257,11 +258,20 @@ Function Decorators
 				args_typedefs[ vname ] = '%s %s' %(vptr, vtype)
 
 			else:
+				args_user_classes = {}
 				for key in decor.keywords:
+					args_user_classes[key.arg] = None
+
 					if isinstance( key.value, ast.Str):
 						args_typedefs[ key.arg ] = key.value.s
+						if key.value.s in self._classes:  ## TODO check if endswith *
+							args_user_classes[key.arg] = key.value.s
+
 					elif isinstance(key.value, ast.Name):
 						T = key.value.id
+						if T in self._classes:
+							args_user_classes[key.arg] = T
+
 						if self.is_prim_type(T) or self._memory[-1]=='STACK':
 							args_typedefs[key.arg] = T
 						elif self._cpp:
@@ -389,26 +399,33 @@ Function Decorators
 
 					## check for super classes - generics ##
 					## this was originally for the Go backend, still used in the c++ or rust backends?
-					if (self._go or self._cpp or self._rust) and args_typedefs[ key.arg ] in self._classes:
-						classname = args_typedefs[ key.arg ]
+					#if (self._go or self._cpp or self._rust) and args_typedefs[ key.arg ] in self._classes:
+					if (self._go or self._cpp or self._rust) and args_user_classes[ key.arg ]:
+						classname = args_user_classes[ key.arg ]
 						options['generic_base_class'] = classname
 
 						if self._cpp:
-							if self._memory[-1]=='STACK':
-								#args_typedefs[key.arg] = 'const %s' %classname
-								pass
-							elif not self._shared_pointers:
-								args_typedefs[ key.arg ] = '%s*' %classname
-							elif self.usertypes and 'shared' in self.usertypes:
-								args_typedefs[ key.arg ] = self.usertypes['shared']['template'] % classname
-							elif self._unique_ptr:
-								args_typedefs[ key.arg ] = 'std::unique_ptr<%s>' %classname
-							else:
-								args_typedefs[ key.arg ] = 'std::shared_ptr<%s>' %classname
-							args_generics[ key.arg ] = classname
+							#if self._memory[-1]=='STACK':
+							#	#args_typedefs[key.arg] = 'const %s' %classname
+							#	pass
+							#elif not self._shared_pointers:
+							#	args_typedefs[ key.arg ] = '%s*' %classname
+							#elif self.usertypes and 'shared' in self.usertypes:
+							#	args_typedefs[ key.arg ] = self.usertypes['shared']['template'] % classname
+							#elif self._unique_ptr:
+							#	args_typedefs[ key.arg ] = 'std::unique_ptr<%s>' %classname
+							#else:
+							#	args_typedefs[ key.arg ] = 'std::shared_ptr<%s>' %classname
+							#args_generics[ key.arg ] = classname
 
-							for subclass in self._classes[classname]._subclasses:
-								generics.add( subclass )
+							#for subclass in self._classes[classname]._subclasses:
+							#	generics.add( subclass )
+
+							cnode = self._classes[classname]
+							if cnode._parents:
+								args_super_classes[key.arg] = []
+								for base in cnode._parents:
+									args_super_classes[key.arg].append(base)
 
 						elif self._rust:
 							args_typedefs[ key.arg ] = 'Rc<RefCell<%s>>' %classname
