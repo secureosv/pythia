@@ -3835,6 +3835,15 @@ because they need some special handling in other places.
 								vh,vt = value.split('->__init__')
 								value = vh.split('((')[0] + '()->__init__' + vt[:-1]
 
+						elif self._memory[-1]=='HEAP':
+							if value.count('->__init__') != 1:
+								print 'WARNING: in heap mode with shared pointers,'
+								print 'objects should be assigned to a variable before'
+								print 'passing them to the constructor of another object'
+							else:
+								vh,vt = value.split('->__init__')
+								value = '%s); %s->__init__%s' %(vh, target, vt[:-1])
+
 						return 'auto %s = %s; // new object' %(target, value)
 
 					else:  ## rust

@@ -17,7 +17,7 @@ class Foo():
 class Sub( Foo ):
 	def __init__(self, x:int, o:Foo ):
 		self.x = x
-		#o.other = shared_from_this()
+		o.other = shared_from_this()
 
 	def submethod(self) -> int:
 		a = callbar( self.shared_from_this() )
@@ -39,7 +39,6 @@ def main():
 	assert f.test()==10
 
 	s = Sub(100, f)
-	#s = Sub(100)
 	print s.test()
 	assert s.test()==100
 	assert s.submethod()==200
