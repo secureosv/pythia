@@ -640,6 +640,7 @@ note: `nullptr` is c++11
 				#out.append( 'class %s {' %node.name)
 				## shared from this is required so that `self` (this) can be passed to
 				## other functions and objects that may take ownership of `self`.
+				## on subclasses the base class is returned from `shared_from_this()`
 				out.append( 'class %s: public std::enable_shared_from_this<%s> {' %(node.name, node.name))
 
 			## body macros come before public ##
@@ -672,6 +673,7 @@ note: `nullptr` is c++11
 
 
 		rust_struct_init = ['__class__:"%s"' %node.name]
+		parent_attrs = {}
 
 		if base_classes:
 			for bnode in base_classes:
@@ -682,6 +684,7 @@ note: `nullptr` is c++11
 						#for key in bnode._struct_def:
 						#	if key not in unionstruct:
 						#		unionstruct[key] = bnode._struct_def[key]
+						parent_attrs.update( bnode._struct_def )
 
 				elif self._rust:
 					out.append('//	members from class: %s  %s'  %(bnode.name, bnode._struct_def.keys()))
@@ -706,6 +709,12 @@ note: `nullptr` is c++11
 			#if name=='__class__': continue
 
 			T = unionstruct[name]
+			## skip redefines of attributes in a subclass with the same type,
+			## this ensures that subclasses will have the same memory layout
+			## for shared attributes of the same type, and that std::static_pointer_cast also works.
+			if name in parent_attrs and parent_attrs[name]==T:
+				continue
+
 			member_isprim = self.is_prim_type(T)
 			if self._cpp:
 				if T=='string': T = 'std::string'
