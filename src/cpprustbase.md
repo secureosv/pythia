@@ -1710,10 +1710,15 @@ handles all special calls
 			#########################################
 			if self._classes[fname]._requires_init:
 				if not isinstance(self._stack[-2], ast.Assign) and self._assign_node:
-					pre = 'auto __%s__arg = %s((new %s())->__init__(%s));' %(fname, prefix,fname,args)
-					if not self._assign_pre or self._assign_pre[-1]!=pre:
+					argname = '%s_%s' %(fname, int(id(node)))
+					pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
+					if not self._assign_pre:
 						self._assign_pre.append(pre)
-					return '__%s__arg' %fname
+					elif pre not in self._assign_pre:
+						self._assign_pre.append(pre)
+
+					return argname
+
 				else:
 					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
 			else:
