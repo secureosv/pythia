@@ -43,7 +43,8 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 					v = '*this;'
 				else:
 					#v = 'std::make_shared<%s>(*this)' %self._class_stack[-1].name
-					v = 'shared_from_this()' %self._class_stack[-1].name
+					#v = 'shared_from_this()'  ## this breaks subclasses when the base class has a method that returns `self`
+					v = 'std::static_pointer_cast<%s>(shared_from_this())' %self._class_stack[-1].name
 
 			elif isinstance(node.value, ast.Name) and node.value.id=='next':  ## seastar lambda repeat
 				v = 'stop_iteration::no'

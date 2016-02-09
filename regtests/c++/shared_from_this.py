@@ -58,4 +58,9 @@ def main():
 	assert s.testsub()==99
 	assert s.test_pass_self()==99
 
-	ss = Sub(10,Sub(1))
+	#ss = Sub(10,Sub(1)) ## segfaults because Sub(1) takes a pointer to the other and then goes out of scope.
+	sa = Sub(1)
+	ss = Sub(10,sa)
+	print ss
+	assert ss.x==10
+	assert ss.test_pass_self()==9
