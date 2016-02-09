@@ -42,7 +42,8 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				if self._memory[-1]=='STACK':
 					v = '*this;'
 				else:
-					v = 'std::make_shared<%s>(*this)' %self._class_stack[-1].name
+					#v = 'std::make_shared<%s>(*this)' %self._class_stack[-1].name
+					v = 'shared_from_this()' %self._class_stack[-1].name
 
 			elif isinstance(node.value, ast.Name) and node.value.id=='next':  ## seastar lambda repeat
 				v = 'stop_iteration::no'

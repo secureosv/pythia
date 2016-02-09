@@ -426,6 +426,9 @@ note: `nullptr` is c++11
 			node._contains_classes = set()
 			node._weak_members = set()
 			node._requires_init = False
+			## subclasses need to check the parent class for methods with the same name
+			## and a different signature.  These are regenerated in the subclass.
+			node._methods = list()  ## nodes
 
 		out = []
 		sdef = dict()
@@ -512,6 +515,8 @@ note: `nullptr` is c++11
 		for b in node.body:
 			if isinstance(b, ast.FunctionDef):
 				method_names.add( b.name )
+				node._methods.append( b )  ## save method node, header-signature and body.
+
 				if b.name == '__init__':
 					init = b
 					node._requires_init = True
@@ -770,6 +775,14 @@ note: `nullptr` is c++11
 		self._cpp_class_header = []
 		impl  = []
 		self.push()
+
+		## required by new style because __init__ returns this which needs to be defined for each subclass type ##
+		if self._cpp and parent_init:
+			if not init:
+				impl.append( self.visit(parent_init['node']) )
+			elif len(init.args.args) != len(parent_init['node'].args.args):
+				impl.append( self.visit(parent_init['node']) )
+
 		for b in node.body:
 			if isinstance(b, ast.FunctionDef):
 				impl.append( self.visit(b) )
@@ -777,9 +790,6 @@ note: `nullptr` is c++11
 		for b in overloaded_returns_self:
 			impl.append( self.visit(b) )
 
-		## required by new style because __init__ returns this which needs to be defined for each subclass type ##
-		if self._cpp and not init and parent_init:
-			impl.append( self.visit(parent_init['node']) )
 
 		self.pull()
 
@@ -2054,6 +2064,9 @@ TODO clean up go stuff.
 		is_declare = hasattr(node, 'declare_only') and node.declare_only  ## see pythonjs.py visit_With
 		is_closure = False
 		node.is_abstract = False
+		node.func_header = None
+		node.func_args = []
+		node.func_body = []
 
 		if self._function_stack[0] is node:
 			self._global_functions[node.name] = node
@@ -2171,6 +2184,7 @@ TODO clean up go stuff.
 		if returns_self and self._cpp:
 			return_type = self._class_stack[-1].name
 
+		node.func_returns = return_type
 
 		is_delete = node.name == '__del__'
 		is_init = node.name == '__init__'
@@ -2701,6 +2715,7 @@ TODO clean up go stuff.
 			else:
 				out.append( self.indent()+'}' )
 
+		node.func_body = out[:]
 
 		if generics and self._cpp:
 			overloads = []
@@ -3891,11 +3906,13 @@ because they need some special handling in other places.
 								value = vh.split('((')[0] + '()->__init__' + vt[:-1]
 
 						elif self._memory[-1]=='HEAP':
-							if value.count('->__init__') != 1:
+							if value.count('->__init__') > 1:
 								print 'WARNING: in heap mode with shared pointers,'
 								print 'objects should be assigned to a variable before'
 								print 'passing them to the constructor of another object'
-							else:
+								print 'target=', target
+								print 'value=', value
+							elif '->__init__(' in value:
 								vh,vt = value.split('->__init__')
 								value = '%s); %s->__init__%s' %(vh, target, vt[:-1])
 
