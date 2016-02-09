@@ -67,3 +67,7 @@ def main():
 	print ss
 	assert ss.x==10
 	assert ss.test_pass_self()==9
+
+	Sub(10,Sub(11))
+	#Sub(10,Sub(100, Sub(1)))  ## TODO nested > 1 levels
+
