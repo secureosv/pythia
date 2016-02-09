@@ -1709,7 +1709,13 @@ handles all special calls
 
 			#########################################
 			if self._classes[fname]._requires_init:
-				return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+				if not isinstance(self._stack[-2], ast.Assign) and self._assign_node:
+					pre = 'auto __%s__arg = %s((new %s())->__init__(%s));' %(fname, prefix,fname,args)
+					if not self._assign_pre or self._assign_pre[-1]!=pre:
+						self._assign_pre.append(pre)
+					return '__%s__arg' %fname
+				else:
+					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
 			else:
 				return '%s(new %s())' %(prefix,fname)
 		else:
@@ -3253,6 +3259,17 @@ because they need some special handling in other places.
 
 	def visit_Assign(self, node):
 		self._catch_assignment = False
+		self._assign_node = node
+		self._assign_pre  = []
+		res = self._visit_assign(node)
+		self._assign_node = None
+		if self._assign_pre:
+			self._assign_pre.append(res)
+			res = '\n'.join(self._assign_pre) 
+			self._assign_pre  = []
+		return res
+
+	def _visit_assign(self, node):
 		result = []  ## for arrays of arrays with list comps
 		value  = None
 		comptarget = None  ## if there was a comp, then use result and comptarget
