@@ -71,3 +71,6 @@ def main():
 	Sub(10,Sub(11))
 	#Sub(10,Sub(100, Sub(1)))  ## TODO nested > 1 levels
 
+	#Sub( Sub(10).sub() )  ## this is not allowed
+	sss = Sub( Sub(10).sub() )  ## this works but is not always shared_from_this
+	#sss = Sub(1, Sub(10).shared_from_this() )  ## this fails

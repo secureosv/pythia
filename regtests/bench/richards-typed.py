@@ -51,9 +51,7 @@ class Packet(object):
 				p = next
 				next = p.link
 
-			with SP as 'std::shared_ptr<Packet>':
-				p.link = SP(self)
-
+			p.link = shared_from_this()
 			return lst
 
 # Task Records
@@ -168,21 +166,19 @@ class Task(TaskState):
 
 		self.handle = handle  ## generic - some subclass
 
-		with SP as 'std::shared_ptr<Task>':
-			taskWorkArea.taskList = SP(self)
-			taskWorkArea.taskTab[ident] = SP(self)
+		taskWorkArea.taskList = shared_from_this() as Task
+		taskWorkArea.taskTab[ident] = shared_from_this() as Task
 
 
 	def addPacket(self,p:Packet, old:Task) -> Task:
-		with SP as 'std::shared_ptr<Task>':
-			if self.input is None:
-				self.input = p
-				self.packet_pending = True
-				if self.priority > old.priority:
-					return SP(self)
-			else:
-				p.append_to(self.input)
-			return old
+		if self.input is None:
+			self.input = p
+			self.packet_pending = True
+			if self.priority > old.priority:
+				return shared_from_this() as Task
+		else:
+			p.append_to(self.input)
+		return old
 
 	@abstractmethod
 	def fn(self, pkt:Packet, r:TaskRec) -> self:
@@ -215,11 +211,10 @@ class Task(TaskState):
 	def release(self,i:int) -> Task:
 		t = self.findtcb(i)
 		t.task_holding = False
-		with SP as 'std::shared_ptr<Task>':
-			if t.priority > self.priority:
-				return SP(t)
-			else:
-				return SP(self)
+		if t.priority > self.priority:
+			return t
+		else:
+			return shared_from_this() as Task
 
 
 	def qpkt(self, pkt:Packet) -> Task:
@@ -228,8 +223,10 @@ class Task(TaskState):
 		pkt.link = None
 		pkt.ident = self.ident
 		#return t.addPacket(pkt,self)
-		with SP as 'std::shared_ptr<Task>(%s)':
-			return t.addPacket(pkt,SP(self))
+		return t.addPacket(
+			pkt,
+			shared_from_this() as Task
+		)
 
 
 	def findtcb(self,id:int) -> Task:
@@ -377,25 +374,32 @@ class Richards(object):
 			taskWorkArea.qpktCount = 0
 
 			#IdleTask(I_IDLE, 1, 10000, TaskState().running(), IdleTaskRec())  ##??
-			IdleTask(I_IDLE, 1, None, TaskState().running(), IdleTaskRec())
+			#IdleTask(I_IDLE, 1, None, TaskState().running(), IdleTaskRec())
+			tsi = TaskState()
+			IdleTask(I_IDLE, 1, None, tsi.running(), IdleTaskRec())
 
 			wkq = Packet(None, 0, K_WORK)
 			wkq = Packet(wkq , 0, K_WORK)
-			WorkTask(I_WORK, 1000, wkq, TaskState().waitingWithPacket(), WorkerTaskRec())
+			tsw = TaskState()
+			WorkTask(I_WORK, 1000, wkq, tsw.waitingWithPacket(), WorkerTaskRec())
 
 			wkq = Packet(None, I_DEVA, K_DEV)
 			wkq = Packet(wkq , I_DEVA, K_DEV)
 			wkq = Packet(wkq , I_DEVA, K_DEV)
-			HandlerTask(I_HANDLERA, 2000, wkq, TaskState().waitingWithPacket(), HandlerTaskRec())
+			tsh = TaskState()
+			HandlerTask(I_HANDLERA, 2000, wkq, tsh.waitingWithPacket(), HandlerTaskRec())
 
 			wkq = Packet(None, I_DEVB, K_DEV)
 			wkq = Packet(wkq , I_DEVB, K_DEV)
 			wkq = Packet(wkq , I_DEVB, K_DEV)
-			HandlerTask(I_HANDLERB, 3000, wkq, TaskState().waitingWithPacket(), HandlerTaskRec())
+			tsh2 = TaskState()
+			HandlerTask(I_HANDLERB, 3000, wkq, tsh2.waitingWithPacket(), HandlerTaskRec())
 
 			wkq = None;
-			DeviceTask(I_DEVA, 4000, wkq, TaskState().waiting(), DeviceTaskRec());
-			DeviceTask(I_DEVB, 5000, wkq, TaskState().waiting(), DeviceTaskRec());
+			tsd1 = TaskState()
+			tsd2 = TaskState()
+			DeviceTask(I_DEVA, 4000, wkq, tsd1.waiting(), DeviceTaskRec());
+			DeviceTask(I_DEVB, 5000, wkq, tsd2.waiting(), DeviceTaskRec());
 			
 			schedule()
 

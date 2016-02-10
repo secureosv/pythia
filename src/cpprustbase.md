@@ -1709,7 +1709,7 @@ handles all special calls
 
 			#########################################
 			if self._classes[fname]._requires_init:
-				if not isinstance(self._stack[-2], ast.Assign):
+				if not isinstance(self._stack[-2], ast.Assign) and self._memory[-1]=='HEAP':
 					if self._assign_node:
 						argname = '%s_%s' %(fname, int(id(node)))
 						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
@@ -1728,7 +1728,7 @@ handles all special calls
 						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
 						return pre
 					else:
-						raise RuntimeError(self._stack[-2])
+						raise SyntaxError(self.format_error('heap mode requires objects are assigned to variables on initialization: %s' %fname))
 
 
 				else:
