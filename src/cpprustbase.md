@@ -1465,12 +1465,16 @@ handles all special calls
 								self._global_arrays[node.args[0].id] = (y, alen)
 
 							if self._memory[-1]=='STACK':
-								## a fixed size C-array non-global `int myarr[N];` will not always
-								## allocate all items to zero.
-								if alen.isdigit() and len(self._function_stack):
+								## note a fixed size C-array non-global `int myarr[N];` will not always
+								## allocate all items to zero or null. gcc4.9 bug?
+								if alen.isdigit():
 									alen = int(alen)
 									if y in ('int', 'uint'):
 										return '%s %s%s] = {%s}' %(y, node.args[0].id, x, ','.join(['0']*alen))
+									elif self.is_prim_type(y):
+										return '%s %s%s] = {}' %(y, node.args[0].id, x)
+									elif y in self._classes:
+										return '%s %s%s] = {%s}' %(y, node.args[0].id, x, ','.join([y+'(false)']*alen))
 									else:
 										raise RuntimeError('TODO let...')
 

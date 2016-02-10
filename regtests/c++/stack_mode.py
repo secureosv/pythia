@@ -5,6 +5,12 @@ with stack:
 	let garr : [10]int
 	grange = range(3)
 
+	class Foo:
+		def __init__(self, ok:bool):
+			self.ok = ok
+
+	let Foos : [10]Foo
+
 	def stack_test():
 		let arr : [5]int
 		for i in garr:
@@ -23,6 +29,11 @@ with stack:
 			j+=1
 
 		print 'loop over global range ok'
+
+		for f in Foos:
+			assert f is None
+		print 'foos initalized to None ok'
+
 
 def main():
 	stack_test()
