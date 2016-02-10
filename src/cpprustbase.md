@@ -29,6 +29,7 @@ class CppRustBase( GoGenerator ):
 		self._known_strings = set()
 		self._force_cstr = False
 		self._known_pointers = {}
+		self._global_arrays  = {}
 		self.macros = {}
 
 
@@ -1457,10 +1458,24 @@ handles all special calls
 						elif T.startswith('[') and ']' in T:
 							is_array = True
 							x,y = T.split(']')
+							alen = x.split('[')[-1].strip()
+
+							self._known_arrays[node.args[0].id] = (y, alen)
+							if not len(self._function_stack):
+								self._global_arrays[node.args[0].id] = (y, alen)
+
 							if self._memory[-1]=='STACK':
+								## a fixed size C-array non-global `int myarr[N];` will not always
+								## allocate all items to zero.
+								if alen.isdigit() and len(self._function_stack):
+									alen = int(alen)
+									if y in ('int', 'uint'):
+										return '%s %s%s] = {%s}' %(y, node.args[0].id, x, ','.join(['0']*alen))
+									else:
+										raise RuntimeError('TODO let...')
+
 								return '%s %s%s]' %(y, node.args[0].id, x)
 							else:
-								alen = x.split('[')[-1].strip()
 								if not self.is_prim_type(y):
 									y = 'std::shared_ptr<%s>' %y
 								return 'auto %s = std::make_shared<std::vector<%s>>(%s)' %(node.args[0].id, y, alen)
@@ -2103,6 +2118,7 @@ TODO clean up go stuff.
 			self._known_vars = set()
 			self._known_instances = dict()
 			self._known_arrays    = dict()
+			self._known_arrays.update( self._global_arrays )
 			self._known_strings   = set()
 			self._known_pyobjects = dict()
 			self._known_refs      = dict()

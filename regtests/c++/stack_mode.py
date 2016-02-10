@@ -9,10 +9,11 @@ with stack:
 		for i in garr:
 			print i
 			assert i==0
-
+		print 'global array iter ok'
 		for i in arr:
 			print i
 			assert i==0
+		print 'local array iter ok'
 
 
 def main():
