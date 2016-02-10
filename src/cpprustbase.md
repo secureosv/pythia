@@ -1458,7 +1458,7 @@ handles all special calls
 							is_array = True
 							x,y = T.split(']')
 							if self._memory[-1]=='STACK':
-								T = y + x + ']'
+								return '%s %s%s]' %(y, node.args[0].id, x)
 							else:
 								alen = x.split('[')[-1].strip()
 								if not self.is_prim_type(y):
@@ -1927,6 +1927,12 @@ regular Python has no support for.
 								raise RuntimeError('TODO other cast to types for cpython')
 						else:
 							return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
+					elif self._memory[-1]=='STACK':
+						if self._function_stack:
+							fnode = self._function_stack[-1]
+							if fnode.return_type==cast_to:  ## TODO check is node above is ast.Return
+								return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
+						return 'static_cast<%s*>(%s)' %(cast_to, self.visit(node.left.left))
 					elif self._polymorphic:
 						return 'std::dynamic_pointer_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
 					else:

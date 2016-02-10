@@ -74,3 +74,11 @@ def main():
 	#Sub( Sub(10).sub() )  ## this is not allowed
 	sss = Sub( Sub(10).sub() )  ## this works but is not always shared_from_this
 	#sss = Sub(1, Sub(10).shared_from_this() )  ## this fails
+
+	let subs : [10]Sub
+	ptr = subs[0]
+	assert ptr is None
+	ps = ptr as Sub
+	assert ps is None
+	pss = ptr as Foo
+	assert pss is None
