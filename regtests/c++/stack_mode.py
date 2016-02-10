@@ -11,7 +11,17 @@ with stack:
 
 	let Foos : [10]Foo
 
+
+	def test_foos( arr:[]Foo ):
+		assert len(arr)==10
+		for item in arr:
+			print item.ok
+
 	def stack_test():
+		with stdvec as 'std::vector<Foo>(std::begin(%s), std::end(%s))':
+			vec = stdvec(Foos, Foos)
+			test_foos(addr(vec))
+
 		let arr : [5]int
 		for i in garr:
 			print i

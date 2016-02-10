@@ -1472,7 +1472,7 @@ handles all special calls
 									if y in ('int', 'uint'):
 										return '%s %s%s] = {%s}' %(y, node.args[0].id, x, ','.join(['0']*alen))
 									elif self.is_prim_type(y):
-										return '%s %s%s] = {}' %(y, node.args[0].id, x)
+										return '%s %s%s] = {}' %(y, node.args[0].id, x)  ## TODO test if these are all init to null
 									elif y in self._classes:
 										return '%s %s%s] = {%s}' %(y, node.args[0].id, x, ','.join([y+'(false)']*alen))
 									else:
@@ -1597,7 +1597,10 @@ handles all special calls
 				elif self._memory[-1]=='STACK':
 					if arg in self._known_arrays and isinstance(self._known_arrays[arg], tuple):
 						return self._known_arrays[arg][1]
-					return '%s.size()' %arg
+					elif arg in self._known_pointers:
+						return '%s->size()' %arg
+					else:
+						return '%s.size()' %arg
 				elif self.usertypes and 'vector' in self.usertypes:
 					return '%s->%s()' %(arg, self.usertypes['vector']['len'])
 				else:
@@ -2373,6 +2376,9 @@ TODO clean up go stuff.
 
 					if generics and arg_name in args_generics.keys():
 						args_gens_indices.append(i)
+
+					if arg_type.endswith('*'):
+						self._known_pointers[arg_name] = arg_type  ## TODO, strip star?
 
 				elif self._rust:  ## standard string type in rust `String`
 					if arg_type == 'string': arg_type = 'String'  

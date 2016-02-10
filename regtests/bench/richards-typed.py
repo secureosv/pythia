@@ -354,6 +354,7 @@ let global_tasks: [10]Task
 taskWorkArea = TaskWorkArea(global_tasks)
 
 def schedule():
+	print 'schedule...'
 	t = taskWorkArea.taskList
 	while t is not None:
 		#pkt = None
@@ -361,9 +362,11 @@ def schedule():
 		#	print("tcb =",t.ident)
 
 		if t.isTaskHoldingOrWaiting():
+			print 'holding.', t
 			t = t.link
 		else:
 			###########if tracing: trace(chr(ord("0")+t.ident))
+			print 'running.', t
 			t = t.runTask()
 
 class Richards(object):
@@ -419,6 +422,10 @@ def entry_point(iterations:int) ->double:
 	return clock() - startTime
 
 def main():
+	print global_tasks
+	for ptr in global_tasks:
+		assert ptr is None
+	print 'starting benchmark...'
 	iterations=10
 	#print("#Richards benchmark (Python) starting. iterations="+str(iterations))
 	total_s = entry_point(iterations)
