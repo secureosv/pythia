@@ -3315,6 +3315,11 @@ because they need some special handling in other places.
 
 		if isinstance(node.targets[0], ast.Name) and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='range':
 			self._known_arrays[node.targets[0].id] = 'int'
+			if len(node.value.args)==1:
+				alen = self.visit(node.value.args[0])
+				self._known_arrays[node.targets[0].id] = ('int', alen)
+				if not len(self._function_stack):
+					self._global_arrays[node.targets[0].id] = ('int', alen)
 
 		#######################
 		if isinstance(node.targets[0], ast.Tuple):
