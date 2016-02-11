@@ -266,6 +266,10 @@ Function Decorators
 						args_typedefs[ key.arg ] = key.value.s
 						if key.value.s in self._classes:  ## TODO check if endswith *
 							args_user_classes[key.arg] = key.value.s
+						elif key.value.s.startswith('['):
+							n,T = key.value.s.split(']')
+							n += ']'
+							args_typedefs[key.arg]=T+n
 
 					elif isinstance(key.value, ast.Name):
 						T = key.value.id

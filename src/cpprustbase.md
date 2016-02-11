@@ -2219,7 +2219,16 @@ TODO clean up go stuff.
 				node.is_abstract = True
 
 		for name in arrays:
-			self._known_arrays[ name ] = arrays[ name ]
+			arrtype = args_typedefs[name]#arrays[ name ]
+			if '[' in arrtype:
+				# C-style
+				if arrtype.endswith(']'):
+					raise RuntimeError(arrtype)
+				else:
+					raise RuntimeError(arrtype+'!!!')
+
+			self._known_arrays[ name ] = arrtype
+
 		for name in args_typedefs:
 			if args_typedefs[name]=='string':
 				self._known_strings.add(name)
@@ -2371,6 +2380,10 @@ TODO clean up go stuff.
 						## note C has funky function pointer syntax, where the arg name is in the middle
 						## of the type, the arg name gets put there when parsing above.
 						a = arg_type
+					elif arg_type.endswith(']'):
+						atype,alen = arg_type.split('[')
+						self._known_arrays[arg_name] = (atype, alen[:-1])
+						a = '%s %s[%s' %(atype, arg_name, alen)
 					else:
 						a = '%s %s' %(arg_type, arg_name)
 

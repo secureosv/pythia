@@ -882,6 +882,8 @@ class typedpython:
 
 						if typedef.startswith('[]'):
 							typedef = '__arg_array__("%s")' %typedef.strip()  ## this parses the go syntax and converts it for each backend
+						elif typedef.startswith('['):
+							typedef = '"%s"' %typedef.strip()
 
 						elif typedef.startswith('map['):
 							typedef = '__arg_map__("%s")' %typedef.strip()  ## this parses the go syntax and converts it for each backend
