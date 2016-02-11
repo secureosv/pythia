@@ -1410,7 +1410,8 @@ handles all special calls
 
 			if self._function_stack:
 				self._known_vars.add( vname )
-				self._vars.remove( vname )
+				if vname in self._vars:
+					self._vars.remove( vname )
 				V = 'let'
 			else:
 				V = 'static'
@@ -3357,14 +3358,32 @@ because they need some special handling in other places.
 			target = self.visit(node.targets[0].value)
 			slice = node.targets[0].slice
 			value = self.visit(node.value)
-			if not slice.lower and slice.upper:
+			if not slice.lower and not slice.upper and not slice.step:
+				if self._memory[-1]=='STACK':
+					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
+						atype, fixed_size = self._known_arrays[target]
+						raise RuntimeError(atype)
+					elif value in self._known_arrays and isinstance(self._known_arrays[value], tuple):
+						atype, fixed_size = self._known_arrays[value]
+						r = [
+							'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+							self.indent()+'}',
+						]
+						return '\n'.join(r)
+					else:
+						raise RuntimeError(target
+							)
+				else:
+					raise RuntimeError('TODO array slice assign `arr[:]=other`')
+
+			elif not slice.lower and slice.upper:
 				s = self.visit(slice.upper)
 				if self._memory[-1]=='STACK':
 					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
 						atype, fixed_size = self._known_arrays[target]
 						r = [
-							#'%s %s[%s];' %(atype, target, fixed_size),
-							self.indent()+'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
+							'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
 							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
 							self.indent()+'}',
 						]

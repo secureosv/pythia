@@ -4,10 +4,20 @@ stack memory mode
 with stack:
 	let garr : [10]int
 	grange = range(3)
+	class Bar:
+		def __init__(self, value:string):
+			self.value = value
 
 	class Foo:
 		def __init__(self, ok:bool):
 			self.ok = ok
+			let self.arr1:  [4]Bar
+
+	class Sub(Foo):
+		def __init__(self, arr2:[4]Bar):
+			#self.arr2[...] = arr2
+			#self.arr2[0] = arr2[0]
+			self.arr2[:] = arr2
 
 	let Foos : [10]Foo
 
@@ -15,7 +25,6 @@ with stack:
 	def test_foos_vec( arr:[]Foo ):
 		assert len(arr)==10
 		for item in arr:
-			print item.ok
 			assert item is None
 			## in stack mode classes `act-like None`
 			assert item.ok is False
@@ -23,9 +32,17 @@ with stack:
 	def test_foos_fixedarr( arr:[10]Foo):
 		assert len(arr)==10
 		for item in arr:
-			print item.ok
+			assert item.ok is False
 
 	def stack_test():
+		let bars : [4]Bar
+		bars[0] = Bar('hello')
+		bars[1] = Bar('world')
+		sub = Sub(bars)
+		print bars[0].value
+		print sub.arr2[0].value
+
+
 		test_foos_fixedarr(Foos)
 
 		with stdvec as 'std::vector<Foo>(std::begin(%s), std::end(%s))':
