@@ -1951,11 +1951,16 @@ regular Python has no support for.
 						else:
 							return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
 					elif self._memory[-1]=='STACK':
+						cast_from = self.visit(node.left.left)
+						if cast_from in self._known_refs:
+							raise RuntimeError(cast_from)
 						if self._function_stack:
 							fnode = self._function_stack[-1]
 							if fnode.return_type==cast_to:  ## TODO check is node above is ast.Return
-								return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
-						return 'static_cast<%s*>(%s)' %(cast_to, self.visit(node.left.left))
+								return 'static_cast<%s>(%s)' %(cast_to, cast_from)
+						#return 'static_cast<%s*>(%s)' %(cast_to, self.visit(node.left.left))
+						return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
+
 					elif self._polymorphic:
 						return 'std::dynamic_pointer_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
 					else:

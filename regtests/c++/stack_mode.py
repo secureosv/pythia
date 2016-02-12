@@ -15,8 +15,9 @@ with stack:
 
 	class Sub(Foo):
 		def __init__(self, arr2:[4]Bar):
-			#self.arr2[...] = arr2
-			#self.arr2[0] = arr2[0]
+			#self.arr2[...] = arr2   ## should work but fails
+			#self.arr2[...] = addr(arr2[0])  ## should also but work fails
+			## workaround, copy data
 			self.arr2[:] = arr2
 
 	let Foos : [10]Foo
