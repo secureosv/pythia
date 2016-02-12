@@ -56,8 +56,10 @@ Below is the minimal set of files required to run Python and Numpy
 
 /usr/lib/python2.7/lib-dynload/datetime.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/datetime.x86_64-linux-gnu.so
 /usr/lib/python2.7/lib-dynload/future_builtins.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/future_builtins.x86_64-linux-gnu.so
-/usr/lib/python2.7/dist-packages/numpy/**: /usr/lib/python2.7/dist-packages/numpy/**
+/usr/local/lib/python2.7/dist-packages/pymzml/**: /usr/lib/python2.7/dist-packages/pymzml/**
 /usr/lib/python2.7/unittest/**: /usr/lib/python2.7/unittest/**
+
+/tmp/small.pwiz.1.1.mzML: /tmp/small.pwiz.1.1.mzML
 
 ```
 
@@ -69,13 +71,10 @@ Python Code
 ```python
 import pymzml
 
-verbose = True
 def test_pymzml():
 	print 'testing pymzml...'
-	example_file = open('/tmp/small.pwiz.1.1.mzML', 'rb')
-	print example_file
 	run = pymzml.run.Reader(
-		example_file,
+		'/tmp/small.pwiz.1.1.mzML',
 		MSn_Precision = 250e-6,
 		obo_version = '1.1.0',
 		extraAccessions = [
@@ -83,10 +82,8 @@ def test_pymzml():
 			('MS:1000130',['value'])
 		]
 	)
-	print 'spec list:', run
 
 	for spec in run:
-		print spec
 		negative_polarity = spec.get('MS:1000129', False)
 		if negative_polarity == '':
 			negative_polarity = True
