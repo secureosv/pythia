@@ -56,8 +56,21 @@ Below is the minimal set of files required to run Python and Numpy
 
 /usr/lib/python2.7/lib-dynload/datetime.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/datetime.x86_64-linux-gnu.so
 /usr/lib/python2.7/lib-dynload/future_builtins.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/future_builtins.x86_64-linux-gnu.so
-/usr/local/lib/python2.7/dist-packages/pymzml/**: /usr/lib/python2.7/dist-packages/pymzml/**
-/usr/lib/python2.7/unittest/**: /usr/lib/python2.7/unittest/**
+
+/usr/local/lib/python2.7/dist-packages/pymzml/**: /usr/local/lib/python2.7/dist-packages/pymzml/**
+/usr/lib/python2.7/bisect.py: /usr/lib/python2.7/bisect.py
+/usr/lib/python2.7/codecs.py: /usr/lib/python2.7/codecs.py
+/usr/lib/python2.7/encodings/ascii.py: /usr/lib/python2.7/encodings/ascii.py
+
+/usr/lib/python2.7/xml/**: /usr/lib/python2.7/xml/**
+/usr/lib/python2.7/lib-dynload/_elementtree.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/_elementtree.x86_64-linux-gnu.so
+/usr/lib/python2.7/lib-dynload/pyexpat.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/pyexpat.x86_64-linux-gnu.so
+/usr/lib/libexpat.so.1: /lib/x86_64-linux-gnu/libexpat.so.1
+
+
+/usr/lib/python2.7/copy.py: /usr/lib/python2.7/copy.py
+/usr/lib/python2.7/base64.py: /usr/lib/python2.7/base64.py
+/usr/lib/python2.7/struct.py: /usr/lib/python2.7/struct.py
 
 /tmp/small.pwiz.1.1.mzML: /tmp/small.pwiz.1.1.mzML
 
@@ -82,8 +95,9 @@ def test_pymzml():
 			('MS:1000130',['value'])
 		]
 	)
-
+	print 'parsed mzML file OK'
 	for spec in run:
+		print type(spec)
 		negative_polarity = spec.get('MS:1000129', False)
 		if negative_polarity == '':
 			negative_polarity = True
