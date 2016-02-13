@@ -3355,6 +3355,25 @@ because they need some special handling in other places.
 			if len(node.targets) > 1: raise NotImplementedError('TODO')
 			elts = [self.visit(e) for e in node.targets[0].elts]
 			target = '(%s)' % ','.join(elts)  ## this works in rust, not c++
+			assert not self._cpp
+		elif isinstance(node.targets[0], ast.Name) and node.targets[0].id in self._known_arrays and isinstance(self._known_arrays[node.targets[0].id], tuple):
+			target = self.visit(node.targets[0])
+			value = self.visit(node.value)
+			atype, fixed_size = self._known_arrays[target]
+			## unroll loop if possible ##
+			if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+				fixed_size = int(fixed_size)
+				r = []
+				for i in range(fixed_size):
+					r.append('%s[%s] = %s[%s];' %(target,i, value,i))
+				return '\n'.join(r)
+			else:
+				r = [
+					'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+					self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+					self.indent()+'}',
+				]
+				return '\n'.join(r)
 
 		elif isinstance(node.targets[0], ast.Subscript) and isinstance(node.targets[0].slice, ast.Slice):
 			## slice assignment, the place sliced away is replaced with the assignment value, this happens inplace.
@@ -3363,7 +3382,7 @@ because they need some special handling in other places.
 			target = self.visit(node.targets[0].value)
 			slice = node.targets[0].slice
 			value = self.visit(node.value)
-			if not slice.lower and not slice.upper and not slice.step:
+			if not slice.lower and not slice.upper and not slice.step:  ## slice copy: `myarr[:]=other` ##
 				if self._memory[-1]=='STACK':
 					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
 						atype, fixed_size = self._known_arrays[target]

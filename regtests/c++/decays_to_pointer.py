@@ -22,7 +22,12 @@ with stack:
 		let b : [2]int
 		#b[...] = addr(arr[0])  ## error: invalid conversion from ‘int*’ to ‘int’
 		#b[...] = arr[0]  ## compiles but fails asserts below
-		b[:] = arr
+
+		## explicit copy
+		#b[:] = arr
+		## in this simple case, the translator knows that `b` is a fixed size array,
+		## and that it needs to copy all items from `arr`
+		b = arr
 
 		assert b[0]==arr[0]
 		assert b[1]==arr[1]
