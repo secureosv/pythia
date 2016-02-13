@@ -1969,7 +1969,7 @@ def main():
 		elif '--dart' in sys.argv: raise RuntimeError('dart backend removed')
 		elif '--lua' in sys.argv:  raise RuntimeError('lua backend removed')
 		elif '--verilog' in sys.argv: script = '#backend:verilog\n'+script
-		else: script = '#backend:javascript\n'+script
+		else: script = '#backend:c++\n'+script
 
 		fpath,fname = os.path.split(path)
 		tag = fname.split('.')[0]
