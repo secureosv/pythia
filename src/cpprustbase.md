@@ -3367,15 +3367,37 @@ because they need some special handling in other places.
 				if self._memory[-1]=='STACK':
 					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
 						atype, fixed_size = self._known_arrays[target]
-						raise RuntimeError(atype)
+						## unroll loop if possible ##
+						if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+							fixed_size = int(fixed_size)
+							r = []
+							for i in range(fixed_size):
+								r.append('%s[%s] = %s[%s];' %(target,i, value,i))
+							return '\n'.join(r)
+						else:
+							r = [
+								'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+								self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+								self.indent()+'}',
+							]
+							return '\n'.join(r)
+
 					elif value in self._known_arrays and isinstance(self._known_arrays[value], tuple):
 						atype, fixed_size = self._known_arrays[value]
-						r = [
-							'for (int __i=0; __i<%s; __i++) {' %fixed_size,
-							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
-							self.indent()+'}',
-						]
-						return '\n'.join(r)
+						## unroll loop if possible ##
+						if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+							fixed_size = int(fixed_size)
+							r = []
+							for i in range(fixed_size):
+								r.append('%s[%s] = %s[%s];' %(target,i, value,i))
+							return '\n'.join(r)
+						else:
+							r = [
+								'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+								self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+								self.indent()+'}',
+							]
+							return '\n'.join(r)
 					else:
 						raise RuntimeError(target
 							)
