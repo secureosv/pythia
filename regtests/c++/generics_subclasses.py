@@ -25,14 +25,15 @@ class D:
 	def method1(self) -> int:
 		return self.x
 
-## rusthon generates the same method for all subclass of `A` ##
-def my_generic( g:A ) ->int:
+## c++14 is able to deduce all the different subclass types 
+## that are passed to `my_generic`, a static type is not defined for `g`
+def my_generic( g ) ->int:
 	return g.method1()
 
-def my_generic2( g1:A, g2:A) ->int:
+def my_generic2( g1, g2) ->int:
 	return g1.method1() * g2.method1()
 
-def my_generic3( g1:A, g2:A, g3:A ) ->int:
+def my_generic3( g1, g2, g3 ) ->int:
 	return g1.method1() * g2.method1() * g3.method1()
 
 def main():

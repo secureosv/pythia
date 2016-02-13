@@ -42,6 +42,7 @@ class JSGenerator(NodeVisitorBase, GeneratorBase):
 		NodeVisitorBase.__init__(self, source)
 
 		self._memory = ['HEAP']  ## used by c++ backend
+		self._with_type = []
 
 
 		self._v8 = '--v8-natives' in sys.argv
