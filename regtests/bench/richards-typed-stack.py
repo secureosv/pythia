@@ -319,7 +319,7 @@ with stack:
 			Task.__init__(self,i,p,w,s,r)
 
 		def fn(self,pkt:Packet, worker:TaskRec) -> Task:
-			w = worker as WorkerTaskRec
+			w = addr(worker) as WorkerTaskRec
 			if pkt is None:
 				return self.waitTask()
 
@@ -343,8 +343,8 @@ with stack:
 
 
 	class TaskWorkArea(object):
-		def __init__(self, taskTab:[]Task ):
-			self.taskTab = taskTab
+		def __init__(self, taskTab:[10]Task ):
+			self.taskTab[:] = taskTab
 			let self.taskList : Task = None
 			let self.holdCount:int = 0
 			let self.qpktCount:int = 0
@@ -364,13 +364,13 @@ with stack:
 			#if tracing:
 			#	print("tcb =",t.ident)
 
-			if t.isTaskHoldingOrWaiting():
+			if t->isTaskHoldingOrWaiting():
 				print 'holding.', t
-				t = t.link
+				t = t->link
 			else:
 				###########if tracing: trace(chr(ord("0")+t.ident))
 				print 'running.', t
-				t = t.runTask()
+				t = addr(t->runTask())
 
 	class Richards(object):
 

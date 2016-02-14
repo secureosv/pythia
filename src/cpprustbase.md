@@ -3360,8 +3360,21 @@ because they need some special handling in other places.
 			target = self.visit(node.targets[0])
 			value = self.visit(node.value)
 			atype, fixed_size = self._known_arrays[target]
-			## unroll loop if possible ##
-			if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+
+			if '(' in value and ')' in value:  ## do not unroll from a function call
+				if not self._function_stack:  ## global
+					self._globals[ target ] = (atype, fixed_size)
+					return 'auto %s = %s; /*global fixed size array: %s[%s]*/' % (target, value, atype, fixed_size)
+
+				elif target in self._vars:
+					## first assignment of a known variable, this requires 'auto' in c++11
+					self._vars.remove( target )
+					self._known_vars.add( target )
+					return 'auto %s = %s; /*assignment to fixed size array: %s[%s]*/' % (target, value, atype, fixed_size)
+				else:
+					return '%s = %s; /*reassignment to fixed size array: %s[%s]*/' % (target, value, atype, fixed_size)
+
+			elif fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
 				fixed_size = int(fixed_size)
 				r = []
 				for i in range(fixed_size):
@@ -4252,8 +4265,18 @@ because they need some special handling in other places.
 
 					if value in self._known_arrays and isinstance(self._known_arrays[value], tuple) and self._memory[-1]=='STACK':
 						atype, fixed_size = self._known_arrays[value]
+
 						## unroll loop if possible ##
-						if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+						if '(' in value and ')' in value:  ## do not unroll from a function call
+							if target in self._vars:
+								## first assignment of a known variable, this requires 'auto' in c++11
+								self._vars.remove( target )
+								self._known_vars.add( target )
+								return 'auto %s = %s; /*Assignment to fixed size array: %s[%s]*/' % (target, value, atype, fixed_size)
+							else:
+								return '%s = %s; /*Reassignment to fixed size array: %s[%s]*/' % (target, value, atype, fixed_size)
+
+						elif fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
 							fixed_size = int(fixed_size)
 							r = []
 							for i in range(fixed_size):
