@@ -3366,7 +3366,7 @@ because they need some special handling in other places.
 				r = []
 				for i in range(fixed_size):
 					r.append('%s[%s] = %s[%s];' %(target,i, value,i))
-				return '\n'.join(r)
+				return ' '.join(r)
 			else:
 				r = [
 					'for (int __i=0; __i<%s; __i++) {' %fixed_size,
@@ -4249,9 +4249,29 @@ because they need some special handling in other places.
 					)
 					return '%s, %s);' %( hack[:-1], value )
 				else:
-					return '%s = %s;' % (target, value)
 
-			elif self._rust:
+					if value in self._known_arrays and isinstance(self._known_arrays[value], tuple) and self._memory[-1]=='STACK':
+						atype, fixed_size = self._known_arrays[value]
+						## unroll loop if possible ##
+						if fixed_size.isdigit() and int(fixed_size)<512:  ## or in self._macro_constants: TODO
+							fixed_size = int(fixed_size)
+							r = []
+							for i in range(fixed_size):
+								r.append('%s[%s] = %s[%s];' %(target,i, value,i))
+							return ' '.join(r)
+						else:
+							r = [
+								'for (int __i=0; __i<%s; __i++) {' %fixed_size,
+								self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+								self.indent()+'}',
+							]
+							return '\n'.join(r)
+
+					else:
+						return '%s = %s;' % (target, value)
+
+			else:
+				assert self._rust
 				## destructured assignments also fallback here.
 				## fallback to mutable by default? `let mut (x,y) = z` breaks rustc
 				if isclass:
@@ -4261,13 +4281,4 @@ because they need some special handling in other places.
 				else:
 					return 'let %s = %s;' % (target, value)
 
-			else:
-				if value.startswith('&make('):  ## TODO DEPRECATE go hack
-					#raise SyntaxError(value)
-					v = value[1:]
-					return '_tmp := %s; %s = &_tmp;' %(v, target)
-				else:
-					#if value.startswith('&[]*') and self._catch_assignment:
-					#	raise SyntaxError(value)
-					return '%s = %s;' % (target, value)
 ```

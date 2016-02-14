@@ -8,12 +8,15 @@ with stack:
 
 	class Bar:
 		def __init__(self, x:[2]int ):
-			self.x[:] = x
+			#self.x[:] = x  ## this works but is not required
+			## the translator is able to detect in this case 
+			## that this needs to be an array copy.
+			self.x = x
 
 	class Foo( Bar ):
 		def __init__(self, x:[2]int, y:[4]A ):
-			self.x[:] = x
-			self.y[:] = y
+			self.x = x
+			self.y = y
 
 	def test_normal_array( arr:[]int )->int:
 		return len(arr)
