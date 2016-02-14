@@ -169,7 +169,8 @@ with stack:
 
 			self.handle = addr(handle)  ## generic - some subclass
 
-			taskWorkArea.taskList = self as Task
+			#taskWorkArea.taskList = self as Task
+			taskWorkArea.taskList[...] = self as Task
 			taskWorkArea.taskTab[ident] = self as Task
 
 
@@ -272,21 +273,22 @@ with stack:
 					h.workInAdd(pkt)
 				else:
 					h.deviceInAdd(pkt)
+
 			work = h.work_in
 			if work is None:
 				return self.waitTask()
-			count = work.datum
+			count = work->datum
 			if count >= BUFSIZE:
-				h.work_in = work.link
+				h.work_in = work->link
 				return self.qpkt(work)
 
 			dev = h.device_in
 			if dev is None:
 				return self.waitTask()
 
-			h.device_in = dev.link
-			dev.datum = work.data[count]
-			work.datum = count + 1
+			h.device_in = dev->link
+			dev->datum = work->data[count]
+			work->datum = count + 1
 			return self.qpkt(dev)
 
 	# IdleTask
@@ -297,7 +299,8 @@ with stack:
 			Task.__init__(self,i,0,None,s,r)
 
 		def fn(self,pkt:Packet, ir:TaskRec) -> Task:
-			i = ir as IdleTaskRec
+			ptr = addr(ir)
+			i = ptr as IdleTaskRec
 			i.count -= 1
 			if i.count == 0:
 				return self.hold()
@@ -370,7 +373,7 @@ with stack:
 			else:
 				###########if tracing: trace(chr(ord("0")+t.ident))
 				print 'running.', t
-				t = addr(t->runTask())
+				t[...] = t->runTask()
 
 	class Richards(object):
 
