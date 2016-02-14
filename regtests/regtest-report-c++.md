@@ -21,15 +21,16 @@ with pointers:
 		return arr
 
 	def test_array( arr:[][]int ):
-		print( arr[0][0] )
+		assert arr[0][0] == 1
 
-	def main():
-		a = make_array()
-		print( len(a))
-		print( len(a[0]) )
-		print( len(a[1]) )
-
-		test_array(a)
+def main():
+	a = make_array()
+	print( len(a))
+	assert len(a)==2
+	assert len(a[0])==3
+	assert len(a[1])==5
+	test_array(a)
+	print 'ok'
 ```
 output:
 ------
@@ -38,25 +39,27 @@ output:
 std::vector<std::vector<int>*>* make_array() {
 
 	
-	auto arr = (new std::vector<std::vector<int>*> {new std::vector<int> {1,2,3},new std::vector<int> {4,5,6,7,8}});			/* new variable */
+	auto arr = new std::vector<std::vector<int>*>{new std::vector<int> {1,2,3},new std::vector<int> {4,5,6,7,8}};
 	return arr;
 }
 void test_array(std::vector<std::vector<int>*>* arr) {
 
 	
-	std::cout << (*(*arr)[0])[0] << std::endl;
+	if (!(( (*(*arr)[0])[0] == 1 ))) {throw std::runtime_error("assertion failed: ( (*(*arr)[0])[0] == 1 )"); }
 	/* arrays:
-		arr : [][]int
+		arr : std::vector<std::vector<int>*>*
 */
 }
 int main() {
 
 	
-	auto a = make_array();			/* new variable */
+	auto a = make_array();			/* new variable*/
 	std::cout << a->size() << std::endl;
-	std::cout << (*a)[0]->size() << std::endl;
-	std::cout << (*a)[1]->size() << std::endl;
+	if (!(( a->size() == 2 ))) {throw std::runtime_error("assertion failed: ( a->size() == 2 )"); }
+	if (!(( (*a)[0]->size() == 3 ))) {throw std::runtime_error("assertion failed: ( (*a)[0]->size() == 3 )"); }
+	if (!(( (*a)[1]->size() == 5 ))) {throw std::runtime_error("assertion failed: ( (*a)[1]->size() == 5 )"); }
 	test_array(a);
+	std::cout << std::string("ok") << std::endl;
 	return 0;
 }
 ```
@@ -66,24 +69,45 @@ input:
 ------
 ```python
 '''
-returns array of arrays
+returns pointer to array
 '''
 
+def make_array() -> std::vector<int>*:
+	arr = new([]int( 1,2,3,4 ))
+	return arr
+
+def test_array( arr:std::vector<int>* ):
+	print( arr[0] )
+	print( arr[1] )
+	print( arr[2] )
+	print( arr[3] )
+
+
 with pointers:
-	def make_array() -> []int:
+	def Pmake_array() -> []int:
 		arr = new([]int( 1,2,3,4 ))
 		return arr
 
-	def test_array( arr:[]int ):
+	def Ptest_array( arr:[]int ):
 		print( arr[0] )
 		print( arr[1] )
 		print( arr[2] )
 		print( arr[3] )
 
-	def main():
-		a = make_array()
-		print('arr length:', len(a))
-		test_array(a)
+def test():
+	a = make_array()
+	print('arr length:', len(a))
+	test_array(a)
+
+
+def test_pointers():
+	a = Pmake_array()
+	print('arr length:', len(a))
+	Ptest_array(a)
+
+def main():
+	test()
+	test_pointers()
 ```
 output:
 ------
@@ -92,7 +116,7 @@ output:
 std::vector<int>* make_array() {
 
 	
-	auto arr = (new std::vector<int> {1,2,3,4});			/* new variable */
+	auto arr = new std::vector<int>({1,2,3,4});
 	return arr;
 }
 void test_array(std::vector<int>* arr) {
@@ -102,86 +126,239 @@ void test_array(std::vector<int>* arr) {
 	std::cout << (*arr)[1] << std::endl;
 	std::cout << (*arr)[2] << std::endl;
 	std::cout << (*arr)[3] << std::endl;
+}
+std::vector<int>* Pmake_array() {
+
+	
+	auto arr = new std::vector<int>({1,2,3,4});
+	return arr;
+}
+void Ptest_array(std::vector<int>* arr) {
+
+	
+	std::cout << (*arr)[0] << std::endl;
+	std::cout << (*arr)[1] << std::endl;
+	std::cout << (*arr)[2] << std::endl;
+	std::cout << (*arr)[3] << std::endl;
 	/* arrays:
-		arr : []int
+		arr : std::vector<int>*
 */
+}
+void test() {
+
+	
+	auto a = make_array();			/* new variable*/
+	std::cout << std::string("arr length:");
+std::cout << a->size();std::cout << std::endl;
+	test_array(a);
+}
+void test_pointers() {
+
+	
+	auto a = Pmake_array();			/* new variable*/
+	std::cout << std::string("arr length:");
+std::cout << a->size();std::cout << std::endl;
+	Ptest_array(a);
 }
 int main() {
 
 	
-	auto a = make_array();			/* new variable */
-	std::cout << std::string("arr length:");
-std::cout << a->size();std::cout << std::endl;
-	test_array(a);
+	test();
+	test_pointers();
 	return 0;
 }
 ```
-* [chan.py](c++/chan.py)
+* [decays_to_pointer.py](c++/decays_to_pointer.py)
 
 input:
 ------
 ```python
-"""cpp-channel backend - send int over channel"""
+'''
+C fixed size arrays decay to pointers in C++.
 
-def sender_wrapper(a:int, send: chan int ):
-	## `chan T` is an alias for `cpp::channel<T>`
-	print 'sending'
-	result = 100
-	send <- result
+'''
+with stack:
+	class A:
+		pass
 
-def recv_wrapper(a:int, recver: cpp::channel<int> ) -> int:
-	## above namespace and template are given c++ style to recver
-	print 'receiving'
-	v = <- recver
-	return v
+	class Bar:
+		def __init__(self, x:[2]int ):
+			self.x[:] = x
+
+	class Foo( Bar ):
+		def __init__(self, x:[2]int, y:[4]A ):
+			self.x[:] = x
+			self.y[:] = y
+
+	def test_normal_array( arr:[]int )->int:
+		return len(arr)
+
+	def test_pointer_decay( arr:[2]int )->int:
+		let b : [2]int
+		#b[...] = addr(arr[0])  ## error: invalid conversion from ‘int*’ to ‘int’
+		#b[...] = arr[0]  ## compiles but fails asserts below
+
+		## explicit copy
+		#b[:] = arr
+		## in this simple case, the translator knows that `b` is a fixed size array,
+		## and that it needs to copy all items from `arr`
+		b = arr
+
+		assert b[0]==arr[0]
+		assert b[1]==arr[1]
+		return len(arr)
+
+	def stack_test():
+		let alist : [4]A
+		let i4 : [4]int
+		i4[0]=1
+		i4[1]=2
+
+		i2 = [2]int(10,20)
+		assert i2[0]==10
+		assert i2[1]==20
+
+		## pointer assignment only catches the first item
+		i2[...] = i4[0]
+		assert i2[0]==i4[0]
+		#assert i2[1]==i4[1]  ## this will fail
+
+		## explicit copy ok
+		i2[:] = i4
+		assert i2[0]==i4[0]
+		assert i2[1]==i4[1]
+
+		test_pointer_decay(i2) == len(i2)
+
+
 
 def main():
-	print 'enter main'
-	c = channel(int)  ## `channel(T)` translates to: `cpp::channel<T>`
-	print 'new channel'
-	## spawn creates a new std::thread, 
-	## and joins it at the end of the function.
-	print 'doing spawn thread'
-	spawn( sender_wrapper(17, c) )
-	print 'done spawning thread'
-	# Do other work...
-	x = recv_wrapper(2, c)
-	print(x)
-	assert x==100
-	print 'ok'
+	stack_test()
 ```
 output:
 ------
 ```c++
 
-void sender_wrapper(int a, cpp::channel<int>  send) {
+class A: public std::enable_shared_from_this<A> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
+	std::string getclassname() {return __class__;}
+};
+class Bar: public std::enable_shared_from_this<Bar> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	int  x[2];
+	Bar __init__(int x[2]);
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Bar() {__class__ = std::string("Bar"); __initialized__ = true; __classid__=2;}
+	Bar(bool init) {__class__ = std::string("Bar"); __initialized__ = init; __classid__=2;}
+	std::string getclassname() {return __class__;}
+};
+class Foo:  public Bar {
+  public:
+//	members from class: Bar  ['x']
+	A  y[4];
+	Foo __init__(int x[2]);
+	Foo __init__(int x[2], A y[4]);
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=1;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=1;}
+	std::string getclassname() {return __class__;}
+};
+int test_normal_array(std::vector<int>* arr) {
 
 	
-	std::cout << std::string("sending") << std::endl;
-	auto result = 100;  /* auto-fallback */
-	send.send(result);
+	return arr->size();
+	/* arrays:
+		arr : std::vector<int>*
+*/
 }
-int recv_wrapper(int a, cpp::channel<int> recver) {
+int test_pointer_decay(int arr[2]) {
 
 	
-	std::cout << std::string("receiving") << std::endl;
-	auto v = recver.recv();
-	return v;
+	int b[2] = {0,0};
+	b[0] = arr[0];
+b[1] = arr[1];
+	if (!(( b[0] == arr[0] ))) {throw std::runtime_error("assertion failed: ( b[0] == arr[0] )"); }
+	if (!(( b[1] == arr[1] ))) {throw std::runtime_error("assertion failed: ( b[1] == arr[1] )"); }
+	return 2;
+	/* arrays:
+		arr : ('int', '2')
+		b : ('int', '2')
+*/
 }
+void stack_test() {
+
+	
+	A alist[4] = {A(false),A(false),A(false),A(false)};
+	int i4[4] = {0,0,0,0};
+	i4[0] = 1;
+	i4[1] = 2;
+	int i2[2] = {10,20};
+	if (!(( i2[0] == 10 ))) {throw std::runtime_error("assertion failed: ( i2[0] == 10 )"); }
+	if (!(( i2[1] == 20 ))) {throw std::runtime_error("assertion failed: ( i2[1] == 20 )"); }
+	(*i2) = i4[0];
+	if (!(( i2[0] == i4[0] ))) {throw std::runtime_error("assertion failed: ( i2[0] == i4[0] )"); }
+	i2[0] = i4[0];
+i2[1] = i4[1];
+	if (!(( i2[0] == i4[0] ))) {throw std::runtime_error("assertion failed: ( i2[0] == i4[0] )"); }
+	if (!(( i2[1] == i4[1] ))) {throw std::runtime_error("assertion failed: ( i2[1] == i4[1] )"); }
+	( test_pointer_decay(i2) == 2 );
+	/* arrays:
+		i2 : ('int', '2')
+		alist : ('A', '4')
+		i4 : ('int', '4')
+*/
+}
+	Foo Foo::__init__(int x[2], A y[4]) {
+
+		
+		(*this).x[0] = x[0];
+(*this).x[1] = x[1];
+		(*this).y[0] = y[0];
+(*this).y[1] = y[1];
+(*this).y[2] = y[2];
+(*this).y[3] = y[3];
+		return *this;
+		/* arrays:
+			y : ('A', '4')
+			x : ('int', '2')
+*/
+	}
+	Foo Foo::__init__(int x[2]) {
+
+		
+		(*this).x[0] = x[0];
+(*this).x[1] = x[1];
+		return *this;
+		/* arrays:
+			x : ('int', '2')
+*/
+	}
+	Bar Bar::__init__(int x[2]) {
+
+		
+		(*this).x[0] = x[0];
+(*this).x[1] = x[1];
+		return *this;
+		/* arrays:
+			x : ('int', '2')
+*/
+	}
 int main() {
 
 	
-	std::cout << std::string("enter main") << std::endl;
-	auto c = cpp::channel<int>{};			/* new variable */
-	std::cout << std::string("new channel") << std::endl;
-	std::cout << std::string("doing spawn thread") << std::endl;
-	std::thread __thread0__( [&]{sender_wrapper(17, c);} );
-	std::cout << std::string("done spawning thread") << std::endl;
-	auto x = recv_wrapper(2, c);			/* new variable */
-	std::cout << x << std::endl;
-	if (!(( x == 100 ))) {throw std::runtime_error("assertion failed: ( x == 100 )"); }
-	std::cout << std::string("ok") << std::endl;
-	if (__thread0__.joinable()) __thread0__.join();
+	stack_test();
 	return 0;
 }
 ```
@@ -355,11 +532,20 @@ void somefunc() {
 
 	
 	for (int step=0; step<2; step++) {
-		auto w = range1(10);			/* new variable */
+		w[0] = range1(10)[0];
+w[1] = range1(10)[1];
+w[2] = range1(10)[2];
+w[3] = range1(10)[3];
+w[4] = range1(10)[4];
+w[5] = range1(10)[5];
+w[6] = range1(10)[6];
+w[7] = range1(10)[7];
+w[8] = range1(10)[8];
+w[9] = range1(10)[9];
 		if (!(( w->size() == 10 ))) {throw std::runtime_error("assertion failed: ( w->size() == 10 )"); }
 		if (!(( (*w)[0] == 0 ))) {throw std::runtime_error("assertion failed: ( (*w)[0] == 0 )"); }
 		if (!(( (*w)[9] == 9 ))) {throw std::runtime_error("assertion failed: ( (*w)[9] == 9 )"); }
-		auto r = range2(10, 20);			/* new variable */
+		auto r = range2(10, 20);			/* new variable*/
 		if (!(( (*r)[0] == 10 ))) {throw std::runtime_error("assertion failed: ( (*r)[0] == 10 )"); }
 		if (!(( (*r)[1] == 11 ))) {throw std::runtime_error("assertion failed: ( (*r)[1] == 11 )"); }
 		std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4,5})) ); /* 1D Array */
@@ -486,7 +672,7 @@ std::cout << a->size();std::cout << std::endl;
 		f : int
 		h : int
 		r : int
-		w : int
+		w : ('int', '10')
 */
 }
 int main() {
@@ -538,53 +724,48 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  x;
 	A* __init__(int x);
 	int method();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 class B:  public A {
   public:
 //	members from class: A  ['x']
-	int foo();
 	B* __init__(int x);
+	int foo();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	B() {__class__ = std::string("B"); __initialized__ = true;}
-	B(bool init) {__class__ = std::string("B"); __initialized__ = init;}
+	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
+	B(bool init) {__class__ = std::string("B"); __initialized__ = init; __classid__=2;}
 	std::string getclassname() {return this->__class__;}
 };
 class C:  public A {
   public:
 //	members from class: A  ['x']
-	int bar();
 	C* __init__(int x);
+	int bar();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	C() {__class__ = std::string("C"); __initialized__ = true;}
-	C(bool init) {__class__ = std::string("C"); __initialized__ = init;}
+	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
+	C(bool init) {__class__ = std::string("C"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
-	C* C::__init__(int x) {
-
-		
-		this->x = x;
-		return this;
-	}
 	int C::bar() {
 
 		
 		return (this->x + 200);
 	}
-	B* B::__init__(int x) {
+	C* C::__init__(int x) {
 
 		
 		this->x = x;
@@ -594,6 +775,12 @@ class C:  public A {
 
 		
 		return (this->x * 2);
+	}
+	B* B::__init__(int x) {
+
+		
+		this->x = x;
+		return this;
 	}
 	int A::method() {
 
@@ -609,9 +796,9 @@ class C:  public A {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())->__init__(0)); // new object
-	auto b = std::shared_ptr<B>((new B())->__init__(1)); // new object
-	auto c = std::shared_ptr<C>((new C())->__init__(2)); // new object
+	auto a = std::shared_ptr<A>((new A())); a->__init__(0); // new object
+	auto b = std::shared_ptr<B>((new B())); b->__init__(1); // new object
+	auto c = std::shared_ptr<C>((new C())); c->__init__(2); // new object
 	std::cout << a->getclassname() << std::endl;
 	std::cout << b->getclassname() << std::endl;
 	std::cout << c->getclassname() << std::endl;
@@ -723,14 +910,15 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 void somefunc() {
@@ -942,10 +1130,11 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  y;
 	int  x;
 	A* __init__(int x, int y);
@@ -953,8 +1142,8 @@ class A {
 	static int bar(int a);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 	int A::bar(int a) {
@@ -977,7 +1166,7 @@ class A {
 int main() {
 
 	
-	auto x = std::shared_ptr<A>((new A())->__init__(1, 2)); // new object
+	auto x = std::shared_ptr<A>((new A())); x->__init__(1, 2); // new object
 	x->foo();
 	A::foo();
 	std::cout << x->bar(100) << std::endl;
@@ -994,69 +1183,114 @@ input:
 '''
 let syntax example
 '''
-NUM = 100
+
+macro( NUM=100 )  ## becomes `#define NUM 100`
 
 class Foo():
 	def __init__(self):
-		#let self.data : [NUM]int
-		pass
+		let self.data : [NUM]int
 
 let Foos: []Foo
 
 let TwentyFoos : [20]Foo
 
 mycomp = []int()
+twentyints = [20]int()
+
+gFoo = Foo()
+
 
 def main():
+	print gFoo
+
+	print 'len mycomp:', len(mycomp)
+	assert len(mycomp)==0
+
+	mycomp2 = []int()
+	mycomp2.append( 10 )
+	print 'len mycomp2:', len(mycomp2)
+	assert len(mycomp2)==1
+
 	print Foos
 
 	print len(Foos)
 	assert len(Foos) == 0
 
 	f = Foo()
+	assert len(f.data)==NUM
+	f.data[0] = 12
+	print f.data[0]
+
 	Foos.push_back(f)
 	print len(Foos)
 	assert len(Foos)==1
 
 	print len(TwentyFoos)
+	TwentyFoos[0] = f
+	print TwentyFoos[0]
 ```
 output:
 ------
 ```c++
 
-int NUM = 100;
-class Foo {
+#define NUM 100//;
+class Foo: public std::enable_shared_from_this<Foo> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
+	std::shared_ptr<std::vector<int>>  data;
 	Foo* __init__();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Foo() {__class__ = std::string("Foo"); __initialized__ = true;}
-	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 auto Foos = std::make_shared<std::vector<std::shared_ptr<Foo>>>();
-auto TwentyFoos = std::make_shared<std::vector<Foo>>(20);
-auto mycomp = ('std::vector<int>*', '{}');
+auto TwentyFoos = std::make_shared<std::vector<std::shared_ptr<Foo>>>(20);
+auto mycomp = std::make_shared<std::vector<int>>();
+auto twentyints = std::make_shared<std::vector<int>>(20);
+auto gFoo = std::shared_ptr<Foo>((new Foo())->__init__());
 	Foo* Foo::__init__() {
 
 		
-		/*pass*/
+		this->data = std::make_shared<std::vector<int>>(NUM);
 		return this;
+		/* arrays:
+			TwentyFoos : ('Foo', '20')
+*/
 	}
 int main() {
 
 	
+	std::cout << gFoo << std::endl;
+	std::cout << std::string("len mycomp:");
+std::cout << mycomp->size();std::cout << std::endl;
+	if (!(( mycomp->size() == 0 ))) {throw std::runtime_error("assertion failed: ( mycomp->size() == 0 )"); }
+	std::shared_ptr<std::vector<int>> mycomp2( (new std::vector<int>({})) ); /* 1D Array */
+	mycomp2->push_back(10);
+	std::cout << std::string("len mycomp2:");
+std::cout << mycomp2->size();std::cout << std::endl;
+	if (!(( mycomp2->size() == 1 ))) {throw std::runtime_error("assertion failed: ( mycomp2->size() == 1 )"); }
 	std::cout << Foos << std::endl;
 	std::cout << Foos->size() << std::endl;
 	if (!(( Foos->size() == 0 ))) {throw std::runtime_error("assertion failed: ( Foos->size() == 0 )"); }
-	auto f = std::shared_ptr<Foo>((new Foo())->__init__()); // new object
+	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(); // new object
+	if (!(( f->data->size() == NUM ))) {throw std::runtime_error("assertion failed: ( f->data->size() == NUM )"); }
+	(*f->data)[0] = 12;
+	std::cout << (*f->data)[0] << std::endl;
 	Foos->push_back(f);
 	std::cout << Foos->size() << std::endl;
 	if (!(( Foos->size() == 1 ))) {throw std::runtime_error("assertion failed: ( Foos->size() == 1 )"); }
 	std::cout << TwentyFoos->size() << std::endl;
+	(*TwentyFoos)[0] = f;
+	std::cout << (*TwentyFoos)[0] << std::endl;
 	return 0;
+	/* arrays:
+		mycomp2 : int
+		TwentyFoos : ('Foo', '20')
+*/
 }
 ```
 * [listcomp.py](c++/listcomp.py)
@@ -1166,14 +1400,15 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 std::shared_ptr<A>  a = nullptr;
@@ -1329,23 +1564,25 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  y;
 	int  x;
 	A* __init__(int x, int y);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 A* create_A() {
 
 	
-	auto a = (new A)->__init__(1,2);  /* new object */
+	auto A_139858037203600 = (new A()); A_139858037203600->__init__(1, 2);
+auto a = (new A)->__init__(1,2);  /* new object */
 	return a;
 }
 	A* A::__init__(int x, int y) {
@@ -1358,10 +1595,79 @@ A* create_A() {
 int main() {
 
 	
-	auto x = create_A();			/* new variable */
+	auto x = create_A();			/* new variable*/
 	std::cout << x << std::endl;
 	std::cout << x->x << std::endl;
 	std::cout << x->y << std::endl;
+	return 0;
+}
+```
+* [chan.py](c++/chan.py)
+
+input:
+------
+```python
+"""cpp-channel backend - send int over channel"""
+
+def sender_wrapper(a:int, send: chan int ):
+	## `chan T` is an alias for `cpp::channel<T>`
+	print 'sending'
+	result = 100
+	send <- result
+
+def recv_wrapper(a:int, recver: cpp::channel<int> ) -> int:
+	## above namespace and template are given c++ style to recver
+	print 'receiving'
+	v = <- recver
+	return v
+
+def main():
+	print 'enter main'
+	c = channel(int)  ## `channel(T)` translates to: `cpp::channel<T>`
+	print 'new channel'
+	## spawn creates a new std::thread, 
+	## and joins it at the end of the function.
+	print 'doing spawn thread'
+	spawn( sender_wrapper(17, c) )
+	print 'done spawning thread'
+	# Do other work...
+	x = recv_wrapper(2, c)
+	print(x)
+	assert x==100
+	print 'ok'
+```
+output:
+------
+```c++
+
+void sender_wrapper(int a, cpp::channel<int>  send) {
+
+	
+	std::cout << std::string("sending") << std::endl;
+	auto result = 100;  /* auto-fallback */
+	send.send(result);
+}
+int recv_wrapper(int a, cpp::channel<int> recver) {
+
+	
+	std::cout << std::string("receiving") << std::endl;
+	auto v = recver.recv();
+	return v;
+}
+int main() {
+
+	
+	std::cout << std::string("enter main") << std::endl;
+	auto c = cpp::channel<int>{};			/* new variable*/
+	std::cout << std::string("new channel") << std::endl;
+	std::cout << std::string("doing spawn thread") << std::endl;
+	std::thread __thread0__( [&]{sender_wrapper(17, c);} );
+	std::cout << std::string("done spawning thread") << std::endl;
+	auto x = recv_wrapper(2, c);			/* new variable*/
+	std::cout << x << std::endl;
+	if (!(( x == 100 ))) {throw std::runtime_error("assertion failed: ( x == 100 )"); }
+	std::cout << std::string("ok") << std::endl;
+	if (__thread0__.joinable()) __thread0__.join();
 	return 0;
 }
 ```
@@ -1454,7 +1760,7 @@ void somefunc() {
 	std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
 	std::cout << std::string("slice assign front") << std::endl;
-	auto lena = a->size();			/* new variable */
+	auto lena = a->size();			/* new variable*/
 	auto two = 2;  /* auto-fallback */
 	if ((two + 1) >= a->size()) { a->erase(a->begin(), a->end());
 } else { a->erase(a->begin(), a->begin()+(two + 1)); }
@@ -1600,10 +1906,11 @@ output:
 ------
 ```c++
 
-class Parent {
+class Parent: public std::enable_shared_from_this<Parent> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  y;
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>>  children;
 	Parent* __init__(int y, std::shared_ptr<std::vector<std::shared_ptr<Child>>> children);
@@ -1611,14 +1918,15 @@ class Parent {
 	void say(std::string msg);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Parent() {__class__ = std::string("Parent"); __initialized__ = true;}
-	Parent(bool init) {__class__ = std::string("Parent"); __initialized__ = init;}
+	Parent() {__class__ = std::string("Parent"); __initialized__ = true; __classid__=0;}
+	Parent(bool init) {__class__ = std::string("Parent"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
-class Child {
+class Child: public std::enable_shared_from_this<Child> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  x;
 	std::weak_ptr<Parent>  parent;
 	Child* __init__(int x, std::shared_ptr<Parent> parent);
@@ -1626,8 +1934,8 @@ class Child {
 	void bar();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Child() {__class__ = std::string("Child"); __initialized__ = true;}
-	Child(bool init) {__class__ = std::string("Child"); __initialized__ = init;}
+	Child() {__class__ = std::string("Child"); __initialized__ = true; __classid__=1;}
+	Child(bool init) {__class__ = std::string("Child"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
 /**
@@ -1678,7 +1986,7 @@ class Child {
 	std::shared_ptr<Child> Parent::create_child(int x, std::shared_ptr<Parent> parent) {
 
 		
-		auto child = std::shared_ptr<Child>((new Child())->__init__(x, parent)); // new object
+		auto child = std::shared_ptr<Child>((new Child())); child->__init__(x, parent); // new object
 		this->children->push_back(child);
 		return child;
 	}
@@ -1689,14 +1997,14 @@ class Child {
 		this->y = y;
 		return this;
 		/* arrays:
-			children : []Child
+			children : std::shared_ptr<std::vector<std::shared_ptr<Child>>>
 */
 	}
 int main() {
 
 	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())->__init__(1000, children)); // new object
+	auto p = std::shared_ptr<Parent>((new Parent())); p->__init__(1000, children); // new object
 	std::cout << std::string("parent:");
 std::cout << p;std::cout << std::endl;
 	auto c1 = p->create_child(1, p);			/* p   */
@@ -1709,6 +2017,262 @@ std::cout << p;std::cout << std::endl;
 	return 0;
 	/* arrays:
 		children : Child
+*/
+}
+```
+* [stack_mode.py](c++/stack_mode.py)
+
+input:
+------
+```python
+'''
+stack memory mode
+'''
+with stack:
+	let garr : [10]int
+	grange = range(3)
+	class Bar:
+		def __init__(self, value:string):
+			self.value = value
+
+	class Foo:
+		def __init__(self, ok:bool):
+			self.ok = ok
+			let self.arr1:  [4]Bar
+
+	class Sub(Foo):
+		def __init__(self, arr2:[4]Bar):
+			#self.arr2[...] = arr2   ## should work but fails
+			#self.arr2[...] = addr(arr2[0])  ## should also but work fails
+			## workaround, copy data
+			self.arr2[:] = arr2
+
+	let Foos : [10]Foo
+
+
+	def test_foos_vec( arr:[]Foo ):
+		assert len(arr)==10
+		for item in arr:
+			assert item is None
+			## in stack mode classes `act-like None`
+			assert item.ok is False
+
+	def test_foos_fixedarr( arr:[10]Foo):
+		assert len(arr)==10
+		for item in arr:
+			assert item.ok is False
+
+	def stack_test():
+		let bars : [4]Bar
+		bars[0] = Bar('hello')
+		bars[1] = Bar('world')
+		sub = Sub(bars)
+		print bars[0].value
+		print sub.arr2[0].value
+
+
+		test_foos_fixedarr(Foos)
+
+		with stdvec as 'std::vector<Foo>(std::begin(%s), std::end(%s))':
+			vec = stdvec(Foos, Foos)
+			test_foos_vec(addr(vec))
+
+		let arr : [5]int
+		for i in garr:
+			print i
+			assert i==0
+		print 'global array iter ok'
+		for i in arr:
+			print i
+			assert i==0
+		print 'local array iter ok'
+
+		j = 0
+		for i in grange:
+			print i
+			assert i==j
+			j+=1
+
+		print 'loop over global range ok'
+
+		for f in Foos:
+			assert f is None
+		print 'foos initalized to None ok'
+
+
+def main():
+	stack_test()
+```
+output:
+------
+```c++
+
+int garr[10] = {0,0,0,0,0,0,0,0,0,0};
+grange[0] = __range1__(3)[0];
+grange[1] = __range1__(3)[1];
+grange[2] = __range1__(3)[2];
+class Bar: public std::enable_shared_from_this<Bar> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	std::string  value;
+	Bar __init__(std::string value);
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Bar() {__class__ = std::string("Bar"); __initialized__ = true; __classid__=1;}
+	Bar(bool init) {__class__ = std::string("Bar"); __initialized__ = init; __classid__=1;}
+	std::string getclassname() {return __class__;}
+};
+class Foo: public std::enable_shared_from_this<Foo> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	bool  ok;
+	Bar  arr1[4];
+	Foo __init__(bool ok);
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
+	std::string getclassname() {return __class__;}
+};
+class Sub:  public Foo {
+  public:
+//	members from class: Foo  ['ok', 'arr1']
+	Bar  arr2[4];
+	Sub __init__(Bar arr2[4]);
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Sub() {__class__ = std::string("Sub"); __initialized__ = true; __classid__=2;}
+	Sub(bool init) {__class__ = std::string("Sub"); __initialized__ = init; __classid__=2;}
+	std::string getclassname() {return __class__;}
+};
+Foo Foos[10] = {Foo(false),Foo(false),Foo(false),Foo(false),Foo(false),Foo(false),Foo(false),Foo(false),Foo(false),Foo(false)};
+void test_foos_vec(std::vector<Foo>* arr) {
+
+	
+	if (!(( arr->size() == 10 ))) {throw std::runtime_error("assertion failed: ( arr->size() == 10 )"); }
+	for (auto &item: (*arr)) {
+		if (!(( item == nullptr ))) {throw std::runtime_error("assertion failed: ( item == nullptr )"); }
+		if (!(( item.ok == false ))) {throw std::runtime_error("assertion failed: ( item.ok == false )"); }
+	}
+	/* arrays:
+		grange : ('int', '3')
+		arr : std::vector<Foo>*
+		garr : ('int', '10')
+		Foos : ('Foo', '10')
+*/
+}
+void test_foos_fixedarr(Foo arr[10]) {
+
+	
+	if (!(( 10 == 10 ))) {throw std::runtime_error("assertion failed: ( 10 == 10 )"); }
+	for (int __idx=0; __idx<10; __idx++) {
+	Foo item = arr[__idx];
+		if (!(( item.ok == false ))) {throw std::runtime_error("assertion failed: ( item.ok == false )"); }
+	}
+	/* arrays:
+		grange : ('int', '3')
+		arr : ('Foo', '10')
+		garr : ('int', '10')
+		Foos : ('Foo', '10')
+*/
+}
+void stack_test() {
+
+	
+	Bar bars[4] = {Bar(false),Bar(false),Bar(false),Bar(false)};
+	bars[0] = Bar().__init__(std::string("hello"));
+	bars[1] = Bar().__init__(std::string("world"));
+	auto sub = Sub().__init__(bars); // new object
+	std::cout << bars[0].value << std::endl;
+	std::cout << sub.arr2[0].value << std::endl;
+	test_foos_fixedarr(Foos);
+	auto vec = std::vector<Foo>(std::begin(Foos), std::end(Foos));			/* new variable*/
+	test_foos_vec(&vec);
+	int arr[5] = {0,0,0,0,0};
+	for (int __idx=0; __idx<10; __idx++) {
+	int i = garr[__idx];
+		std::cout << i << std::endl;
+		if (!(( i == 0 ))) {throw std::runtime_error("assertion failed: ( i == 0 )"); }
+	}
+	std::cout << std::string("global array iter ok") << std::endl;
+	for (int __idx=0; __idx<5; __idx++) {
+	int i = arr[__idx];
+		std::cout << i << std::endl;
+		if (!(( i == 0 ))) {throw std::runtime_error("assertion failed: ( i == 0 )"); }
+	}
+	std::cout << std::string("local array iter ok") << std::endl;
+	auto j = 0;  /* auto-fallback */
+	for (int __idx=0; __idx<3; __idx++) {
+	int i = grange[__idx];
+		std::cout << i << std::endl;
+		if (!(( i == j ))) {throw std::runtime_error("assertion failed: ( i == j )"); }
+		j ++;
+	}
+	std::cout << std::string("loop over global range ok") << std::endl;
+	for (int __idx=0; __idx<10; __idx++) {
+	Foo f = Foos[__idx];
+		if (!(( f == nullptr ))) {throw std::runtime_error("assertion failed: ( f == nullptr )"); }
+	}
+	std::cout << std::string("foos initalized to None ok") << std::endl;
+	/* arrays:
+		grange : ('int', '3')
+		bars : ('Bar', '4')
+		garr : ('int', '10')
+		arr : ('int', '5')
+		Foos : ('Foo', '10')
+*/
+}
+	Sub Sub::__init__(Bar arr2[4]) {
+
+		
+		(*this).arr2[0] = arr2[0];
+(*this).arr2[1] = arr2[1];
+(*this).arr2[2] = arr2[2];
+(*this).arr2[3] = arr2[3];
+		return *this;
+		/* arrays:
+			grange : ('int', '3')
+			garr : ('int', '10')
+			arr2 : ('Bar', '4')
+			Foos : ('Foo', '10')
+*/
+	}
+	Foo Foo::__init__(bool ok) {
+
+		
+		(*this).ok = ok;
+		/* arr1 : [4]Bar */;
+		return *this;
+		/* arrays:
+			grange : ('int', '3')
+			garr : ('int', '10')
+			Foos : ('Foo', '10')
+*/
+	}
+	Bar Bar::__init__(std::string value) {
+
+		
+		(*this).value = value;
+		return *this;
+		/* arrays:
+			grange : ('int', '3')
+			garr : ('int', '10')
+			Foos : ('Foo', '10')
+*/
+	}
+int main() {
+
+	
+	stack_test();
+	return 0;
+	/* arrays:
+		grange : ('int', '3')
+		garr : ('int', '10')
+		Foos : ('Foo', '10')
 */
 }
 ```
@@ -2000,42 +2564,43 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  x;
 	A* __init__(int x);
 	int method1();
 	std::string getname();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 class B:  public A {
   public:
 //	members from class: A  ['x']
+	B* __init__(int x);
 	int method1();
 	void method2(int y);
-	B* __init__(int x);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	B() {__class__ = std::string("B"); __initialized__ = true;}
-	B(bool init) {__class__ = std::string("B"); __initialized__ = init;}
+	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
+	B(bool init) {__class__ = std::string("B"); __initialized__ = init; __classid__=2;}
 	std::string getclassname() {return this->__class__;}
 };
 class C:  public A {
   public:
 //	members from class: A  ['x']
+	C* __init__(int x);
 	int method1();
 	void say_hi();
-	C* __init__(int x);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	C() {__class__ = std::string("C"); __initialized__ = true;}
-	C(bool init) {__class__ = std::string("C"); __initialized__ = init;}
+	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
+	C(bool init) {__class__ = std::string("C"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
 int my_generic(std::shared_ptr<A> g) {
@@ -2043,12 +2608,6 @@ int my_generic(std::shared_ptr<A> g) {
 	
 	return g->method1();
 }
-	C* C::__init__(int x) {
-
-		
-		this->x = x;
-		return this;
-	}
 	void C::say_hi() {
 
 		
@@ -2059,7 +2618,7 @@ int my_generic(std::shared_ptr<A> g) {
 		
 		return (this->x + 200);
 	}
-	B* B::__init__(int x) {
+	C* C::__init__(int x) {
 
 		
 		this->x = x;
@@ -2074,6 +2633,12 @@ int my_generic(std::shared_ptr<A> g) {
 
 		
 		return (this->x * 2);
+	}
+	B* B::__init__(int x) {
+
+		
+		this->x = x;
+		return this;
 	}
 	std::string A::getname() {
 
@@ -2094,9 +2659,9 @@ int my_generic(std::shared_ptr<A> g) {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
-	auto b = std::shared_ptr<B>((new B())->__init__(200)); // new object
-	auto c = std::shared_ptr<C>((new C())->__init__(3000)); // new object
+	auto a = std::shared_ptr<A>((new A())); a->__init__(1); // new object
+	auto b = std::shared_ptr<B>((new B())); b->__init__(200); // new object
+	auto c = std::shared_ptr<C>((new C())); c->__init__(3000); // new object
 	std::cout << a->__class__ << std::endl;
 	std::cout << b->__class__ << std::endl;
 	std::cout << c->__class__ << std::endl;
@@ -2191,14 +2756,22 @@ input:
 returns subclasses
 '''
 class A:
-	def __init__(self, x:int):
+	def __init__(self, x:int, other:A):
 		self.x = x
+		self.other = other
 	def method(self) -> int:
 		return self.x
+	def get_self(self) ->self:
+		return self
+	def set_self(self):
+		#self.other.other = self  ## TODO
+		self.other.other = self.get_self()
 
 class B(A):
 	def foo(self) ->int:
 		return self.x * 2
+	def foo(self, x:float, y:float) ->int:
+		return (x+y) as int
 
 class C(A):
 	def bar(self) ->int:
@@ -2209,72 +2782,97 @@ class D(C):
 		return self.x + 1
 
 
-def some_subclass( x:int ) ->A:
+def some_subclass( x:int, o:A ) ->A:
 	switch x:
 		case 0:
-			a = A(1)
+			a = A(1,o)
 			return a
 		case 1:
-			b = B(2)
+			b = B(2,o)
 			return b
 		case 2:
-			c = C(3)
+			c = C(3,o)
 			return c
 		case 3:
-			d = D(4)
+			d = D(4,o)
 			return d
 
 
 def main():
-	a = some_subclass(0)
-	b = some_subclass(1)
-	c = some_subclass(2)
-	d = some_subclass(3)
+	a = some_subclass(0, None)
+	b = some_subclass(1, a)
+	c = some_subclass(2, b)
+	d = some_subclass(3, c)
 
-	print(a.getclassname())
-	print(b.getclassname())
+	bb = b.get_self()
+	#assert bb.foo()==4  ## this wont work here
+
+	#assert a.getclassname() == 'A'  ## TODO fix
+	#assert b.getclassname() == 'B'
 	print(c.getclassname())
 	print(d.getclassname())
 
-	print(a.method())
-	print a.x
-	print(b.method())
-	print b.x
-	print(c.method())
-	print c.x
-	print(d.method())
-	print d.x
+	assert a.method() == a.x
+	assert a.x == 1
+	assert b.method() == b.x
+	assert b.x == 2
+
+	#assert d.hey()==5  ## not allowed before `if isinstance(d,D)`
+	assert b.other.method() == 1
+	assert c.other.method() == b.x
+
+	## the method not allowed here because `other` is reduced to the super class `A`
+	#assert c.other.foo()==4
+	## this works using an explicit cast
+	assert (c.other as B).foo()==4
+	## testing overloaded method
+	assert (c.other as B).foo(
+			100 as float,
+			200 as float
+		) == 300
+
+
 
 	print('- - - - - - - ')
 	if isinstance(b, B):
-		print('b is type B')
-		print(b.method())
-		print(b.foo())
+		assert b.foo()==4
+		bbb = b.get_self()
+		assert bbb.foo()==4
 	else:
-		print('error: b is not type B')
+		raise RuntimeError('error: b is not type B')
 
 	if isinstance(c, C):
-		print('c is type C')
-		print(c.method())
-		print(c.bar())
+		assert c.method()==3
+		assert c.bar()==203
+		## not allowed here either, because `foo` is not a method of the base class `A`
+		#assert c.other.foo()==4
+		if isinstance(c.other, B):
+			assert c.other.foo()==4
+
 	else:
 		print('error: c is not type C')
 
 	if isinstance(d, D):
 		print('d is type D')
 		#print(d.bar())  ## TODO, subclass from C.
-		print(d.hey())
+		assert d.hey()==5
 	else:
 		print('error: d is not type D')
 
 	print('------------------')
 	for i in range(3):
-		o = some_subclass(i)
+		o = some_subclass(i, a)
 		print(o.method())
 		if isinstance(o, B):
 			print(o.foo())
 		if isinstance(o,C):		## TODO-FIX elif isinstance(o,C)
 			print(o.bar())
+
+		switch type(o):
+			case B:
+				assert o.foo()==4
+			case C:
+				assert o.bar()==203
 
 	print('end of test')
 ```
@@ -2282,164 +2880,208 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  x;
-	A* __init__(int x);
+	std::shared_ptr<A>  other;
+	A* __init__(int x, std::shared_ptr<A> other);
 	int method();
+	std::shared_ptr<A> get_self();
+	void set_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 class B:  public A {
   public:
-//	members from class: A  ['x']
+//	members from class: A  ['x', 'other']
+	B* __init__(int x, std::shared_ptr<A> other);
 	int foo();
-	B* __init__(int x);
+	int foo(float x, float y);
+	std::shared_ptr<B> get_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	B() {__class__ = std::string("B"); __initialized__ = true;}
-	B(bool init) {__class__ = std::string("B"); __initialized__ = init;}
+	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
+	B(bool init) {__class__ = std::string("B"); __initialized__ = init; __classid__=2;}
 	std::string getclassname() {return this->__class__;}
 };
 class C:  public A {
   public:
-//	members from class: A  ['x']
+//	members from class: A  ['x', 'other']
+	C* __init__(int x, std::shared_ptr<A> other);
 	int bar();
-	C* __init__(int x);
+	std::shared_ptr<C> get_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	C() {__class__ = std::string("C"); __initialized__ = true;}
-	C(bool init) {__class__ = std::string("C"); __initialized__ = init;}
+	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
+	C(bool init) {__class__ = std::string("C"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
 class D:  public C {
   public:
-//	members from class: A  ['x']
+//	members from class: A  ['x', 'other']
+	D* __init__(int x, std::shared_ptr<A> other);
 	int hey();
-	D* __init__(int x);
+	std::shared_ptr<D> get_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	D() {__class__ = std::string("D"); __initialized__ = true;}
-	D(bool init) {__class__ = std::string("D"); __initialized__ = init;}
+	D() {__class__ = std::string("D"); __initialized__ = true; __classid__=3;}
+	D(bool init) {__class__ = std::string("D"); __initialized__ = init; __classid__=3;}
 	std::string getclassname() {return this->__class__;}
 };
-std::shared_ptr<A> some_subclass(int x) {
+std::shared_ptr<A> some_subclass(int x, std::shared_ptr<A> o) {
 
 	
 		switch (x) {
 		case 0: {
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
+	auto a = std::shared_ptr<A>((new A())); a->__init__(1, o); // new object
 	return a;
 	} break;
 		case 1: {
-	auto b = std::shared_ptr<B>((new B())->__init__(2)); // new object
+	auto b = std::shared_ptr<B>((new B())); b->__init__(2, o); // new object
 	return b;
 	} break;
 		case 2: {
-	auto c = std::shared_ptr<C>((new C())->__init__(3)); // new object
+	auto c = std::shared_ptr<C>((new C())); c->__init__(3, o); // new object
 	return c;
 	} break;
 		case 3: {
-	auto d = std::shared_ptr<D>((new D())->__init__(4)); // new object
+	auto d = std::shared_ptr<D>((new D())); d->__init__(4, o); // new object
 	return d;
 	} break;
 	}
 }
-	D* D::__init__(int x) {
+	std::shared_ptr<D> D::get_self() {
 
 		
-		this->x = x;
-		return this;
+		return std::static_pointer_cast<D>(shared_from_this());
 	}
 	int D::hey() {
 
 		
 		return (this->x + 1);
 	}
-	C* C::__init__(int x) {
+	D* D::__init__(int x, std::shared_ptr<A> other) {
 
 		
 		this->x = x;
+		this->other = other;
 		return this;
+	}
+	std::shared_ptr<C> C::get_self() {
+
+		
+		return std::static_pointer_cast<C>(shared_from_this());
 	}
 	int C::bar() {
 
 		
 		return (this->x + 200);
 	}
-	B* B::__init__(int x) {
+	C* C::__init__(int x, std::shared_ptr<A> other) {
 
 		
 		this->x = x;
+		this->other = other;
 		return this;
+	}
+	std::shared_ptr<B> B::get_self() {
+
+		
+		return std::static_pointer_cast<B>(shared_from_this());
+	}
+	int B::foo(float x, float y) {
+
+		
+		return static_cast<int>((x + y));
 	}
 	int B::foo() {
 
 		
 		return (this->x * 2);
 	}
+	B* B::__init__(int x, std::shared_ptr<A> other) {
+
+		
+		this->x = x;
+		this->other = other;
+		return this;
+	}
+	void A::set_self() {
+
+		
+		this->other->other = this->get_self();
+	}
+	std::shared_ptr<A> A::get_self() {
+
+		
+		return std::static_pointer_cast<A>(shared_from_this());
+	}
 	int A::method() {
 
 		
 		return this->x;
 	}
-	A* A::__init__(int x) {
+	A* A::__init__(int x, std::shared_ptr<A> other) {
 
 		
 		this->x = x;
+		this->other = other;
 		return this;
 	}
 int main() {
 
 	
-	auto a = some_subclass(0);			/* new variable */
-	auto b = some_subclass(1);			/* new variable */
-	auto c = some_subclass(2);			/* new variable */
-	auto d = some_subclass(3);			/* new variable */
-	std::cout << a->getclassname() << std::endl;
-	std::cout << b->getclassname() << std::endl;
+	auto a = some_subclass(0, nullptr);			/* new variable*/
+	auto b = some_subclass(1, a);			/* new variable*/
+	auto c = some_subclass(2, b);			/* new variable*/
+	auto d = some_subclass(3, c);			/* new variable*/
+	auto bb = b->get_self();			/* b   */
 	std::cout << c->getclassname() << std::endl;
 	std::cout << d->getclassname() << std::endl;
-	std::cout << a->method() << std::endl;
-	std::cout << a->x << std::endl;
-	std::cout << b->method() << std::endl;
-	std::cout << b->x << std::endl;
-	std::cout << c->method() << std::endl;
-	std::cout << c->x << std::endl;
-	std::cout << d->method() << std::endl;
-	std::cout << d->x << std::endl;
+	if (!(( a->method() == a->x ))) {throw std::runtime_error("assertion failed: ( a->method() == a->x )"); }
+	if (!(( a->x == 1 ))) {throw std::runtime_error("assertion failed: ( a->x == 1 )"); }
+	if (!(( b->method() == b->x ))) {throw std::runtime_error("assertion failed: ( b->method() == b->x )"); }
+	if (!(( b->x == 2 ))) {throw std::runtime_error("assertion failed: ( b->x == 2 )"); }
+	if (!(( b->other->method() == 1 ))) {throw std::runtime_error("assertion failed: ( b->other->method() == 1 )"); }
+	if (!(( c->other->method() == b->x ))) {throw std::runtime_error("assertion failed: ( c->other->method() == b->x )"); }
+	if (!(( std::static_pointer_cast<B>(c->other)->foo() == 4 ))) {throw std::runtime_error("assertion failed: ( std::static_pointer_cast<B>(c->other)->foo() == 4 )"); }
+	if (!(( std::static_pointer_cast<B>(c->other)->foo(static_cast<float>(100), static_cast<float>(200)) == 300 ))) {throw std::runtime_error("assertion failed: ( std::static_pointer_cast<B>(c->other)->foo(static_cast<float>(100), static_cast<float>(200)) == 300 )"); }
 	std::cout << std::string("- - - - - - - ") << std::endl;
 	if ((b->__class__==std::string("B"))) {
 		auto _cast_b = std::static_pointer_cast<B>(b);
-		std::cout << std::string("b is type B") << std::endl;
-		std::cout << _cast_b->method() << std::endl;
-		std::cout << _cast_b->foo() << std::endl;
+		if (!(( _cast_b->foo() == 4 ))) {throw std::runtime_error("assertion failed: ( _cast_b->foo() == 4 )"); }
+		auto bbb = _cast_b->get_self();			/* b   */
+		if (!(( bbb->foo() == 4 ))) {throw std::runtime_error("assertion failed: ( bbb->foo() == 4 )"); }
 	} else {
-		std::cout << std::string("error: b is not type B") << std::endl;
+		throw RuntimeError(std::string("error: b is not type B"));
 	}
 	if ((c->__class__==std::string("C"))) {
 		auto _cast_c = std::static_pointer_cast<C>(c);
-		std::cout << std::string("c is type C") << std::endl;
-		std::cout << _cast_c->method() << std::endl;
-		std::cout << _cast_c->bar() << std::endl;
+		if (!(( _cast_c->method() == 3 ))) {throw std::runtime_error("assertion failed: ( _cast_c->method() == 3 )"); }
+		if (!(( _cast_c->bar() == 203 ))) {throw std::runtime_error("assertion failed: ( _cast_c->bar() == 203 )"); }
+		if ((_cast_c->other->__class__==std::string("B"))) {
+			auto _cast__cast_c_other = std::static_pointer_cast<B>(_cast_c->other);
+			if (!(( _cast__cast_c_other->foo() == 4 ))) {throw std::runtime_error("assertion failed: ( _cast__cast_c_other->foo() == 4 )"); }
+		}
 	} else {
 		std::cout << std::string("error: c is not type C") << std::endl;
 	}
 	if ((d->__class__==std::string("D"))) {
 		auto _cast_d = std::static_pointer_cast<D>(d);
 		std::cout << std::string("d is type D") << std::endl;
-		std::cout << _cast_d->hey() << std::endl;
+		if (!(( _cast_d->hey() == 5 ))) {throw std::runtime_error("assertion failed: ( _cast_d->hey() == 5 )"); }
 	} else {
 		std::cout << std::string("error: d is not type D") << std::endl;
 	}
 	std::cout << std::string("------------------") << std::endl;
 	for (int i=0; i<3; i++) {
-		auto o = some_subclass(i);			/* new variable */
+		auto o = some_subclass(i, a);			/* new variable*/
 		std::cout << o->method() << std::endl;
 		if ((o->__class__==std::string("B"))) {
 			auto _cast_o = std::static_pointer_cast<B>(o);
@@ -2448,6 +3090,16 @@ int main() {
 		if ((o->__class__==std::string("C"))) {
 			auto _cast_o = std::static_pointer_cast<C>(o);
 			std::cout << _cast_o->bar() << std::endl;
+		}
+				switch (o->__classid__) {
+				case 2: {
+			auto _cast_o = std::static_pointer_cast<B>(o);
+		if (!(( _cast_o->foo() == 4 ))) {throw std::runtime_error("assertion failed: ( _cast_o->foo() == 4 )"); }
+		} break;
+				case 1: {
+			auto _cast_o = std::static_pointer_cast<C>(o);
+		if (!(( _cast_o->bar() == 203 ))) {throw std::runtime_error("assertion failed: ( _cast_o->bar() == 203 )"); }
+		} break;
 		}
 	}
 	std::cout << std::string("end of test") << std::endl;
@@ -2478,17 +3130,18 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  x;
 	A* __init__(int x);
 	~A();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 	A::~A() {
@@ -2505,7 +3158,7 @@ class A {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())->__init__(1)); // new object
+	auto a = std::shared_ptr<A>((new A())); a->__init__(1); // new object
 	std::cout << a << std::endl;
 	a.reset();
 	std::cout << std::string("done") << std::endl;
@@ -2549,16 +3202,17 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	A __init__();
 	bool is_initialized();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return __class__;}
 };
 void test() {
@@ -2593,6 +3247,241 @@ int main() {
 	
 	test();
 	return 0;
+}
+```
+* [shared_from_this.py](c++/shared_from_this.py)
+
+input:
+------
+```python
+'''
+std::enable_shared_from_this
+tests passing shared pointer to self to other functions,
+and subclasses that use std::static_pointer_cast to convert
+function arguments.
+'''
+
+
+class Foo():
+	def __init__(self, x:int):
+		self.x = x
+		let self.other : Foo = None
+
+	def bar(self) -> int:
+		return self.x
+
+	def test(self) ->int:
+		return callbar( self.shared_from_this() )
+
+def callbar( o:Foo ) -> int:
+	return o.bar()
+
+class Sub( Foo ):
+	def __init__(self, x:int, o:Foo ):
+		self.x = x
+		o.other = shared_from_this()
+
+	def submethod(self) -> int:
+		a = callbar( self.shared_from_this() )
+		return a * 2
+	def sub(self) -> int:
+		return self.x -1
+
+	## returns self.sub()
+	def testsub(self) -> int:
+		return callsub( shared_from_this() )
+
+	## returns self.sub()
+	def test_pass_self(self) -> int:
+		return self.callsub( shared_from_this() )
+
+	def callsub(self, other:Sub) -> int:
+		return other.sub()
+
+
+def callsub( s:Sub ) -> int:
+	return s.sub()
+
+
+def main():
+	f = Foo(10)
+	assert f.test()==10
+
+	s = Sub(100, f)
+	print 'should be 100:', s.test()
+	assert s.test()==100
+	assert s.submethod()==200
+	assert s.testsub()==99
+	assert s.test_pass_self()==99
+
+	ss = Sub(
+		10,
+		Sub(100, Sub(1))
+	)
+	#sa = Sub(1)
+	#ss = Sub(10,sa)
+	print ss
+	assert ss.x==10
+	assert ss.test_pass_self()==9
+
+	Sub(10,Sub(11))
+	#Sub(10,Sub(100, Sub(1)))  ## TODO nested > 1 levels
+
+	#Sub( Sub(10).sub() )  ## this is not allowed
+	sss = Sub( Sub(10).sub() )  ## this works but is not always shared_from_this
+	#sss = Sub(1, Sub(10).shared_from_this() )  ## this fails
+
+	let subs : [10]Sub
+	ptr = subs[0]
+	assert ptr is None
+	ps = ptr as Sub
+	assert ps is None
+	pss = ptr as Foo
+	assert pss is None
+```
+output:
+------
+```c++
+
+class Foo: public std::enable_shared_from_this<Foo> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	int  x;
+	std::shared_ptr<Foo>  other;
+	Foo* __init__(int x);
+	int bar();
+	int test();
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
+	std::string getclassname() {return this->__class__;}
+};
+int callbar(std::shared_ptr<Foo> o) {
+
+	
+	return o->bar();
+}
+class Sub:  public Foo {
+  public:
+//	members from class: Foo  ['x', 'other']
+	std::shared_ptr<Foo>  o;
+	Sub* __init__(int x);
+	Sub* __init__(int x, std::shared_ptr<Foo> o);
+	int submethod();
+	int sub();
+	int testsub();
+	int test_pass_self();
+	int callsub(std::shared_ptr<Sub> other);
+	inline int callsub(std::shared_ptr<Foo> other){ return callsub(
+std::static_pointer_cast<Sub>(other));}
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Sub() {__class__ = std::string("Sub"); __initialized__ = true; __classid__=1;}
+	Sub(bool init) {__class__ = std::string("Sub"); __initialized__ = init; __classid__=1;}
+	std::string getclassname() {return this->__class__;}
+};
+int callsub(std::shared_ptr<Foo> __s){
+auto s = std::static_pointer_cast<Sub>(__s);
+
+return s->sub();
+}
+int callsub(std::shared_ptr<Sub> s) {
+
+	
+	return s->sub();
+}
+	int Sub::callsub(std::shared_ptr<Sub> other) {
+
+		
+		return other->sub();
+	}
+	int Sub::test_pass_self() {
+
+		
+		return this->callsub(shared_from_this());
+	}
+	int Sub::testsub() {
+
+		
+		return callsub(shared_from_this());
+	}
+	int Sub::sub() {
+
+		
+		return (this->x - 1);
+	}
+	int Sub::submethod() {
+
+		
+		auto a = callbar(this->shared_from_this());			/* new variable*/
+		return (a * 2);
+	}
+	Sub* Sub::__init__(int x, std::shared_ptr<Foo> o) {
+
+		
+		this->x = x;
+		o->other = shared_from_this();
+		return this;
+	}
+	Sub* Sub::__init__(int x) {
+
+		
+		this->x = x;
+		this->other = nullptr;
+		return this;
+	}
+	int Foo::test() {
+
+		
+		return callbar(this->shared_from_this());
+	}
+	int Foo::bar() {
+
+		
+		return this->x;
+	}
+	Foo* Foo::__init__(int x) {
+
+		
+		this->x = x;
+		this->other = nullptr;
+		return this;
+	}
+int main() {
+
+	
+	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(10); // new object
+	if (!(( f->test() == 10 ))) {throw std::runtime_error("assertion failed: ( f->test() == 10 )"); }
+	auto s = std::shared_ptr<Sub>((new Sub())); s->__init__(100, f); // new object
+	std::cout << std::string("should be 100:");
+std::cout << s->test();std::cout << std::endl;
+	if (!(( s->test() == 100 ))) {throw std::runtime_error("assertion failed: ( s->test() == 100 )"); }
+	if (!(( s->submethod() == 200 ))) {throw std::runtime_error("assertion failed: ( s->submethod() == 200 )"); }
+	if (!(( s->testsub() == 99 ))) {throw std::runtime_error("assertion failed: ( s->testsub() == 99 )"); }
+	if (!(( s->test_pass_self() == 99 ))) {throw std::runtime_error("assertion failed: ( s->test_pass_self() == 99 )"); }
+	auto Sub_140004374057168 = std::shared_ptr<Sub>(new Sub()); Sub_140004374057168->__init__(1);
+auto Sub_140004374040528 = std::shared_ptr<Sub>(new Sub()); Sub_140004374040528->__init__(100, Sub_140004374057168);
+auto ss = std::shared_ptr<Sub>((new Sub())); ss->__init__(10, Sub_140004374040528); // new object
+	std::cout << ss << std::endl;
+	if (!(( ss->x == 10 ))) {throw std::runtime_error("assertion failed: ( ss->x == 10 )"); }
+	if (!(( ss->test_pass_self() == 9 ))) {throw std::runtime_error("assertion failed: ( ss->test_pass_self() == 9 )"); }
+	auto Sub_140004374058256 = std::shared_ptr<Sub>(new Sub()); Sub_140004374058256->__init__(10, std::shared_ptr<Sub>((new Sub())->__init__(11)));
+	auto Sub_140004374059024 = std::shared_ptr<Sub>(new Sub()); Sub_140004374059024->__init__(10);
+auto sss = std::shared_ptr<Sub>((new Sub())); sss->__init__(Sub_140004374059024->sub()); // new object
+	auto subs = std::make_shared<std::vector<std::shared_ptr<Sub>>>(10);
+	auto ptr = (*subs)[0];  /* auto-fallback */
+	if (!(( ptr == nullptr ))) {throw std::runtime_error("assertion failed: ( ptr == nullptr )"); }
+		auto ps = std::static_pointer_cast<Sub>(ptr);
+	if (!(( ps == nullptr ))) {throw std::runtime_error("assertion failed: ( ps == nullptr )"); }
+		auto pss = std::static_pointer_cast<Foo>(ptr);
+	if (!(( pss == nullptr ))) {throw std::runtime_error("assertion failed: ( pss == nullptr )"); }
+	return 0;
+	/* arrays:
+		subs : ('Sub', '10')
+*/
 }
 ```
 * [array_of_arrays_objects.py](c++/array_of_arrays_objects.py)
@@ -2633,17 +3522,18 @@ output:
 ------
 ```c++
 
-class A {
+class A: public std::enable_shared_from_this<A> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	int  id;
 	A* __init__(int id);
 	void method();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	A() {__class__ = std::string("A"); __initialized__ = true;}
-	A(bool init) {__class__ = std::string("A"); __initialized__ = init;}
+	A() {__class__ = std::string("A"); __initialized__ = true; __classid__=0;}
+	A(bool init) {__class__ = std::string("A"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
 	void A::method() {
@@ -2660,10 +3550,11 @@ class A {
 int main() {
 
 	
-	auto a1 = std::shared_ptr<A>((new A())->__init__(1)); // new object
-	auto a2 = std::shared_ptr<A>((new A())->__init__(2)); // new object
-	auto a3 = std::shared_ptr<A>((new A())->__init__(3)); // new object
-	/* arr = vector of vectors to: A */	
+	auto a1 = std::shared_ptr<A>((new A())); a1->__init__(1); // new object
+	auto a2 = std::shared_ptr<A>((new A())); a2->__init__(2); // new object
+	auto a3 = std::shared_ptr<A>((new A())); a3->__init__(3); // new object
+	auto A_140252303304848 = std::shared_ptr<A>(new A()); A_140252303304848->__init__(4);
+/* arr = vector of vectors to: A */	
 std::vector<  std::shared_ptr<A>  > _r__sub0_arr = {a1,a2,a3,std::shared_ptr<A>((new A())->__init__(4))};	
 std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub0_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub0_arr);	
 std::vector<  std::shared_ptr<A>  > _r__sub1_arr = {a1,nullptr};	
@@ -2734,36 +3625,38 @@ output:
 ------
 ```c++
 
-class Parent {
+class Parent: public std::enable_shared_from_this<Parent> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>>  children;
 	Parent* __init__(std::shared_ptr<std::vector<std::shared_ptr<Child>>> children);
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Parent() {__class__ = std::string("Parent"); __initialized__ = true;}
-	Parent(bool init) {__class__ = std::string("Parent"); __initialized__ = init;}
+	Parent() {__class__ = std::string("Parent"); __initialized__ = true; __classid__=0;}
+	Parent(bool init) {__class__ = std::string("Parent"); __initialized__ = init; __classid__=0;}
 	std::string getclassname() {return this->__class__;}
 };
-class Child {
+class Child: public std::enable_shared_from_this<Child> {
   public:
 	std::string __class__;
 	bool __initialized__;
+	int  __classid__;
 	std::weak_ptr<Parent>  parent;
 	Child* __init__(std::shared_ptr<Parent> parent);
 	int foo();
 	void bar();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Child() {__class__ = std::string("Child"); __initialized__ = true;}
-	Child(bool init) {__class__ = std::string("Child"); __initialized__ = init;}
+	Child() {__class__ = std::string("Child"); __initialized__ = true; __classid__=1;}
+	Child(bool init) {__class__ = std::string("Child"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
 std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 
 	
-	auto c = std::shared_ptr<Child>((new Child())->__init__(p)); // new object
+	auto c = std::shared_ptr<Child>((new Child())); c->__init__(p); // new object
 	p->children->push_back(c);
 	return c;
 }
@@ -2794,16 +3687,16 @@ std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 		this->children = children;
 		return this;
 		/* arrays:
-			children : []Child
+			children : std::shared_ptr<std::vector<std::shared_ptr<Child>>>
 */
 	}
 int main() {
 
 	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())->__init__(children)); // new object
-	auto c1 = make_child(p);			/* new variable */
-	auto c2 = make_child(p);			/* new variable */
+	auto p = std::shared_ptr<Parent>((new Parent())); p->__init__(children); // new object
+	auto c1 = make_child(p);			/* new variable*/
+	auto c2 = make_child(p);			/* new variable*/
 	std::cout << c1->foo() << std::endl;
 	c1->bar();
 	p.reset();
@@ -2864,13 +3757,13 @@ void test_array(std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> 
 	
 	std::cout << (*(*arr)[0])[0] << std::endl;
 	/* arrays:
-		arr : [][]int
+		arr : std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>>
 */
 }
 int main() {
 
 	
-	auto a = make_array();			/* new variable */
+	auto a = make_array();			/* new variable*/
 	std::cout << a->size() << std::endl;
 	std::cout << (*a)[0]->size() << std::endl;
 	std::cout << (*a)[1]->size() << std::endl;
@@ -2981,7 +3874,7 @@ void myfunc() {
 	try {
 		std::cout << std::string("trying something that will fail...") << std::endl;
 		std::cout << std::string("some call that fails at runtime") << std::endl;
-		auto f = __open__(std::string("/tmp/nosuchfile"), std::string("rb"));			/* new variable */
+		auto f = __open__(std::string("/tmp/nosuchfile"), std::string("rb"));			/* new variable*/
 	}
 	catch (std::runtime_error* __error__) {
 		std::string __errorname__ = __parse_error_type__(__error__);

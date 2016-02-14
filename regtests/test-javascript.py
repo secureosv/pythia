@@ -1,7 +1,5 @@
 import os, sys, subprocess
 
-
-
 ignore = (
 	'tuple_keys.py',
 	'for_else.py',
@@ -22,7 +20,6 @@ for folder in 'class list calling str dict loop lang set'.split():
 		'-----------------------------',
 		'the following tests compiled, and run in nodejs without any errors',
 	]
-
 
 	passed = {}
 
@@ -50,8 +47,7 @@ for folder in 'class list calling str dict loop lang set'.split():
 
 
 		subprocess.check_call([
-			'python',
-			'../rusthon.py',
+			'pythia',
 			'--javascript',
 			#'--release',
 			os.path.join('./'+folder, md)

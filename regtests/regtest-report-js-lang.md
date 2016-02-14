@@ -39,8 +39,8 @@ var mylib = require('mylib');
 console.log("TODO import mylib");
 
 }
-var Sub =  function Sub()
-{
+var Sub =  function Sub(){
+/***/var ƒ = arguments.callee;
 /***/ if (Sub.__recompile !== undefined) { eval("Sub.__redef="+Sub.__recompile); Sub.__recompile=undefined; };
 /***/ if (Sub.__redef !== undefined) { return Sub.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -50,31 +50,30 @@ Sub.locals={};
 Sub.prototype.__class__ = Sub;
 Sub.__name__ = "Sub";
 Sub.__bases__ = [];
-Sub.prototype.toString =  function Sub_toString()
-{
+Sub.prototype.toString =  function Sub_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (Sub_toString.__recompile !== undefined) { eval("Sub_toString.__redef="+Sub_toString.__recompile); Sub_toString.__recompile=undefined; };
 /***/ if (Sub_toString.__redef !== undefined) { return Sub_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 Sub.prototype.toString.locals = {};
 
-Sub.prototype.foo =  function Sub_foo(x)
-{
+Sub.prototype.foo =  function Sub_foo(x){
+/***/var ƒ = arguments.callee;
 /***/ if (Sub_foo.__recompile !== undefined) { eval("Sub_foo.__redef="+Sub_foo.__recompile); Sub_foo.__recompile=undefined; };
 /***/ if (Sub_foo.__redef !== undefined) { return Sub_foo.__redef.apply(this,arguments); };
-	
 	console.log("foo");
 	return x;
 }/*end->	`foo`	*/
 Sub.prototype.foo.locals = {};
 
 Sub.foo = function () { return Sub.prototype.foo.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var s;
-	arguments.callee.locals.s=s =  new Sub();
+	ƒ.locals.s=s =  new Sub();
 	if (!(s.foo(10) === 10)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -118,22 +117,22 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,x;
-	arguments.callee.locals.x=x = "";
-	arguments.callee.locals.a=a = 2;
+	ƒ.locals.x=x = "";
+	ƒ.locals.a=a = 2;
 		switch (a) {
 		case 1: {
-	arguments.callee.locals.x=x = "fail";
+	ƒ.locals.x=x = "fail";
 	} break;
 		case 2: {
-	arguments.callee.locals.x=x = "ok";
+	ƒ.locals.x=x = "ok";
 	} break;
 		default:
-	arguments.callee.locals.x=x = "default";
+	ƒ.locals.x=x = "default";
 	break;
 	}
 	console.log(x);
@@ -173,8 +172,8 @@ output:
 ```javascript
 
 
-var f =  function f(l)
-{
+var f =  function f(l){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
 	var l;
@@ -187,12 +186,12 @@ var f =  function f(l)
 f.locals={};
 f.args = ["[]int"];
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b;
-	arguments.callee.locals.a=a = [1,2,3] /*array of: int*/;
+	ƒ.locals.a=a = [1,2,3] /*array of: int*/;
 	if (!(a[0] === 1)) {throw new Error("assertion failed"); }
 	/***/ try {
 	f(a);
@@ -202,19 +201,19 @@ var main =  function main()
 	var idx0;
 	var iter0;
 	var get0;
-	arguments.callee.locals.__comp__0=__comp__0 = [];
-	arguments.callee.locals.idx0=idx0 = 0;
-	arguments.callee.locals.iter0=iter0 = 9;
+	ƒ.locals.__comp__0=__comp__0 = [];
+	ƒ.locals.idx0=idx0 = 0;
+	ƒ.locals.iter0=iter0 = 9;
 	while (idx0 < iter0)
 	{
 		var x;
-		arguments.callee.locals.x=x = idx0;
+		ƒ.locals.x=x = idx0;
 		/***/ try {
 		__comp__0.push(x);
 		/***/ } catch (__err) { if (__debugger__.onerror(__err, main, __comp__0.push)==true){debugger;}else{throw __err;} };
 		idx0 ++;
 	}
-	arguments.callee.locals.b=b = __comp__0;
+	ƒ.locals.b=b = __comp__0;
 	/***/ try {
 	f(b);
 	/***/ } catch (__err) { if (__debugger__.onerror(__err, main, f)==true){debugger;}else{throw __err;} };
@@ -254,8 +253,8 @@ output:
 ```javascript
 
 
-var f =  function f(m)
-{
+var f =  function f(m){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
 	var m;
@@ -267,12 +266,12 @@ var f =  function f(m)
 f.locals={};
 f.args = ["map[string]int"];
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = dict({  }, { copy:false, keytype:"string", iterable:[["x", 1], ["y", 2], ["z", 3]] ,valuetype:"int" });
+	ƒ.locals.a=a = dict({  }, { copy:false, keytype:"string", iterable:[["x", 1], ["y", 2], ["z", 3]] ,valuetype:"int" });
 	if (!(a["x"] === 1)) {throw new Error("assertion failed"); }
 	/***/ try {
 	f(a);
@@ -324,20 +323,20 @@ output:
 ```javascript
 
 
-var myfunc =  function myfunc(_kwargs_)
-{
+var myfunc =  function myfunc(_kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (myfunc.__recompile !== undefined) { eval("myfunc.__redef="+myfunc.__recompile); myfunc.__recompile=undefined; };
 /***/ if (myfunc.__redef !== undefined) { return myfunc.__redef.apply(this,arguments); };
 	var y,x;
 	var value = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.value===undefined))?	"bar" :   typeof(_kwargs_)=='object'?_kwargs_.value: __invalid_call__('function `myfunc` requires named keyword arguments, invalid parameter for `value`',arguments);
-	arguments.callee.locals.x=x = 1;
-	arguments.callee.locals.y=y = dict({ foo:value }, { copy:false });
-			var nested =  function nested()
-	{
+	ƒ.locals.x=x = 1;
+	ƒ.locals.y=y = dict({ foo:value }, { copy:false });
+			var nested =  function nested(){
+/***/var ƒ = arguments.callee;
 /***/ if (nested.__recompile !== undefined) { eval("nested.__redef="+nested.__recompile); nested.__recompile=undefined; };
 /***/ if (nested.__redef !== undefined) { return nested.__redef.apply(this,arguments); };
 		var z;
-		arguments.callee.locals.z=z = "FOO";
+		ƒ.locals.z=z = "FOO";
 		return (value + "NESTED");
 	}/*end->	`nested`	*/
 nested.locals={};
@@ -347,11 +346,10 @@ arguments.callee.locals.nested=nested
 }/*end->	`myfunc`	*/
 myfunc.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	console.log(myfunc.locals);
 	console.log(myfunc());
 	console.log(myfunc.locals);
@@ -384,11 +382,10 @@ output:
 ------
 ```javascript
 var __$UID$__=0;
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	/***/ try {
 	now = new Date();
 	/***/ } catch (__err) { if (__debugger__.onerror(__err, main, JS)==true){debugger;}else{throw __err;} };
@@ -424,18 +421,18 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b;
-	arguments.callee.locals.a=a = [1, 2, 3];
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.a=a = [1, 2, 3];
+	ƒ.locals.b=b = false;
 		try {
 a.no_such_method();
-arguments.callee.locals.b=b = "this should not happen";
+ƒ.locals.b=b = "this should not happen";
 	} catch(__exception__) {
-arguments.callee.locals.b=b = true;
+ƒ.locals.b=b = true;
 
 }
 	if (!(b === true)) {throw new Error("assertion failed"); }
@@ -465,12 +462,12 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = (false && (false || true));
+	ƒ.locals.a=a = (false && (false || true));
 	if (!(a === false)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -525,8 +522,8 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b,t4,t5,t2,t3,t1;
@@ -534,19 +531,19 @@ var main =  function main()
 	if (!(1 === 1)) {throw new Error("assertion failed"); }
 	if (!(1.0 === 1)) {throw new Error("assertion failed"); }
 	if (!("a" === "a")) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = [6];
-	arguments.callee.locals.b=b = [6];
-	arguments.callee.locals.t1=t1 = a.equals(b);
+	ƒ.locals.a=a = [6];
+	ƒ.locals.b=b = [6];
+	ƒ.locals.t1=t1 = a.equals(b);
 	if (!(t1 === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = [6];
-	arguments.callee.locals.b=b = [6];
-	arguments.callee.locals.t2=t2 = a.equals(b);
+	ƒ.locals.a=a = [6];
+	ƒ.locals.b=b = [6];
+	ƒ.locals.t2=t2 = a.equals(b);
 	if (!(t2 === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.t3=t3 = "" === 0;
+	ƒ.locals.t3=t3 = "" === 0;
 	console.log(("empty string equals zero:" + t3));
-	arguments.callee.locals.t4=t4 = [1, 2].equals([1, 2]);
+	ƒ.locals.t4=t4 = [1, 2].equals([1, 2]);
 	if (!(t4 === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.t5=t5 = ["1", "2"].equals([1, 2]);
+	ƒ.locals.t5=t5 = ["1", "2"].equals([1, 2]);
 	if (!(t5 === false)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -579,15 +576,15 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b,d;
-	arguments.callee.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["x", 1]] });
-	arguments.callee.locals.a=a = __contains__(d, "x");
+	ƒ.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["x", 1]] });
+	ƒ.locals.a=a = __contains__(d, "x");
 	if (!(a === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = __contains__(d, "y");
+	ƒ.locals.b=b = __contains__(d, "y");
 	if (!(b === false)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -620,30 +617,27 @@ output:
 ```javascript
 
 
-var foo =  function foo()
-{
+var foo =  function foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (foo.__recompile !== undefined) { eval("foo.__redef="+foo.__recompile); foo.__recompile=undefined; };
 /***/ if (foo.__redef !== undefined) { return foo.__redef.apply(this,arguments); };
-	
 	return 42;
 }/*end->	`foo`	*/
 foo.locals={};
 
-var __lambda__ =  function __lambda__()
-{
+var __lambda__ =  function __lambda__(){
+/***/var ƒ = arguments.callee;
 /***/ if (__lambda__.__recompile !== undefined) { eval("__lambda__.__redef="+__lambda__.__recompile); __lambda__.__recompile=undefined; };
 /***/ if (__lambda__.__redef !== undefined) { return __lambda__.__redef.apply(this,arguments); };
-	
 	return 42;
 }/*end->	`__lambda__`	*/
 __lambda__.locals={};
 
 bar = __lambda__;
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	/***/ try {
 	eval("a = bar()");
 	/***/ } catch (__err) { if (__debugger__.onerror(__err, main, eval)==true){debugger;}else{throw __err;} };
@@ -722,12 +716,12 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b,d,ii,s;
-	arguments.callee.locals.s=s = [10, 20, 30];
+	ƒ.locals.s=s = [10, 20, 30];
 	var __iter0 = s;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -736,7 +730,7 @@ var main =  function main()
 	}
 	console.log(s);
 	console.log("testing javascript typed arrays");
-	arguments.callee.locals.a=a = __array_fill__( new Int32Array(128), [1,2,3]);
+	ƒ.locals.a=a = __array_fill__( new Int32Array(128), [1,2,3]);
 	console.log(__is_some_array(a));
 	if (!(len(a) === 128)) {throw new Error("assertion failed"); }
 	if (!(isinstance(a, Int32Array))) {throw new Error("assertion failed"); }
@@ -744,31 +738,30 @@ var main =  function main()
 	if (!(a[1] === 2)) {throw new Error("assertion failed"); }
 	if (!(a[2] === 3)) {throw new Error("assertion failed"); }
 	if (!(a[3] === 0)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.ii=ii = 0;
+	ƒ.locals.ii=ii = 0;
 	var __iter0 = a;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
 		var value = __iter0[ __n0 ];
 		console.log(value);
 		ii ++;
-				if (ii > 10)
-		{
+		if (ii > 10) {
 			break;
 		}
 	}
-	arguments.callee.locals.b=b = __array_fill__( new Int32Array(128), [1,2,3]);
-	arguments.callee.locals.c=c = __array_fill__( new Int32Array(128), [1,2,3]);
+	ƒ.locals.b=b = __array_fill__( new Int32Array(128), [1,2,3]);
+	ƒ.locals.c=c = __array_fill__( new Int32Array(128), [1,2,3]);
 	if (!(isinstance(b, Int32Array))) {throw new Error("assertion failed"); }
 	if (!(isinstance(c, Int32Array))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
+	ƒ.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
 	if (!(isinstance(d, Float32Array))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
+	ƒ.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
 	if (!(isinstance(d, Float32Array))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
+	ƒ.locals.d=d = __array_fill__( new Float32Array(128), [1.1,2.2,3.3]);
 	if (!(isinstance(d, Float32Array))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = __array_fill__( new Float64Array(128), [1.1,2.2,3.3]);
+	ƒ.locals.d=d = __array_fill__( new Float64Array(128), [1.1,2.2,3.3]);
 	if (!(isinstance(d, Float64Array))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = __array_fill__( new Float64Array(128), [1.1,2.2,3.3]);
+	ƒ.locals.d=d = __array_fill__( new Float64Array(128), [1.1,2.2,3.3]);
 	if (!(isinstance(d, Float64Array))) {throw new Error("assertion failed"); }
 	console.log(d[0]);
 	console.log(d[1]);
@@ -829,31 +822,31 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var i,x,r,o,n;
-	arguments.callee.locals.o=o = "x".charCodeAt(0);
+	ƒ.locals.o=o = "x".charCodeAt(0);
 	if (!(o === 120)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.n=n = float("1.1");
+	ƒ.locals.n=n = float("1.1");
 	if (!(n === 1.1)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.n=n = float("NaN");
+	ƒ.locals.n=n = float("NaN");
 	console.log(n);
 	if (!(isNaN(n) === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = round(1.1234, 2);
+	ƒ.locals.r=r = round(1.1234, 2);
 	console.log(r);
 	if (!(str(r) === "1.12")) {throw new Error("assertion failed"); }
-	arguments.callee.locals.x=x = String.fromCharCode(120);
+	ƒ.locals.x=x = String.fromCharCode(120);
 	console.log(x);
 	if (!(x === "x")) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = round(100.001, 2);
+	ƒ.locals.r=r = round(100.001, 2);
 	if (!(r === 100)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.i=i = int(100.1);
+	ƒ.locals.i=i = int(100.1);
 	if (!(i === 100)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = round(5.49);
+	ƒ.locals.r=r = round(5.49);
 	if (!(r === 5)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = round(5.49, 1);
+	ƒ.locals.r=r = round(5.49, 1);
 	if (!(r === 5.5)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -904,41 +897,37 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b;
-	arguments.callee.locals.a=a = false;
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.a=a = false;
+	ƒ.locals.b=b = false;
 	if (! (a) instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (! (a))
-	{
-		arguments.callee.locals.b=b = true;
+	if (! (a)) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = 0;
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.a=a = 0;
+	ƒ.locals.b=b = false;
 	if (! (a) instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (! (a))
-	{
-		arguments.callee.locals.b=b = true;
+	if (! (a)) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = 0.0;
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.a=a = 0.0;
+	ƒ.locals.b=b = false;
 	if (! (a) instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (! (a))
-	{
-		arguments.callee.locals.b=b = true;
+	if (! (a)) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = null;
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.a=a = null;
+	ƒ.locals.b=b = false;
 	if (! (a) instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (! (a))
-	{
-		arguments.callee.locals.b=b = true;
+	if (! (a)) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
@@ -1009,77 +998,63 @@ output:
 ```javascript
 
 
-var func =  function func(_kwargs_)
-{
+var func =  function func(_kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (func.__recompile !== undefined) { eval("func.__redef="+func.__recompile); func.__recompile=undefined; };
 /***/ if (func.__redef !== undefined) { return func.__redef.apply(this,arguments); };
 	var a;
 	var x        = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.x===undefined))       ?	false :   typeof(_kwargs_)=='object'?_kwargs_.x: __invalid_call__('function `func` requires named keyword arguments, invalid parameter for `x`',arguments);
 	var callback = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.callback===undefined))?	null  :   typeof(_kwargs_)=='object'?_kwargs_.callback: __invalid_call__('function `func` requires named keyword arguments, invalid parameter for `callback`',arguments);
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 	if (x instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (x)
-	{
-		arguments.callee.locals.a=a = false;
-	}
-	else
-	{
-		arguments.callee.locals.a=a = true;
+	if (x) {
+		ƒ.locals.a=a = false;
+	} else {
+		ƒ.locals.a=a = true;
 	}
 	if (!(a === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 	if (callback instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (callback)
-	{
-		arguments.callee.locals.a=a = true;
-	}
-	else
-	{
-		arguments.callee.locals.a=a = false;
+	if (callback) {
+		ƒ.locals.a=a = true;
+	} else {
+		ƒ.locals.a=a = false;
 	}
 	if (!(a === true)) {throw new Error("assertion failed"); }
 }/*end->	`func`	*/
 func.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 	if (1 instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (1)
-	{
-		arguments.callee.locals.a=a = true;
+	if (1) {
+		ƒ.locals.a=a = true;
 	}
 	if (!(a === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 	if (false instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (false)
-	{
-		arguments.callee.locals.a=a = false;
-	}
-	else
-	{
-		arguments.callee.locals.a=a = true;
+	if (false) {
+		ƒ.locals.a=a = false;
+	} else {
+		ƒ.locals.a=a = true;
 	}
 	if (!(a === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 	if (null instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (null)
-	{
-		arguments.callee.locals.a=a = false;
-	}
-	else
-	{
-		arguments.callee.locals.a=a = true;
+	if (null) {
+		ƒ.locals.a=a = false;
+	} else {
+		ƒ.locals.a=a = true;
 	}
 	if (!(a === true)) {throw new Error("assertion failed"); }
-			var cb =  function cb()
-	{
+			var cb =  function cb(){
+/***/var ƒ = arguments.callee;
 /***/ if (cb.__recompile !== undefined) { eval("cb.__redef="+cb.__recompile); cb.__recompile=undefined; };
 /***/ if (cb.__redef !== undefined) { return cb.__redef.apply(this,arguments); };
-		
 		return (1 + 1);
 	}/*end->	`cb`	*/
 cb.locals={};
@@ -1109,8 +1084,8 @@ def main():
 	## it is only allowed to make it easy to copy and paste js code and convert it to rusthon.
 	a = new Date()
 	b = new( Date() )  ## using new as a function call is safer and always works
-	assert( a.getFullYear()==2015 )
-	assert( b.getFullYear()==2015 )
+	assert( a.getFullYear()==2016 )
+	assert( b.getFullYear()==2016 )
 
 main()
 ```
@@ -1119,15 +1094,15 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b;
-	arguments.callee.locals.a=a =  new Date();
-	arguments.callee.locals.b=b =  new Date();
-	if (!(a.getFullYear() === 2015)) {throw new Error("assertion failed"); }
-	if (!(b.getFullYear() === 2015)) {throw new Error("assertion failed"); }
+	ƒ.locals.a=a =  new Date();
+	ƒ.locals.b=b =  new Date();
+	if (!(a.getFullYear() === 2016)) {throw new Error("assertion failed"); }
+	if (!(b.getFullYear() === 2016)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
 
@@ -1175,35 +1150,35 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b;
-	arguments.callee.locals.a=a = false;
+	ƒ.locals.a=a = false;
 		try {
 throw new TypeError;
 	} catch(__exception__) {
 if (__exception__ == TypeError || __exception__ instanceof TypeError) {
-arguments.callee.locals.a=a = true;
+ƒ.locals.a=a = true;
 }
 
 }
 	if (!(a === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.b=b = false;
 		try {
-arguments.callee.locals.b=b = true;
+ƒ.locals.b=b = true;
 	} catch(__exception__) {
-arguments.callee.locals.b=b = false;
+ƒ.locals.b=b = false;
 
 }
 	if (!(b === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.c=c = false;
+	ƒ.locals.c=c = false;
 		try {
 throw new AttributeError("name");
 	} catch(__exception__) {
 if (__exception__ == AttributeError || __exception__ instanceof AttributeError) {
-arguments.callee.locals.c=c = true;
+ƒ.locals.c=c = true;
 }
 
 }

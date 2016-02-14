@@ -45,8 +45,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -56,16 +56,16 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-var B =  function B()
-{
+var B =  function B(){
+/***/var ƒ = arguments.callee;
 /***/ if (B.__recompile !== undefined) { eval("B.__redef="+B.__recompile); B.__recompile=undefined; };
 /***/ if (B.__redef !== undefined) { return B.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -75,32 +75,32 @@ B.locals={};
 B.prototype.__class__ = B;
 B.__name__ = "B";
 B.__bases__ = [];
-B.prototype.toString =  function B_toString()
-{
+B.prototype.toString =  function B_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (B_toString.__recompile !== undefined) { eval("B_toString.__redef="+B_toString.__recompile); B_toString.__recompile=undefined; };
 /***/ if (B_toString.__redef !== undefined) { return B_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 B.prototype.toString.locals = {};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b,d;
 	console.log("testing isinstance");
-	arguments.callee.locals.a=a =  new A();
-	arguments.callee.locals.b=b =  new B();
+	ƒ.locals.a=a =  new A();
+	ƒ.locals.b=b =  new B();
 	if (!(isinstance(a, A) === true)) {throw new Error("assertion failed"); }
 	if (!(isinstance(a, B) === false)) {throw new Error("assertion failed"); }
 	if (!(isinstance(a, dict) === false)) {throw new Error("assertion failed"); }
 	if (!(isinstance(b, B) === true)) {throw new Error("assertion failed"); }
 	if (!(isinstance(b, A) === false)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.c=c = [1, 2];
+	ƒ.locals.c=c = [1, 2];
 	if (!(isinstance(c, list) === true)) {throw new Error("assertion failed"); }
 	if (!(isinstance(c, dict) === false)) {throw new Error("assertion failed"); }
 	if (!(isinstance(c, A) === false)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["a", 1], ["b", 2]] });
+	ƒ.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["a", 1], ["b", 2]] });
 	if (!(isinstance(d, dict) === true)) {throw new Error("assertion failed"); }
 	if (!(isinstance(d, A) === false)) {throw new Error("assertion failed"); }
 	console.log("ok");
@@ -133,13 +133,13 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-			var Cell =  function Cell(x)
-	{
+			var Cell =  function Cell(x){
+/***/var ƒ = arguments.callee;
 /***/ if (Cell.__recompile !== undefined) { eval("Cell.__redef="+Cell.__recompile); Cell.__recompile=undefined; };
 /***/ if (Cell.__redef !== undefined) { return Cell.__redef.apply(this,arguments); };
 		this.__$UID$__ = __$UID$__ ++;
@@ -153,26 +153,25 @@ arguments.callee.locals.Cell=Cell
 	Cell.prototype.__class__ = Cell;
 	Cell.__name__ = "Cell";
 	Cell.__bases__ = [];
-			Cell.prototype.toString =  function Cell_toString()
-	{
+			Cell.prototype.toString =  function Cell_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (Cell_toString.__recompile !== undefined) { eval("Cell_toString.__redef="+Cell_toString.__recompile); Cell_toString.__recompile=undefined; };
 /***/ if (Cell_toString.__redef !== undefined) { return Cell_toString.__redef.apply(this,arguments); };
 		return this.__$UID$__;
 	}/*end->	`toString`	*/
 Cell.prototype.toString.locals = {};
 
-			Cell.prototype.__init__ =  function Cell___init__(_kwargs_)
-	{
+			Cell.prototype.__init__ =  function Cell___init__(_kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (Cell___init__.__recompile !== undefined) { eval("Cell___init__.__redef="+Cell___init__.__recompile); Cell___init__.__recompile=undefined; };
 /***/ if (Cell___init__.__redef !== undefined) { return Cell___init__.__redef.apply(this,arguments); };
-		
 		var x = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.x===undefined))?	1 :   typeof(_kwargs_)=='object'?_kwargs_.x: __invalid_call__('function `__init__` requires named keyword arguments, invalid parameter for `x`',arguments);
 		this.x = x;
 	}/*end->	`__init__`	*/
 Cell.prototype.__init__.locals = {};
 
 	Cell.__init__ = function () { return Cell.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-	arguments.callee.locals.a=a =  new Cell({ x:2 });
+	ƒ.locals.a=a =  new Cell({ x:2 });
 	if (!(a.x === 2)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -229,8 +228,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -243,19 +242,18 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__()
-{
+A.prototype.__init__ =  function A___init__(){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
-	
 	this.b = 5;
 }/*end->	`__init__`	*/
 A.prototype.__init__.locals = {};
@@ -263,15 +261,15 @@ A.prototype.__init__.locals = {};
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
 A.g = 6;
 a = null;
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,x,b;
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.b === 5)) {throw new Error("assertion failed"); }
 		try {
-arguments.callee.locals.x=x = a.c;
+ƒ.locals.x=x = a.c;
 if (!(! ("No exception: on undefined attribute"))) {throw new Error("assertion failed"); }
 	} catch(__exception__) {
 if (__exception__ == AttributeError || __exception__ instanceof AttributeError) {
@@ -279,7 +277,7 @@ if (__exception__ == AttributeError || __exception__ instanceof AttributeError) 
 }
 
 }
-	arguments.callee.locals.b=b = a;
+	ƒ.locals.b=b = a;
 	if (!(getattr(b, "b") === 5)) {throw new Error("assertion failed"); }
 	if (!(getattr(b, "g") === 6)) {throw new Error("assertion failed"); }
 		try {
@@ -321,8 +319,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -335,30 +333,29 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__()
-{
+A.prototype.__init__ =  function A___init__(){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
-	
 	this.x = 5;
 }/*end->	`__init__`	*/
 A.prototype.__init__.locals = {};
 
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.x === 5)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -396,8 +393,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -410,43 +407,41 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__()
-{
+A.prototype.__init__ =  function A___init__(){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
-	
 	this.x = 5;
 }/*end->	`__init__`	*/
 A.prototype.__init__.locals = {};
 
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-A.prototype.__add__ =  function A___add__(other)
-{
+A.prototype.__add__ =  function A___add__(other){
+/***/var ƒ = arguments.callee;
 /***/ if (A___add__.__recompile !== undefined) { eval("A___add__.__redef="+A___add__.__recompile); A___add__.__recompile=undefined; };
 /***/ if (A___add__.__redef !== undefined) { return A___add__.__redef.apply(this,arguments); };
-	
 	return (this.x + other.x);
 }/*end->	`__add__`	*/
 A.prototype.__add__.locals = {};
 
 A.__add__ = function () { return A.prototype.__add__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b;
 	console.log("testing __add__ operator overloading");
-	arguments.callee.locals.a=a =  new A();
-	arguments.callee.locals.b=b =  new A();
-	arguments.callee.locals.c=c = (a.__add__(b));
+	ƒ.locals.a=a =  new A();
+	ƒ.locals.b=b =  new A();
+	ƒ.locals.c=c = (a.__add__(b));
 	if (!(c === 10)) {throw new Error("assertion failed"); }
 	console.log("ok");
 }/*end->	`main`	*/
@@ -503,8 +498,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -514,27 +509,26 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.foo =  function A_foo()
-{
+A.prototype.foo =  function A_foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_foo.__recompile !== undefined) { eval("A_foo.__redef="+A_foo.__recompile); A_foo.__recompile=undefined; };
 /***/ if (A_foo.__redef !== undefined) { return A_foo.__redef.apply(this,arguments); };
-	
 	return 1;
 }/*end->	`foo`	*/
 A.prototype.foo.locals = {};
 A.prototype.foo.returns = "int";
 
 A.foo = function () { return A.prototype.foo.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var B =  function B()
-{
+var B =  function B(){
+/***/var ƒ = arguments.callee;
 /***/ if (B.__recompile !== undefined) { eval("B.__redef="+B.__recompile); B.__recompile=undefined; };
 /***/ if (B.__redef !== undefined) { return B.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -544,27 +538,26 @@ B.locals={};
 B.prototype.__class__ = B;
 B.__name__ = "B";
 B.__bases__ = [];
-B.prototype.toString =  function B_toString()
-{
+B.prototype.toString =  function B_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (B_toString.__recompile !== undefined) { eval("B_toString.__redef="+B_toString.__recompile); B_toString.__recompile=undefined; };
 /***/ if (B_toString.__redef !== undefined) { return B_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 B.prototype.toString.locals = {};
 
-B.prototype.bar =  function B_bar()
-{
+B.prototype.bar =  function B_bar(){
+/***/var ƒ = arguments.callee;
 /***/ if (B_bar.__recompile !== undefined) { eval("B_bar.__redef="+B_bar.__recompile); B_bar.__recompile=undefined; };
 /***/ if (B_bar.__redef !== undefined) { return B_bar.__redef.apply(this,arguments); };
-	
 	return 2;
 }/*end->	`bar`	*/
 B.prototype.bar.locals = {};
 B.prototype.bar.returns = "int";
 
 B.bar = function () { return B.prototype.bar.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var C =  function C()
-{
+var C =  function C(){
+/***/var ƒ = arguments.callee;
 /***/ if (C.__recompile !== undefined) { eval("C.__redef="+C.__recompile); C.__recompile=undefined; };
 /***/ if (C.__redef !== undefined) { return C.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -574,20 +567,20 @@ C.locals={};
 C.prototype.__class__ = C;
 C.__name__ = "C";
 C.__bases__ = [];
-C.prototype.toString =  function C_toString()
-{
+C.prototype.toString =  function C_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_toString.__recompile !== undefined) { eval("C_toString.__redef="+C_toString.__recompile); C_toString.__recompile=undefined; };
 /***/ if (C_toString.__redef !== undefined) { return C_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 C.prototype.toString.locals = {};
 
-C.prototype.call_foo_bar =  function C_call_foo_bar()
-{
+C.prototype.call_foo_bar =  function C_call_foo_bar(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_call_foo_bar.__recompile !== undefined) { eval("C_call_foo_bar.__redef="+C_call_foo_bar.__recompile); C_call_foo_bar.__recompile=undefined; };
 /***/ if (C_call_foo_bar.__redef !== undefined) { return C_call_foo_bar.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = this.foo();
+	ƒ.locals.a=a = this.foo();
 	if (a instanceof Array || __is_typed_array(a)) { throw new RuntimeError("Array += Array is not allowed without operator overloading"); }
 	else { a += this.bar(); }
 	return a;
@@ -596,12 +589,12 @@ C.prototype.call_foo_bar.locals = {};
 C.prototype.call_foo_bar.returns = "int";
 
 C.call_foo_bar = function () { return C.prototype.call_foo_bar.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-C.prototype.foo =  function C_foo()
-{
+C.prototype.foo =  function C_foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_foo.__recompile !== undefined) { eval("C_foo.__redef="+C_foo.__recompile); C_foo.__recompile=undefined; };
 /***/ if (C_foo.__redef !== undefined) { return C_foo.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = A.prototype.foo(this);
+	ƒ.locals.a=a = A.prototype.foo(this);
 	a += 100;
 	return a;
 }/*end->	`foo`	*/
@@ -613,16 +606,16 @@ for (var n in A.prototype) {  if (!(n in C.prototype)) {    C.prototype[n] = A.p
 C.__bases__.push(A);
 for (var n in B.prototype) {  if (!(n in C.prototype)) {    C.prototype[n] = B.prototype[n]  }};
 C.__bases__.push(B);
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b;
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.foo() === 1)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b =  new B();
+	ƒ.locals.b=b =  new B();
 	if (!(b.bar() === 2)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.c=c =  new C();
+	ƒ.locals.c=c =  new C();
 	if (!(c.foo() === 101)) {throw new Error("assertion failed"); }
 	if (!(c.bar() === 2)) {throw new Error("assertion failed"); }
 	if (!(c.call_foo_bar() === 103)) {throw new Error("assertion failed"); }
@@ -668,15 +661,14 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
-			var __call__ =  function __call__()
-	{
+			var __call__ =  function __call__(){
+/***/var ƒ = arguments.callee;
 /***/ if (__call__.__recompile !== undefined) { eval("__call__.__redef="+__call__.__recompile); __call__.__recompile=undefined; };
 /***/ if (__call__.__redef !== undefined) { return __call__.__redef.apply(this,arguments); };
-		
 		console.log(__call__.x);
 		return "XXX";
 	}/*end->	`__call__`	*/
@@ -698,41 +690,39 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__()
-{
+A.prototype.__init__ =  function A___init__(){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
-	
 	this.x = 5;
 }/*end->	`__init__`	*/
 A.prototype.__init__.locals = {};
 
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-A.prototype.foo =  function A_foo()
-{
+A.prototype.foo =  function A_foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_foo.__recompile !== undefined) { eval("A_foo.__redef="+A_foo.__recompile); A_foo.__recompile=undefined; };
 /***/ if (A_foo.__redef !== undefined) { return A_foo.__redef.apply(this,arguments); };
-	
 	return this.x;
 }/*end->	`foo`	*/
 A.prototype.foo.locals = {};
 
 A.foo = function () { return A.prototype.foo.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
 	console.log("testing __call__");
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.x === 5)) {throw new Error("assertion failed"); }
 	if (!(a() === "XXX")) {throw new Error("assertion failed"); }
 	if (!(a.__call__() === "XXX")) {throw new Error("assertion failed"); }
@@ -790,8 +780,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -801,27 +791,26 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.foo =  function A_foo()
-{
+A.prototype.foo =  function A_foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_foo.__recompile !== undefined) { eval("A_foo.__redef="+A_foo.__recompile); A_foo.__recompile=undefined; };
 /***/ if (A_foo.__redef !== undefined) { return A_foo.__redef.apply(this,arguments); };
-	
 	return 1;
 }/*end->	`foo`	*/
 A.prototype.foo.locals = {};
 A.prototype.foo.returns = "int";
 
 A.foo = function () { return A.prototype.foo.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var B =  function B()
-{
+var B =  function B(){
+/***/var ƒ = arguments.callee;
 /***/ if (B.__recompile !== undefined) { eval("B.__redef="+B.__recompile); B.__recompile=undefined; };
 /***/ if (B.__redef !== undefined) { return B.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -831,27 +820,26 @@ B.locals={};
 B.prototype.__class__ = B;
 B.__name__ = "B";
 B.__bases__ = [];
-B.prototype.toString =  function B_toString()
-{
+B.prototype.toString =  function B_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (B_toString.__recompile !== undefined) { eval("B_toString.__redef="+B_toString.__recompile); B_toString.__recompile=undefined; };
 /***/ if (B_toString.__redef !== undefined) { return B_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 B.prototype.toString.locals = {};
 
-B.prototype.bar =  function B_bar()
-{
+B.prototype.bar =  function B_bar(){
+/***/var ƒ = arguments.callee;
 /***/ if (B_bar.__recompile !== undefined) { eval("B_bar.__redef="+B_bar.__recompile); B_bar.__recompile=undefined; };
 /***/ if (B_bar.__redef !== undefined) { return B_bar.__redef.apply(this,arguments); };
-	
 	return 2;
 }/*end->	`bar`	*/
 B.prototype.bar.locals = {};
 B.prototype.bar.returns = "int";
 
 B.bar = function () { return B.prototype.bar.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var C =  function C()
-{
+var C =  function C(){
+/***/var ƒ = arguments.callee;
 /***/ if (C.__recompile !== undefined) { eval("C.__redef="+C.__recompile); C.__recompile=undefined; };
 /***/ if (C.__redef !== undefined) { return C.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -861,20 +849,20 @@ C.locals={};
 C.prototype.__class__ = C;
 C.__name__ = "C";
 C.__bases__ = [];
-C.prototype.toString =  function C_toString()
-{
+C.prototype.toString =  function C_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_toString.__recompile !== undefined) { eval("C_toString.__redef="+C_toString.__recompile); C_toString.__recompile=undefined; };
 /***/ if (C_toString.__redef !== undefined) { return C_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 C.prototype.toString.locals = {};
 
-C.prototype.call_foo_bar =  function C_call_foo_bar()
-{
+C.prototype.call_foo_bar =  function C_call_foo_bar(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_call_foo_bar.__recompile !== undefined) { eval("C_call_foo_bar.__redef="+C_call_foo_bar.__recompile); C_call_foo_bar.__recompile=undefined; };
 /***/ if (C_call_foo_bar.__redef !== undefined) { return C_call_foo_bar.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = this.foo();
+	ƒ.locals.a=a = this.foo();
 	if (a instanceof Array || __is_typed_array(a)) { throw new RuntimeError("Array += Array is not allowed without operator overloading"); }
 	else { a += this.bar(); }
 	return a;
@@ -883,11 +871,10 @@ C.prototype.call_foo_bar.locals = {};
 C.prototype.call_foo_bar.returns = "int";
 
 C.call_foo_bar = function () { return C.prototype.call_foo_bar.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-C.prototype.foo =  function C_foo()
-{
+C.prototype.foo =  function C_foo(){
+/***/var ƒ = arguments.callee;
 /***/ if (C_foo.__recompile !== undefined) { eval("C_foo.__redef="+C_foo.__recompile); C_foo.__recompile=undefined; };
 /***/ if (C_foo.__redef !== undefined) { return C_foo.__redef.apply(this,arguments); };
-	
 	return 100;
 }/*end->	`foo`	*/
 C.prototype.foo.locals = {};
@@ -898,16 +885,16 @@ for (var n in A.prototype) {  if (!(n in C.prototype)) {    C.prototype[n] = A.p
 C.__bases__.push(A);
 for (var n in B.prototype) {  if (!(n in C.prototype)) {    C.prototype[n] = B.prototype[n]  }};
 C.__bases__.push(B);
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b;
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.foo() === 1)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b =  new B();
+	ƒ.locals.b=b =  new B();
 	if (!(b.bar() === 2)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.c=c =  new C();
+	ƒ.locals.c=c =  new C();
 	if (!(c.foo() === 100)) {throw new Error("assertion failed"); }
 	if (!(c.bar() === 2)) {throw new Error("assertion failed"); }
 	if (!(c.call_foo_bar() === 102)) {throw new Error("assertion failed"); }
@@ -946,8 +933,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -960,42 +947,40 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__()
-{
+A.prototype.__init__ =  function A___init__(){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
-	
 	this.x = 5;
 }/*end->	`__init__`	*/
 A.prototype.__init__.locals = {};
 
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-A.prototype.__mul__ =  function A___mul__(other)
-{
+A.prototype.__mul__ =  function A___mul__(other){
+/***/var ƒ = arguments.callee;
 /***/ if (A___mul__.__recompile !== undefined) { eval("A___mul__.__redef="+A___mul__.__recompile); A___mul__.__recompile=undefined; };
 /***/ if (A___mul__.__redef !== undefined) { return A___mul__.__redef.apply(this,arguments); };
-	
 	return (this.x * other.x);
 }/*end->	`__mul__`	*/
 A.prototype.__mul__.locals = {};
 
 A.__mul__ = function () { return A.prototype.__mul__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b;
-	arguments.callee.locals.a=a =  new A();
-	arguments.callee.locals.b=b =  new A();
-	arguments.callee.locals.c=c = (a.__mul__(b));
+	ƒ.locals.a=a =  new A();
+	ƒ.locals.b=b =  new A();
+	ƒ.locals.c=c = (a.__mul__(b));
 	if (!(c === 25)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};

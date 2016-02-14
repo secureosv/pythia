@@ -24,13 +24,13 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var y,x;
-	arguments.callee.locals.x=x = set([1, 2, 3]);
-	arguments.callee.locals.y=y = set([1, 2, 3, 4]);
+	ƒ.locals.x=x = set([1, 2, 3]);
+	ƒ.locals.y=y = set([1, 2, 3, 4]);
 	if (!(x.issubset(y) === true)) {throw new Error("assertion failed"); }
 	if (!(y.issubset(x) === false)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/

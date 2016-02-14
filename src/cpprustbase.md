@@ -4113,7 +4113,17 @@ because they need some special handling in other places.
 						elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='new':
 							V = self.visit(node.value.args[0])
 							if isinstance(V, tuple):
-								return 'auto %s = new %s({%s});' %(target, V[0], ','.join(V[1]))
+								vType, vInit = V
+								if isinstance(vInit, list):
+									return 'auto %s = new %s({%s});' %(target, vType, ','.join(vInit))
+								else:
+									if vType.endswith('*'):
+										vType = vType[:-1]
+										return 'auto %s = new %s%s;' %(target, vType, vInit)
+									else:
+										raise RuntimeError('not a pointer?')
+										return '%s %s %s;' %(vType, target, vInit)
+
 							else:
 								return 'auto %s = %s;			/* new variable*/' % (target, value)
 						else:

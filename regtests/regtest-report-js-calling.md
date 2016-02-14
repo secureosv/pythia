@@ -46,31 +46,28 @@ output:
 ```javascript
 
 
-var f1 =  function f1(a)
-{
+var f1 =  function f1(a){
+/***/var ƒ = arguments.callee;
 /***/ if (f1.__recompile !== undefined) { eval("f1.__redef="+f1.__recompile); f1.__recompile=undefined; };
 /***/ if (f1.__redef !== undefined) { return f1.__redef.apply(this,arguments); };
-	
 	return a;
 }/*end->	`f1`	*/
 f1.locals={};
 
-var f2 =  function f2(_kwargs_)
-{
+var f2 =  function f2(_kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (f2.__recompile !== undefined) { eval("f2.__redef="+f2.__recompile); f2.__recompile=undefined; };
 /***/ if (f2.__redef !== undefined) { return f2.__redef.apply(this,arguments); };
-	
 	var a = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.a===undefined))?	1 :   typeof(_kwargs_)=='object'?_kwargs_.a: __invalid_call__('function `f2` requires named keyword arguments, invalid parameter for `a`',arguments);
 	var b = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.b===undefined))?	2 :   typeof(_kwargs_)=='object'?_kwargs_.b: __invalid_call__('function `f2` requires named keyword arguments, invalid parameter for `b`',arguments);
 	return (a + b);
 }/*end->	`f2`	*/
 f2.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	console.log("testing calling named parameters");
 	if (!(f1(10) === 10)) {throw new Error("assertion failed"); }
 	if (!(f2() === 3)) {throw new Error("assertion failed"); }
@@ -106,8 +103,8 @@ output:
 ```javascript
 
 
-var A =  function A()
-{
+var A =  function A(){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -117,20 +114,20 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.f2 =  function A_f2(kw)
-{
+A.prototype.f2 =  function A_f2(kw){
+/***/var ƒ = arguments.callee;
 /***/ if (A_f2.__recompile !== undefined) { eval("A_f2.__redef="+A_f2.__recompile); A_f2.__recompile=undefined; };
 /***/ if (A_f2.__redef !== undefined) { return A_f2.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = 0;
+	ƒ.locals.a=a = 0;
 	var __iter0 = __jsdict_keys(kw);
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -143,12 +140,12 @@ A.prototype.f2 =  function A_f2(kw)
 A.prototype.f2.locals = {};
 
 A.f2 = function () { return A.prototype.f2.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a =  new A();
+	ƒ.locals.a=a =  new A();
 	if (!(a.f2({ x:1, y:2 }) === 3)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -179,8 +176,8 @@ output:
 ```javascript
 
 
-var A =  function A(kw)
-{
+var A =  function A(kw){
+/***/var ƒ = arguments.callee;
 /***/ if (A.__recompile !== undefined) { eval("A.__redef="+A.__recompile); A.__recompile=undefined; };
 /***/ if (A.__redef !== undefined) { return A.__redef.apply(this,arguments); };
 	this.__$UID$__ = __$UID$__ ++;
@@ -193,20 +190,20 @@ A.locals={};
 A.prototype.__class__ = A;
 A.__name__ = "A";
 A.__bases__ = [];
-A.prototype.toString =  function A_toString()
-{
+A.prototype.toString =  function A_toString(){
+/***/var ƒ = arguments.callee;
 /***/ if (A_toString.__recompile !== undefined) { eval("A_toString.__redef="+A_toString.__recompile); A_toString.__recompile=undefined; };
 /***/ if (A_toString.__redef !== undefined) { return A_toString.__redef.apply(this,arguments); };
 	return this.__$UID$__;
 }/*end->	`toString`	*/
 A.prototype.toString.locals = {};
 
-A.prototype.__init__ =  function A___init__(kw)
-{
+A.prototype.__init__ =  function A___init__(kw){
+/***/var ƒ = arguments.callee;
 /***/ if (A___init__.__recompile !== undefined) { eval("A___init__.__redef="+A___init__.__recompile); A___init__.__recompile=undefined; };
 /***/ if (A___init__.__redef !== undefined) { return A___init__.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = 0;
+	ƒ.locals.a=a = 0;
 	var __iter0 = kw;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -219,12 +216,12 @@ A.prototype.__init__ =  function A___init__(kw)
 A.prototype.__init__.locals = {};
 
 A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a =  new A({ x:1, y:2 });
+	ƒ.locals.a=a =  new A({ x:1, y:2 });
 	if (!(a.value === 3)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -287,16 +284,14 @@ output:
 ```javascript
 
 
-var get_lambda =  function get_lambda()
-{
+var get_lambda =  function get_lambda(){
+/***/var ƒ = arguments.callee;
 /***/ if (get_lambda.__recompile !== undefined) { eval("get_lambda.__redef="+get_lambda.__recompile); get_lambda.__recompile=undefined; };
 /***/ if (get_lambda.__redef !== undefined) { return get_lambda.__redef.apply(this,arguments); };
-	
-			var __lambda__ =  function __lambda__(x, y)
-	{
+			var __lambda__ =  function __lambda__(x, y){
+/***/var ƒ = arguments.callee;
 /***/ if (__lambda__.__recompile !== undefined) { eval("__lambda__.__redef="+__lambda__.__recompile); __lambda__.__recompile=undefined; };
 /***/ if (__lambda__.__redef !== undefined) { return __lambda__.__redef.apply(this,arguments); };
-		
 		return (x + y);
 	}/*end->	`__lambda__`	*/
 __lambda__.locals={};
@@ -306,67 +301,63 @@ arguments.callee.locals.__lambda__=__lambda__
 }/*end->	`get_lambda`	*/
 get_lambda.locals={};
 
-var get_lambdas =  function get_lambdas()
-{
+var get_lambdas =  function get_lambdas(){
+/***/var ƒ = arguments.callee;
 /***/ if (get_lambdas.__recompile !== undefined) { eval("get_lambdas.__redef="+get_lambdas.__recompile); get_lambdas.__recompile=undefined; };
 /***/ if (get_lambdas.__redef !== undefined) { return get_lambdas.__redef.apply(this,arguments); };
-	
 	return [(function (a,b) {return (a + b);}), (function (x,y) {return (x + y);})];
 }/*end->	`get_lambdas`	*/
 get_lambdas.locals={};
 
-var call_lambda =  function call_lambda(F)
-{
+var call_lambda =  function call_lambda(F){
+/***/var ƒ = arguments.callee;
 /***/ if (call_lambda.__recompile !== undefined) { eval("call_lambda.__redef="+call_lambda.__recompile); call_lambda.__recompile=undefined; };
 /***/ if (call_lambda.__redef !== undefined) { return call_lambda.__redef.apply(this,arguments); };
-	
 	return F();
 }/*end->	`call_lambda`	*/
 call_lambda.locals={};
 
-var call_lambda2 =  function call_lambda2(_kwargs_)
-{
+var call_lambda2 =  function call_lambda2(_kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (call_lambda2.__recompile !== undefined) { eval("call_lambda2.__redef="+call_lambda2.__recompile); call_lambda2.__recompile=undefined; };
 /***/ if (call_lambda2.__redef !== undefined) { return call_lambda2.__redef.apply(this,arguments); };
-	
 	var callback = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.callback===undefined))?	null :   typeof(_kwargs_)=='object'?_kwargs_.callback: __invalid_call__('function `call_lambda2` requires named keyword arguments, invalid parameter for `callback`',arguments);
 	return callback();
 }/*end->	`call_lambda2`	*/
 call_lambda2.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var funcs,r,e,d,f;
-			var __lambda__ =  function __lambda__(a, b)
-	{
+			var __lambda__ =  function __lambda__(a, b){
+/***/var ƒ = arguments.callee;
 /***/ if (__lambda__.__recompile !== undefined) { eval("__lambda__.__redef="+__lambda__.__recompile); __lambda__.__recompile=undefined; };
 /***/ if (__lambda__.__redef !== undefined) { return __lambda__.__redef.apply(this,arguments); };
-		
 		return (a + b);
 	}/*end->	`__lambda__`	*/
 __lambda__.locals={};
 arguments.callee.locals.__lambda__=__lambda__
 
-	arguments.callee.locals.f=f = __lambda__;
+	ƒ.locals.f=f = __lambda__;
 	if (!(f(1, 2) === 3)) {throw new Error("assertion failed"); }
 	if (!((function (a,b) {return (a + b);})(1, 2) === 3)) {throw new Error("assertion failed"); }
 	if (!(get_lambda()(1, 2) === 3)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.funcs=funcs = get_lambdas();
+	ƒ.locals.funcs=funcs = get_lambdas();
 	if (!(funcs[0](1, 2) === 3)) {throw new Error("assertion failed"); }
 	if (!(funcs[1](1, 2) === 3)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.funcs=funcs = [(function (a,b) {return (a + b);}), (function (x,y) {return (x + y);})];
+	ƒ.locals.funcs=funcs = [(function (a,b) {return (a + b);}), (function (x,y) {return (x + y);})];
 	if (!(funcs[0](1, 2) === 3)) {throw new Error("assertion failed"); }
 	if (!(funcs[1](1, 2) === 3)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["x", (function (a,b) {return (a + b);})]] });
+	ƒ.locals.d=d = dict({  }, { copy:false, keytype:"string", iterable:[["x", (function (a,b) {return (a + b);})]] });
 	if (!(d["x"](1, 2) === 3)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.e=e = [(function (a,b) {return (a + b);}), (function (x,y) {return (x + y);})];
+	ƒ.locals.e=e = [(function (a,b) {return (a + b);}), (function (x,y) {return (x + y);})];
 	if (!(e[0](1, 2) === 3)) {throw new Error("assertion failed"); }
 	if (!(e[1](1, 2) === 3)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = call_lambda((function () {return int(100);}));
+	ƒ.locals.r=r = call_lambda((function () {return int(100);}));
 	if (!(r === 100)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.r=r = call_lambda2({ callback:(function () {return int(200);}) });
+	ƒ.locals.r=r = call_lambda2({ callback:(function () {return int(200);}) });
 	if (!(r === 200)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -397,12 +388,12 @@ output:
 ```javascript
 
 
-var f2 =  function f2(kw)
-{
+var f2 =  function f2(kw){
+/***/var ƒ = arguments.callee;
 /***/ if (f2.__recompile !== undefined) { eval("f2.__redef="+f2.__recompile); f2.__recompile=undefined; };
 /***/ if (f2.__redef !== undefined) { return f2.__redef.apply(this,arguments); };
 	var a;
-	arguments.callee.locals.a=a = 0;
+	ƒ.locals.a=a = 0;
 	var __iter0 = kw;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -414,11 +405,10 @@ var f2 =  function f2(kw)
 }/*end->	`f2`	*/
 f2.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	if (!(f2({ x:1, y:2 }) === 3)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -452,15 +442,15 @@ output:
 ```javascript
 
 
-var f =  function f(a)
-{
+var f =  function f(a){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
 var args = Array.prototype.splice.call(arguments,1, arguments.length);
 	var c;
 	console.log("*args");
 	console.log(args);
-	arguments.callee.locals.c=c = a;
+	ƒ.locals.c=c = a;
 	var __iter0 = args;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -472,11 +462,10 @@ var args = Array.prototype.splice.call(arguments,1, arguments.length);
 }/*end->	`f`	*/
 f.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	console.log("testing calling function that takes *args");
 	if (!(f(1, 2, 3, 3) === 9)) {throw new Error("assertion failed"); }
 	console.log("ok");
@@ -506,20 +495,18 @@ output:
 ```javascript
 
 
-var f =  function f(a, b, c)
-{
+var f =  function f(a, b, c){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
-	
 	return ((a + b) + c);
 }/*end->	`f`	*/
 f.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	if (!(f(1, 2, 3) === 6)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};
@@ -551,22 +538,20 @@ output:
 ```javascript
 
 
-var f =  function f(a, _kwargs_)
-{
+var f =  function f(a, _kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
-	
 	var b = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.b===undefined))?	null :   typeof(_kwargs_)=='object'?_kwargs_.b: __invalid_call__('function `f` requires named keyword arguments, invalid parameter for `b`',arguments);
 	var c = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.c===undefined))?	null :   typeof(_kwargs_)=='object'?_kwargs_.c: __invalid_call__('function `f` requires named keyword arguments, invalid parameter for `c`',arguments);
 	return ((a + b) * c);
 }/*end->	`f`	*/
 f.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
-	
 	console.log("testing keywords");
 	console.log(f(1, { b:2, c:3 }));
 	console.log(f(1, { c:3, b:2 }));
@@ -607,34 +592,32 @@ output:
 ```javascript
 
 
-var f =  function f(x, a, b, c)
-{
+var f =  function f(x, a, b, c){
+/***/var ƒ = arguments.callee;
 /***/ if (f.__recompile !== undefined) { eval("f.__redef="+f.__recompile); f.__recompile=undefined; };
 /***/ if (f.__redef !== undefined) { return f.__redef.apply(this,arguments); };
-	
 	return (((x + a) + b) + c);
 }/*end->	`f`	*/
 f.locals={};
 
-var f2 =  function f2(x, y, z, _kwargs_)
-{
+var f2 =  function f2(x, y, z, _kwargs_){
+/***/var ƒ = arguments.callee;
 /***/ if (f2.__recompile !== undefined) { eval("f2.__redef="+f2.__recompile); f2.__recompile=undefined; };
 /***/ if (f2.__redef !== undefined) { return f2.__redef.apply(this,arguments); };
-	
 	var w = (_kwargs_===undefined || (typeof(_kwargs_)=='object' && _kwargs_.w===undefined))?	0 :   typeof(_kwargs_)=='object'?_kwargs_.w: __invalid_call__('function `f2` requires named keyword arguments, invalid parameter for `w`',arguments);
 	return (((x + y) + z) + w);
 }/*end->	`f2`	*/
 f2.locals={};
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,b;
-	arguments.callee.locals.a=a = [1, 1, 1];
+	ƒ.locals.a=a = [1, 1, 1];
 	if (!(f.apply(f, [].extend([1]).extend(a)) === 4)) {throw new Error("assertion failed"); }
 	if (!(f2.apply(f2, [].extend(a).append({ w:10 })) === 13)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = [1, 1];
+	ƒ.locals.b=b = [1, 1];
 	if (!(f2.apply(f2, [].extend([100]).extend(b).append({ w:10 })) === 112)) {throw new Error("assertion failed"); }
 }/*end->	`main`	*/
 main.locals={};

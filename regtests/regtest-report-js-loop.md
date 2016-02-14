@@ -92,13 +92,13 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,arr,b,e,keys,k,ob,s,values,v,y,z,ob2;
-	arguments.callee.locals.a=a = [1, 2, 3];
-	arguments.callee.locals.y=y = 0;
+	ƒ.locals.a=a = [1, 2, 3];
+	ƒ.locals.y=y = 0;
 	var __iter0 = a;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -107,8 +107,8 @@ var main =  function main()
 		else { y += x; }
 	}
 	if (!(y === 6)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.z=z = "";
-	arguments.callee.locals.arr=arr = ["a", "b", "c"];
+	ƒ.locals.z=z = "";
+	ƒ.locals.arr=arr = ["a", "b", "c"];
 	var __iter0 = arr;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -117,15 +117,14 @@ var main =  function main()
 		else { z += v; }
 	}
 	if (!(z === "abc")) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.b=b = false;
 	if (__contains__(arr, "a") instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (__contains__(arr, "a"))
-	{
-		arguments.callee.locals.b=b = true;
+	if (__contains__(arr, "a")) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.s=s = "hello world";
-	arguments.callee.locals.z=z = "";
+	ƒ.locals.s=s = "hello world";
+	ƒ.locals.z=z = "";
 	var __iter0 = s;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -134,17 +133,16 @@ var main =  function main()
 		else { z += char; }
 	}
 	if (!(z === "hello world")) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = false;
+	ƒ.locals.b=b = false;
 	if (__contains__(s, "hello") instanceof Array) {throw new RuntimeError("if test not allowed directly on arrays. The correct syntax is: `if len(array)` or `if array.length`")}
-	if (__contains__(s, "hello"))
-	{
-		arguments.callee.locals.b=b = true;
+	if (__contains__(s, "hello")) {
+		ƒ.locals.b=b = true;
 	}
 	if (!(b === true)) {throw new Error("assertion failed"); }
 	console.log("testing for loop over dict");
-	arguments.callee.locals.ob=ob = dict({  }, { copy:false, keytype:"string", iterable:[["a", "A"], ["b", "B"]] });
-	arguments.callee.locals.k=k = "";
-	arguments.callee.locals.v=v = "";
+	ƒ.locals.ob=ob = dict({  }, { copy:false, keytype:"string", iterable:[["a", "A"], ["b", "B"]] });
+	ƒ.locals.k=k = "";
+	ƒ.locals.v=v = "";
 	var __iter0 = ob;
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
@@ -158,15 +156,15 @@ var main =  function main()
 	console.log(v);
 	if (!((k === "ab" || k === "ba"))) {throw new Error("assertion failed"); }
 	if (!((v === "AB" || v === "BA"))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.keys=keys = [];
-	arguments.callee.locals.values=values = [];
+	ƒ.locals.keys=keys = [];
+	ƒ.locals.values=values = [];
 	var __mtarget__4,x;
 	var __iter0 = __jsdict_items(ob);
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
 		var __mtarget__4 = __iter0[ __n0 ];
-		arguments.callee.locals.x=x = __mtarget__4[0];
-		arguments.callee.locals.y=y = __mtarget__4[1];
+		ƒ.locals.x=x = __mtarget__4[0];
+		ƒ.locals.y=y = __mtarget__4[1];
 		/***/ try {
 		keys.append(x);
 		/***/ } catch (__err) { if (__debugger__.onerror(__err, main, keys.append)==true){debugger;}else{throw __err;} };
@@ -176,16 +174,16 @@ var main =  function main()
 	}
 	if (!(__contains__(keys, "a"))) {throw new Error("assertion failed"); }
 	if (!(__contains__(values, "A"))) {throw new Error("assertion failed"); }
-	arguments.callee.locals.ob2=ob2 = dict({  }, { copy:false, keytype:"string", iterable:[["c", "C"], ["d", "D"]] });
-	arguments.callee.locals.e=e = 0;
-	arguments.callee.locals.arr=arr = [];
+	ƒ.locals.ob2=ob2 = dict({  }, { copy:false, keytype:"string", iterable:[["c", "C"], ["d", "D"]] });
+	ƒ.locals.e=e = 0;
+	ƒ.locals.arr=arr = [];
 	var __mtarget__5;
 	var __iter0 = __jsdict_items(ob);
 	if (! (__iter0 instanceof Array || typeof __iter0 == "string" || __is_typed_array(__iter0) || __is_some_array(__iter0) )) { __iter0 = __object_keys__(__iter0) }
 	for (var __n0 = 0; __n0 < __iter0.length; __n0++) {
 		var __mtarget__5 = __iter0[ __n0 ];
-		arguments.callee.locals.x=x = __mtarget__5[0];
-		arguments.callee.locals.y=y = __mtarget__5[1];
+		ƒ.locals.x=x = __mtarget__5[0];
+		ƒ.locals.y=y = __mtarget__5[1];
 		/***/ try {
 		arr.append(x);
 		/***/ } catch (__err) { if (__debugger__.onerror(__err, main, arr.append)==true){debugger;}else{throw __err;} };
@@ -197,8 +195,8 @@ var main =  function main()
 		if (! (__iter1 instanceof Array || typeof __iter1 == "string" || __is_typed_array(__iter1) || __is_some_array(__iter1) )) { __iter1 = __object_keys__(__iter1) }
 		for (var __n1 = 0; __n1 < __iter1.length; __n1++) {
 			var __mtarget__6 = __iter1[ __n1 ];
-			arguments.callee.locals.w=w = __mtarget__6[0];
-			arguments.callee.locals.z=z = __mtarget__6[1];
+			ƒ.locals.w=w = __mtarget__6[0];
+			ƒ.locals.z=z = __mtarget__6[1];
 			e ++;
 			/***/ try {
 			arr.append(w);
@@ -265,43 +263,41 @@ output:
 ```javascript
 
 
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,c,b,e,d;
-	arguments.callee.locals.a=a = range(10);
+	ƒ.locals.a=a = range(10);
 	if (!(a[0] === 0)) {throw new Error("assertion failed"); }
 	if (!(a[1] === 1)) {throw new Error("assertion failed"); }
 	if (!(len(a) === 10)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.b=b = range(1, 10);
+	ƒ.locals.b=b = range(1, 10);
 	if (!(b[0] === 1)) {throw new Error("assertion failed"); }
 	if (!(b[1] === 2)) {throw new Error("assertion failed"); }
 	if (!(len(b) === 9)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.c=c = 0;
+	ƒ.locals.c=c = 0;
 	/*for var in range*/;
 	var i;
-	arguments.callee.locals.i=i = -1;
+	ƒ.locals.i=i = -1;
 	while (++i < 10)
 	{
 		c ++;
 	}
 	if (!(c === 10)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.d=d = 0;
+	ƒ.locals.d=d = 0;
 	/*for var in range*/;
-	
-	arguments.callee.locals.i=i = (1 - 1);
+	ƒ.locals.i=i = (1 - 1);
 	while (++i < 10)
 	{
 		d ++;
 	}
 	if (!(d === 9)) {throw new Error("assertion failed"); }
-	arguments.callee.locals.e=e = 0;
+	ƒ.locals.e=e = 0;
 	/*for var in range*/;
-	
-	arguments.callee.locals.i=i = (1 - 1);
+	ƒ.locals.i=i = (1 - 1);
 	var i__end__;
-	arguments.callee.locals.i__end__=i__end__ = (8 + 2);
+	ƒ.locals.i__end__=i__end__ = (8 + 2);
 	while (++i < i__end__)
 	{
 		e ++;
@@ -353,16 +349,16 @@ output:
 
 arr1 = [];
 arr2 = [];
-var main =  function main()
-{
+var main =  function main(){
+/***/var ƒ = arguments.callee;
 /***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
 /***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
 	var a,i,j;
-	arguments.callee.locals.a=a = 0;
-	arguments.callee.locals.i=i = 0;
+	ƒ.locals.a=a = 0;
+	ƒ.locals.i=i = 0;
 	while (i < 10)
 	{
-		arguments.callee.locals.j=j = 0;
+		ƒ.locals.j=j = 0;
 		while (j < 10)
 		{
 			a ++;
@@ -382,6 +378,74 @@ var main =  function main()
 	}
 	if (!(len(arr1) === 5)) {throw new Error("assertion failed"); }
 	if (!(len(arr2) === 5)) {throw new Error("assertion failed"); }
+}/*end->	`main`	*/
+main.locals={};
+
+main();
+```
+* [interval_loop.py](loop/interval_loop.py)
+
+input:
+------
+```python
+from runtime import *
+'''
+timeout decorator with loop
+'''
+
+counter = 0
+
+def main():
+	@timeout(1)
+	def foo():
+		print 'foo'
+
+	@timeout(1, loop=True)
+	def bar():
+		global counter
+		print 'bar:'+counter
+		counter += 1
+		if counter > 5:
+			process.exit()
+
+main()
+```
+output:
+------
+```javascript
+
+
+counter = 0;
+var main =  function main(){
+/***/var ƒ = arguments.callee;
+/***/ if (main.__recompile !== undefined) { eval("main.__redef="+main.__recompile); main.__recompile=undefined; };
+/***/ if (main.__redef !== undefined) { return main.__redef.apply(this,arguments); };
+			var foo = __set_timeout( function foo(){
+/***/var ƒ = arguments.callee;
+/***/ if (foo.__recompile !== undefined) { eval("foo.__redef="+foo.__recompile); foo.__recompile=undefined; };
+/***/ if (foo.__redef !== undefined) { return foo.__redef.apply(this,arguments); };
+		console.log("foo");
+	}/*end->	`foo`	*/
+, 1);/*end-decorators*/
+foo.locals={};
+arguments.callee.locals.foo=foo
+
+			var bar = __set_interval( function bar(){
+/***/var ƒ = arguments.callee;
+/***/ if (bar.__recompile !== undefined) { eval("bar.__redef="+bar.__recompile); bar.__recompile=undefined; };
+/***/ if (bar.__redef !== undefined) { return bar.__redef.apply(this,arguments); };
+		console.log(("bar:" + counter));
+		counter ++;
+		if (counter > 5) {
+			/***/ try {
+			process.exit();
+			/***/ } catch (__err) { if (__debugger__.onerror(__err, bar, process.exit)==true){debugger;}else{throw __err;} };
+		}
+	}/*end->	`bar`	*/
+, 1);/*end-decorators*/
+bar.locals={};
+arguments.callee.locals.bar=bar
+
 }/*end->	`main`	*/
 main.locals={};
 
