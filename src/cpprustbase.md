@@ -3418,8 +3418,7 @@ because they need some special handling in other places.
 							]
 							return '\n'.join(r)
 					else:
-						raise RuntimeError(target
-							)
+						raise RuntimeError( self.format_error('can not determine the fixed array size from either the target or source: %s=%s'%(target,value) ))
 				else:
 					raise RuntimeError('TODO array slice assign `arr[:]=other`')
 
@@ -3428,20 +3427,30 @@ because they need some special handling in other places.
 				if self._memory[-1]=='STACK':
 					if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
 						atype, fixed_size = self._known_arrays[target]
-						r = [
-							'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
-							self.indent()+'  %s[__i] = %s[__i];' %(target, value),
-							self.indent()+'}',
-						]
-						return '\n'.join(r)
+						## TODO assert fixed_size < slice.upper
 
-					else:
-						r = [
-							'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
-							'} else { %s.erase(%s.begin(), %s.begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
-							'%s.insert(%s.begin(), %s.begin(), %s.end());' %(target, target, value,value)
-						]
+					r = [
+						'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
+						self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+						self.indent()+'}',
+					]
 					return '\n'.join(r)
+
+					#if target in self._known_arrays and isinstance(self._known_arrays[target], tuple):
+					#	atype, fixed_size = self._known_arrays[target]
+					#	r = [
+					#		'for (int __i=0; __i<%s; __i++) {' %self.visit(slice.upper),
+					#		self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+					#		self.indent()+'}',
+					#	]
+					#	return '\n'.join(r)
+					#else:
+					#	r = [
+					#		'if (%s >= %s.size()) { %s.erase(%s.begin(), %s.end());' %(s,target, target,target,target),
+					#		'} else { %s.erase(%s.begin(), %s.begin()+%s); }' %(target,target,target, self.visit(slice.upper)),
+					#		'%s.insert(%s.begin(), %s.begin(), %s.end());' %(target, target, value,value)
+					#	]
+					#return '\n'.join(r)
 				else:
 					r = [
 						'if (%s >= %s->size()) { %s->erase(%s->begin(), %s->end());' %(s,target, target,target,target),

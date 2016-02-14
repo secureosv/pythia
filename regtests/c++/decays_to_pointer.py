@@ -55,7 +55,18 @@ with stack:
 
 		test_pointer_decay(i2) == len(i2)
 
-
+		a = Bar(i2)
+		arr = [2]int(6,7)
+		b = Bar(arr)
+		## test fixed size array assignment from object to object
+		assert a.x[0]==i2[0]
+		assert a.x[1]==i2[1]
+		## direct assignment not allowed
+		#a.x = b.x  # error: invalid array assignment
+		#a.x[:] = b.x  ## error unknown array fixed size
+		a.x[:2] = b.x  ## workaround: slice assignment with upper bound
+		assert a.x[0]==b.x[0]
+		assert a.x[1]==b.x[1]
 
 def main():
 	stack_test()
