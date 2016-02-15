@@ -158,6 +158,7 @@ with stack:
 
 		# note: r:TaskRec is the super class, TODO cast to its subclass.
 		def __init__(self,ident:int, priority:int, input:Packet, initialState:TaskState, handle:TaskRec):
+			print 'init new Task...'
 			let self.link     : Task = taskWorkArea.taskList
 			self.ident = ident
 			self.priority = priority
@@ -166,12 +167,17 @@ with stack:
 			let self.packet_pending : bool = initialState.isPacketPending()
 			let self.task_waiting   : bool = initialState.isTaskWaiting()
 			let self.task_holding   : bool = initialState.isTaskHolding()
-
+			print 'setting handle'
 			self.handle = addr(handle)  ## generic - some subclass
-
+			print 'setting taskList'
 			#taskWorkArea.taskList = self as Task
-			taskWorkArea.taskList[...] = self as Task
+			#taskWorkArea.taskList[...] = self as Task  ## compiles but segfaults at runtime
+			#ptr = addr(self)  ## error: lvalue required as unary ‘&’ operand
+			ptr = addr(self[...])
+			taskWorkArea.taskList = self as 'Task*'
+			print 'setting taskTab'
 			taskWorkArea.taskTab[ident] = self as Task
+			print 'init OK'
 
 
 		def addPacket(self,p:Packet, old:Task) -> Task:

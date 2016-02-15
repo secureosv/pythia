@@ -1917,7 +1917,11 @@ regular Python has no support for.
 					return '%s as ' %self.visit(node.left)
 
 			elif isinstance(node.left, ast.BinOp) and isinstance(node.left.right, ast.Name) and node.left.right.id=='__as__':
-				cast_to = right
+				#cast_to = right
+				cast_to = self.visit(node.right)
+				if isinstance(node.right, ast.Str):
+					cast_to = node.right.s
+
 				if self._rust:
 					return '%s %s' %(self.visit(node.left), cast_to)
 				else:
@@ -1952,13 +1956,16 @@ regular Python has no support for.
 							return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
 					elif self._memory[-1]=='STACK':
 						cast_from = self.visit(node.left.left)
+						if isinstance(node.left.left, ast.Str):  ## allow quoted cast to with `as`
+							cast_from = node.left.left.s
+
 						if cast_from in self._known_refs:
 							raise RuntimeError(cast_from)
 						if self._function_stack:
 							fnode = self._function_stack[-1]
 							if fnode.return_type==cast_to:  ## TODO check is node above is ast.Return
 								return 'static_cast<%s>(%s)' %(cast_to, cast_from)
-						#return 'static_cast<%s*>(%s)' %(cast_to, self.visit(node.left.left))
+
 						return 'static_cast<%s>(%s)' %(cast_to, self.visit(node.left.left))
 
 					elif self._polymorphic:
