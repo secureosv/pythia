@@ -379,7 +379,15 @@ with stack:
 			else:
 				###########if tracing: trace(chr(ord("0")+t.ident))
 				print 'running.', t
-				t[...] = t->runTask()
+				#t[...] = t->runTask()
+				res = t->runTask()
+				if res is None:
+					print 'res is null'
+					t = None
+				else:
+					ptr =  addr(res)
+					#print 'ptr to res:', ptr  ## BUG: always prints same address
+					t = ptr
 
 	class Richards(object):
 

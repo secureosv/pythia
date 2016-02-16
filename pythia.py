@@ -70,9 +70,10 @@ if not os.path.isdir(OSV_ROOT) and '--osv' in sys.argv:
 has_seastar = False
 HAS_CPP14 = False
 try:
+	## note on osx may throw a ValueError, or on linux OSError
 	subprocess.check_call(['g++-4.9', '--version'])
 	HAS_CPP14 = True
-except OSError:
+except:  ## catch any errors
 	print 'c++14 not enabled (g++-4.9 or newer is required)'
 
 GO_EXE = None
