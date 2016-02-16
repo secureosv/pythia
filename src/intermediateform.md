@@ -1837,6 +1837,15 @@ class PythonToPythonJS(NodeVisitorBase):
 						val_type = 'int'
 					else:
 						val_type = 'float64'
+				elif isinstance(v, ast.List) and len(v.elts):
+					for elt in v.elts:
+						if isinstance(elt, ast.Num):
+							if isinstance(elt, int):
+								val_type = '"[]int"'
+							else:
+								val_type = '"[]double"'
+						elif isinstance(elt, ast.Str):
+							val_type = '"[]string"'
 
 			if not key_type:
 				raise SyntaxError(  self.format_error('can not determine dict key type')  )
