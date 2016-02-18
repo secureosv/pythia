@@ -1846,6 +1846,30 @@ regular Python has no support for.
 				elif node.left.func.id == '__go__map__':
 					key_type = self.visit(node.left.args[0])
 					value_type = self.visit(node.left.args[1])
+					if isinstance(node.left.args[0], ast.Str):
+						key_type = node.left.args[0].s
+						if key_type.startswith('['):
+							raise SyntaxError(self.format_error('dictionary keys can not be a vector type'))
+					if isinstance(node.left.args[1], ast.Str):
+						value_type = node.left.args[1].s
+						if value_type.startswith('[]'):
+							T = value_type.split(']')[-1]
+							value_type = 'std::vector<%s>' % T
+
+					if key_type == 'string':
+						key_type = 'std::string'
+
+					if isinstance(node.right, ast.Dict):
+						items = []
+						for i in range( len(node.right.keys) ):
+							k = self.visit(node.right.keys[i])
+							v = self.visit(node.right.values[i])
+							if v.startswith('[') and v.endswith(']'):
+								v = '{' + v[1:-1] + '}'
+							items.append('{%s, %s}' %(k,v))
+
+						right = '{%s}' %'\n,'.join(items)
+
 					## TODO check where this is used,
 					## this should actually return the map wrapped in std::shared_ptr
 					return 'std::map<%s, %s>%s' %(key_type, value_type, right)
@@ -3754,6 +3778,13 @@ because they need some special handling in other places.
 			if not self._cpp and isinstance(node.value, ast.BinOp) and self.visit(node.value.op)=='<<' and isinstance(node.value.left, ast.Call) and isinstance(node.value.left.func, ast.Name) and node.value.left.func.id=='__go__map__':
 				key_type = self.visit(node.value.left.args[0])
 				value_type = self.visit(node.value.left.args[1])
+
+				if isinstance(node.value.left.args[0], ast.Str):
+					raise RuntimeError(node.value.left.args[0])
+
+				if isinstance(node.value.left.args[1], ast.Str):
+					raise RuntimeError(node.value.left.args[1])
+
 				if key_type=='string': key_type = 'String'
 				if value_type=='string': value_type = 'String'
 				self._known_maps[ target ] = (key_type, value_type)
@@ -3875,6 +3906,13 @@ because they need some special handling in other places.
 					if S == '__go__map__':
 						key_type = self.visit(node.value.left.args[0])
 						value_type = self.visit(node.value.left.args[1])
+
+						if isinstance(node.value.left.args[0], ast.Str):
+							raise RuntimeError('TODO dict key type: %s' %value_type)
+
+						if isinstance(node.value.left.args[1], ast.Str):
+							raise RuntimeError('TODO dict value type: %s' %value_type)
+
 						if key_type=='string':
 							if self.usertypes and 'string' in self.usertypes:
 								key_type = self.usertypes['string']['type']

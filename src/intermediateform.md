@@ -1840,7 +1840,7 @@ class PythonToPythonJS(NodeVisitorBase):
 				elif isinstance(v, ast.List) and len(v.elts):
 					for elt in v.elts:
 						if isinstance(elt, ast.Num):
-							if isinstance(elt, int):
+							if isinstance(elt.n, int):
 								val_type = '"[]int"'
 							else:
 								val_type = '"[]double"'
