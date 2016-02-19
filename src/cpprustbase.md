@@ -3909,12 +3909,16 @@ because they need some special handling in other places.
 					if S == '__go__map__':
 						key_type = self.visit(node.value.left.args[0])
 						value_type = self.visit(node.value.left.args[1])
+						value_vec  = None
 
 						if isinstance(node.value.left.args[0], ast.Str):
 							raise RuntimeError('TODO dict key type: %s' %value_type)
 
 						if isinstance(node.value.left.args[1], ast.Str):
-							raise RuntimeError('TODO dict value type: %s' %value_type)
+							#raise RuntimeError('TODO dict value type: %s' %value_type)
+							value_type = node.value.left.args[1].s
+							value_vec  = value_type.split(']')[-1]
+							value_type = 'std::vector<%s>*' %value_vec
 
 						if key_type=='string':
 							if self.usertypes and 'string' in self.usertypes:
@@ -3934,9 +3938,15 @@ because they need some special handling in other places.
 						for i in range( len(node.value.right.keys) ):
 							k = self.visit( node.value.right.keys[ i ] )
 							v = self.visit( node.value.right.values[i] )
+							if v.startswith('[') and v.endswith(']'):
+								v = ('new std::vector<%s>{'%value_vec) + v[1:-1] + '}'
+
 							a.append( '{%s,%s}'%(k,v) )
 							keyvalues.append( (k,v) )
-						v = ', '.join( a )
+						#v = ', '.join( a )
+						initlist = '{%s}' %'\n,'.join(a)
+						map_type = 'std::map<%s,%s>' %(key_type, value_type)
+						return 'auto %s = std::shared_ptr<%s>(new %s%s);' %(target, map_type, map_type, initlist)
 
 
 						## c++11 shared pointer
