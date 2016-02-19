@@ -1846,6 +1846,7 @@ regular Python has no support for.
 				elif node.left.func.id == '__go__map__':
 					key_type = self.visit(node.left.args[0])
 					value_type = self.visit(node.left.args[1])
+					value_vec  = None
 					if isinstance(node.left.args[0], ast.Str):
 						key_type = node.left.args[0].s
 						if key_type.startswith('['):
@@ -1853,8 +1854,8 @@ regular Python has no support for.
 					if isinstance(node.left.args[1], ast.Str):
 						value_type = node.left.args[1].s
 						if value_type.startswith('[]'):
-							T = value_type.split(']')[-1]
-							value_type = 'std::vector<%s>' % T
+							value_vec = value_type.split(']')[-1]
+							value_type = 'std::vector<%s>*' % value_vec
 
 					if key_type == 'string':
 						key_type = 'std::string'
@@ -1865,14 +1866,16 @@ regular Python has no support for.
 							k = self.visit(node.right.keys[i])
 							v = self.visit(node.right.values[i])
 							if v.startswith('[') and v.endswith(']'):
-								v = '{' + v[1:-1] + '}'
+								v = ('new std::vector<%s>{'%value_vec) + v[1:-1] + '}'
 							items.append('{%s, %s}' %(k,v))
 
 						right = '{%s}' %'\n,'.join(items)
 
 					## TODO check where this is used,
 					## this should actually return the map wrapped in std::shared_ptr
-					return 'std::map<%s, %s>%s' %(key_type, value_type, right)
+					map_type = 'std::map<%s,%s>' %(key_type, value_type)
+					#return 'std::map<%s, %s>%s' %(key_type, value_type, right)
+					return 'std::shared_ptr<%s>(new %s%s)' %(map_type, map_type, right)
 				else:
 					if isinstance(node.right, ast.Name):
 						raise SyntaxError(node.right.id)

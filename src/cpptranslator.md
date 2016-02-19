@@ -74,8 +74,9 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 		return False
 
 	def visit_Assert(self, node):
-		t = self.visit(node.test)
-		return 'if (!(%s)) {throw std::runtime_error("assertion failed: %s"); }' %(t,t)
+		t = ts = self.visit(node.test)
+		ts = ts.replace('"', '\\"')
+		return 'if (!(%s)) {throw std::runtime_error("assertion failed: %s"); }' %(t,ts)
 
 
 	def visit_ImportFrom(self, node):

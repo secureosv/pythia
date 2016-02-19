@@ -9,4 +9,4 @@ mymap = {
 def main():
 	print mymap
 	assert mymap['key1'][0]==1
-	assert mymap['key1'][1]==2
+	assert mymap['key2'][1]==5
