@@ -36,7 +36,8 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 
 	def visit_Return(self, node):
 		if isinstance(node.value, ast.Tuple):
-			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
+			## initializer list ##
+			return 'return {%s};' % ', '.join(map(self.visit, node.value.elts))
 		if node.value:
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
 				if self._memory[-1]=='STACK':
@@ -59,7 +60,10 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				v = 'make_ready_future<%s>(%s)' %(T,F)
 			else:
 				v = self.visit(node.value)
-			return 'return %s;' % v
+			try:
+				return 'return %s;' % v
+			except:
+				raise RuntimeError(v)
 		else:
 			return 'return;'
 

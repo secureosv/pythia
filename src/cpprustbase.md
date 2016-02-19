@@ -1733,7 +1733,10 @@ handles all special calls
 			#########################################
 			if self._classes[fname]._requires_init:
 				if not isinstance(self._stack[-2], ast.Assign) and self._memory[-1]=='HEAP':
-					if self._assign_node:
+					if isinstance(self._stack[-2], ast.ListComp):
+						return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+
+					elif self._assign_node:
 						argname = '%s_%s' %(fname, int(id(node)))
 						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
 						if not self._assign_pre:
@@ -1750,8 +1753,12 @@ handles all special calls
 						argname = '%s_%s' %(fname, int(id(node)))
 						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
 						return pre
+					elif isinstance(self._stack[-2], ast.Return):
+						pass
 					else:
-						raise SyntaxError(self.format_error('heap mode requires objects are assigned to variables on initialization: %s' %fname))
+						raise SyntaxError(self.format_error('heap mode requires objects are assigned to variables on initialization: %s' %self._stack[-2]))
+
+					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
 
 
 				else:
@@ -3661,6 +3668,14 @@ because they need some special handling in other places.
 				compnode = error[0]
 
 				if not isinstance(node.value, ast.BinOp):
+					## try to guess type of list comprehension ##
+					if isinstance(compnode.elt, ast.Call) and isinstance(compnode.elt.func, ast.Name) and compnode.elt.func.id in self._classes:
+						return self._listcomp_helper(
+							compnode,
+							target=target,
+							type=compnode.elt.func.id
+						)
+
 					raise SyntaxError( self.format_error('untyped list comprehension') )
 
 				comptarget = None
