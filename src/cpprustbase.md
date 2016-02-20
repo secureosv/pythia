@@ -3189,6 +3189,7 @@ List Comp
 		assert type
 		isprim = self.is_prim_type(type)
 		slice_hack = False
+		self._known_arrays[target] = type
 
 		gen = node.generators[0]
 		try:
@@ -3222,8 +3223,11 @@ List Comp
 					range_n.append( self.visit(gen.iter.args[1]) )
 					range_n.append( self.visit(gen.iter.args[2]) )
 
-		compname = '_comp_%s' %target
 		out = []
+		compname = target
+		if self._memory[-1]=='HEAP':
+			compname = '_comp_%s' %target
+
 		if self._rust:
 			if range_n:
 				if len(range_n)==1:
@@ -3274,7 +3278,9 @@ List Comp
 				subvectype = 'std::vector<%s>' %type
 				#out.append('std::vector<%s> %s;' %(type,compname))
 			else:
-				if not self._shared_pointers:
+				if self._memory[-1]=='STACK':
+					subvectype = 'std::vector<%s>' %type
+				elif not self._shared_pointers:
 					subvectype = 'std::vector<%s*>' %type
 				elif self._unique_ptr:
 					subvectype = 'std::vector<std::unique_ptr<%s>>' %type
@@ -3325,7 +3331,7 @@ List Comp
 					if not self._shared_pointers:
 						r += '%s* %s = &_ref_%s;' %(type, tmp, tmp)
 					elif self._unique_ptr:
-						r += 'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(type, tmp, type, tmp)
+						r += 'std::unique_ptr<%s> %s = std::make_unique<%s>(_ref_%s);' %(type, tmp, type, tmp)
 					else:
 						r += 'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(type, tmp, type, tmp)
 					out.append( r )
@@ -3339,11 +3345,12 @@ List Comp
 
 			## TODO vector.resize if size is given
 			if self._memory[-1]=='STACK':
-				out.append(self.indent()+'auto %s = %s;' %(target, compname))
+				#out.append(self.indent()+'auto %s = %s;' %(target, compname))
+				pass
 			elif not self._shared_pointers:
 				out.append(self.indent()+'auto %s = &%s;' %(target, compname))
 			elif self._unique_ptr:
-				out.append(self.indent()+'auto %s = _make_unique<%s>(%s);' %(target, vectype, compname))
+				out.append(self.indent()+'auto %s = std::make_unique<%s>(%s);' %(target, vectype, compname))
 			else:
 				out.append(self.indent()+'auto %s = std::make_shared<%s>(%s);' %(target, vectype, compname))
 

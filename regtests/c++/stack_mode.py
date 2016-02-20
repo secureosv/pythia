@@ -72,6 +72,12 @@ with stack:
 			assert f is None
 		print 'foos initalized to None ok'
 
+		comp = [ Bar('hello') for i in range(10) ]
+		assert len(comp)==10
+		comp.append( Bar('world') )
+		assert len(comp)==11
+
+
 
 def main():
 	stack_test()
