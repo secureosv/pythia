@@ -77,6 +77,10 @@ with stack:
 		comp.append( Bar('world') )
 		assert len(comp)==11
 
+		s = []Bar()
+		s.append( Bar('xxx') )
+		assert len(s)==1
+
 
 
 def main():

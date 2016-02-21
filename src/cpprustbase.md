@@ -3101,7 +3101,10 @@ Also swaps `.` for c++ namespace `::` by checking if the value is a Name and the
 			return '%s->%s' %(name, attr)
 
 		elif self._cpp and name in self._known_pointers:
-			return '%s->%s' %(name, attr)
+			if name in self._known_arrays and attr=='append':
+				return '%s->push_back' %name
+			else:
+				return '%s->%s' %(name, attr)
 
 		elif (name in self._known_instances or name in self._known_arrays) and not isinstance(parent_node, ast.Attribute):
 			if self._cpp:
