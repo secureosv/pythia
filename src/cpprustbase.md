@@ -3395,11 +3395,12 @@ because they need some special handling in other places.
 
 		if isinstance(node.targets[0], ast.Name) and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='range':
 			self._known_arrays[node.targets[0].id] = 'int'
-			if len(node.value.args)==1:
-				alen = self.visit(node.value.args[0])
-				self._known_arrays[node.targets[0].id] = ('int', alen)
-				if not len(self._function_stack):
-					self._global_arrays[node.targets[0].id] = ('int', alen)
+			## TODO move this to new builtin `fixedrange(...)`
+			#if len(node.value.args)==1:
+			#	alen = self.visit(node.value.args[0])
+			#	self._known_arrays[node.targets[0].id] = ('int', alen)
+			#	if not len(self._function_stack):
+			#		self._global_arrays[node.targets[0].id] = ('int', alen)
 
 		#######################
 		if isinstance(node.targets[0], ast.Tuple):
@@ -3409,7 +3410,19 @@ because they need some special handling in other places.
 			assert not self._cpp
 		elif isinstance(node.targets[0], ast.Name) and node.targets[0].id in self._known_arrays and isinstance(self._known_arrays[node.targets[0].id], tuple):
 			target = self.visit(node.targets[0])
-			value = self.visit(node.value)
+			value = None
+			if isinstance(node.value, ast.Subscript):
+				if isinstance(node.value.slice, ast.Slice):
+					if not node.value.slice.lower and not node.value.slice.upper and not node.value.slice.step:
+						value = self.visit(node.value.value)
+					else:
+						raise SyntaxError(self.format_error('invalid slice assignment to a fixed size array'))
+				else:
+					raise SyntaxError(self.format_error('invalid assignment to a fixed size array'))
+
+			if value is None:
+				value = self.visit(node.value)
+
 			atype, fixed_size = self._known_arrays[target]
 
 			if '(' in value and ')' in value:  ## do not unroll from a function call
