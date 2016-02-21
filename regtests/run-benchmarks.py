@@ -137,7 +137,11 @@ for name in BENCHES:
 		#times['rust'] = runbench('./bench', nametyped, 'rust')
 
 		if '--go' in sys.argv:
-			times['go'] = runbench('./bench', nametyped, 'go')
+			gotyped = name.replace('.py','-typed-go.py')
+			if os.path.isfile('./bench/'+gotyped):
+				times['go'] = runbench('./bench', gotyped, 'go')
+			else:
+				times['go'] = runbench('./bench', nametyped, 'go')
 
 
 		times['c++']  = runbench('./bench', nametyped, 'c++')

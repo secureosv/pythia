@@ -8,22 +8,25 @@ def copy_list( a:[]int, n:int ) -> [][]int:
 	for i in range(n):
 		b = a[:]
 		for j in range(10):
-			b.push_back( j )
-		x.append( b )
+			b.append( j )
+		x.append( b[...] )
 	return x
 
 def test():
 	a = range(1000)
-	times = []double()
+	times = []float64()
 	for i in range(4):
 		t0 = clock()
-		res = copy_list(a, 10000)
+		_ = copy_list(a, 10000)
 		tk = clock()
 		times.append(tk - t0)
-	avg = sumd(times) / len(times)
+	avg = 0.0
+	for t in times:
+		avg += t
+	avg /= float64( len(times) )
 	print(avg)
 
 def main():
+	print 'starting...'
 	test()
 
-main()

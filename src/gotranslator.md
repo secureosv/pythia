@@ -1169,16 +1169,23 @@ class GoGenerator( JSGenerator ):
 							self._known_instances[target] = cname
 							#raise SyntaxError('xxxxxxxxx %s - %s' % (self.visit(node.value), target ) )
 							raise GenerateGenericSwitch( {'target':target, 'value':value, 'class':cname, 'method':node.value.func.attr} )
-					return '%s := %s;' % (target, value)
 
+					if target=='_':
+						return '%s = %s;' % (target, value)
+					else:
+						return '%s := %s;' % (target, value)
 
 				elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
 					if node.value.func.id in self._classes:
 						#raise SyntaxError(value+' in classes')
 						self._known_instances[ target ] = node.value.func.id
 
-					return '%s := %s;' % (target, value)
-
+					if target=='_':
+						return '%s = %s;' % (target, value)
+					else:
+						return '%s := %s;' % (target, value)
+				elif target=='_':
+					return '%s = %s;' % (target, value)
 				else:
 					return '%s := %s;' % (target, value)
 
