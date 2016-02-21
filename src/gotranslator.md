@@ -308,7 +308,7 @@ class GoGenerator( JSGenerator ):
 
 	def visit_Subscript(self, node):
 		if isinstance(node.slice, ast.Ellipsis):
-			raise NotImplementedError( 'ellipsis')
+			return '(*%s)' %self.visit(node.value)
 		else:
 			## deference pointer and then index
 			if isinstance(node.slice, ast.Slice):
@@ -1127,64 +1127,68 @@ class GoGenerator( JSGenerator ):
 		if isinstance(node.value, ast.BinOp) and self.visit(node.value.op)=='<<' and isinstance(node.value.left, ast.Name) and node.value.left.id=='__go__send__':
 			value = self.visit(node.value.right)
 			return '%s <- %s;' % (target, value)
-
-		elif not self._function_stack:
-			value = self.visit(node.value)
-			#return 'var %s = %s;' % (target, value)
-			if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in self._classes:
-				#value = '__new__' + value
-				return 'var %s *%s = %s;' % (target, node.value.func.id, value)
-			else:
-				return 'var %s = %s;' % (target, value)
-
-		elif isinstance(node.targets[0], ast.Name) and node.targets[0].id in self._vars:
-			value = self.visit(node.value)
-			self._vars.remove( target )
-			self._known_vars.add( target )
-
-			if value.startswith('&[]*') and self._catch_assignment:
-				self._known_arrays[ target ] = self._catch_assignment['class']
-
-
-			if value.startswith('&(*') and '[' in value and ']' in value:  ## slice hack
-				v = value[1:]
-				self._slice_hack_id += 1
-				return '__slice%s := %s; %s := &__slice%s;' %(self._slice_hack_id, v, target, self._slice_hack_id)
-
-			elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and isinstance(node.value.func.value, ast.Name):
-				varname = node.value.func.value.id
-				if varname in self._known_vars:
-					#raise SyntaxError(varname + ' is known class::' + self._known_instances[varname] + '%s(%s)' % (fname, args))
-					cname = self._known_instances[varname]
-					if node.value.func.attr in self.method_returns_multiple_subclasses[ cname ]:
-						self._known_instances[target] = cname
-						#raise SyntaxError('xxxxxxxxx %s - %s' % (self.visit(node.value), target ) )
-						raise GenerateGenericSwitch( {'target':target, 'value':value, 'class':cname, 'method':node.value.func.attr} )
-				return '%s := %s;' % (target, value)
-
-
-			elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
-				if node.value.func.id in self._classes:
-					#raise SyntaxError(value+' in classes')
-					self._known_instances[ target ] = node.value.func.id
-
-				return '%s := %s;' % (target, value)
-
-			else:
-				return '%s := %s;' % (target, value)
-
 		else:
-			value = self.visit(node.value)
-			#if '<-' in value:
-			#	raise RuntimeError(target+value)
-			if value.startswith('&make('):
-				#raise SyntaxError(value)
-				v = value[1:]
-				return '_tmp := %s; %s = &_tmp;' %(v, target)
+			value = None
+			if isinstance(node.value, ast.Subscript) and isinstance(node.value.slice, ast.Slice):
+				if not node.value.slice.lower and not node.value.slice.upper and not node.value.slice.step:  ## copy array
+					value = self.visit(node.value.value)
+
+			if value is None:
+				value = self.visit(node.value)
+
+			if not self._function_stack:
+				if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in self._classes:
+					#value = '__new__' + value
+					return 'var %s *%s = %s;' % (target, node.value.func.id, value)
+				else:
+					return 'var %s = %s;' % (target, value)
+
+			elif isinstance(node.targets[0], ast.Name) and node.targets[0].id in self._vars:
+				self._vars.remove( target )
+				self._known_vars.add( target )
+
+				if value.startswith('&[]*') and self._catch_assignment:
+					self._known_arrays[ target ] = self._catch_assignment['class']
+
+
+				if value.startswith('&(*') and '[' in value and ']' in value:  ## slice hack
+					v = value[1:]
+					self._slice_hack_id += 1
+					return '__slice%s := %s; %s := &__slice%s;' %(self._slice_hack_id, v, target, self._slice_hack_id)
+
+				elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and isinstance(node.value.func.value, ast.Name):
+					varname = node.value.func.value.id
+					if varname in self._known_vars:
+						#raise SyntaxError(varname + ' is known class::' + self._known_instances[varname] + '%s(%s)' % (fname, args))
+						cname = self._known_instances[varname]
+						if node.value.func.attr in self.method_returns_multiple_subclasses[ cname ]:
+							self._known_instances[target] = cname
+							#raise SyntaxError('xxxxxxxxx %s - %s' % (self.visit(node.value), target ) )
+							raise GenerateGenericSwitch( {'target':target, 'value':value, 'class':cname, 'method':node.value.func.attr} )
+					return '%s := %s;' % (target, value)
+
+
+				elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
+					if node.value.func.id in self._classes:
+						#raise SyntaxError(value+' in classes')
+						self._known_instances[ target ] = node.value.func.id
+
+					return '%s := %s;' % (target, value)
+
+				else:
+					return '%s := %s;' % (target, value)
+
 			else:
-				#if value.startswith('&[]*') and self._catch_assignment:
-				#	raise SyntaxError(value)
-				return '%s = %s;' % (target, value)
+				#if '<-' in value:
+				#	raise RuntimeError(target+value)
+				if value.startswith('&make('):
+					#raise SyntaxError(value)
+					v = value[1:]
+					return '_tmp := %s; %s = &_tmp;' %(v, target)
+				else:
+					#if value.startswith('&[]*') and self._catch_assignment:
+					#	raise SyntaxError(value)
+					return '%s = %s;' % (target, value)
 
 	def visit_While(self, node):
 		cond = self.visit(node.test)

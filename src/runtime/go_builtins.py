@@ -79,16 +79,18 @@ func range1( x int ) *[]int {
 
 func range2( start int, stop int ) *[]int {
 	arr := make([]int, stop-start)
+	j := 0
 	for i := start; i < stop; i++ {
-		arr[i]=i
+		arr[j]=i; j++
 	}
 	return &arr
 }
 
 func range3( start int, stop int, step int ) *[]int {
 	arr := make([]int, stop-start)
+	j := 0
 	for i := start; i < stop; i+=step {
-		arr[i]=i
+		arr[j]=i; j++
 	}
 	return &arr
 }

@@ -18,16 +18,16 @@ def main():
 	assert b[0]==100
 	assert b[1]==200
 
-	#c = a[:2]
-	#TestError( len(c)==2 )
+	c = a[:2]
+	assert len(c)==2
 
-	#d = range(10)
-	#TestError(len(d)==10)
-	#d.append(99)
-	#TestError(len(d)==11)
+	d = range(10)
+	assert len(d)==10
+	d.append(99)
+	assert len(d)==11
 
-	#e = range(2,10)
-	#TestError(len(e)==8)
+	e = range(2,10)
+	assert len(e)==8
 
 	#f = range(2,10, 2)
-	#TestError(len(f)==4)
+	#assert len(f)==4
