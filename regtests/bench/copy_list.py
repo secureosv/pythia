@@ -1,13 +1,9 @@
 '''copy list micro benchmark'''
 
 from time import time
+from runtime import *
 
-def main():
-	if PYTHON=='PYTHONJS':
-		pythonjs.configure( direct_operator='+' )
-		pythonjs.configure( direct_keys=True )
-		pass
-
+def test():
 	a = list(range(1000))
 	times = []
 	for i in range(4):
@@ -27,3 +23,9 @@ def copy_list( a, n ):
 		x.append( b )
 	return x
 
+
+
+def main():
+	test()
+
+main()

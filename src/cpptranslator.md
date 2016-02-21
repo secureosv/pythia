@@ -658,7 +658,9 @@ negative slice is not fully supported, only `-1` literal works.
 			return '\n'.join(slice)
 
 		elif type:
-			slice = ['/* <slice> %s : %s : %s */' %(lower, upper, step)]
+			slice = ['/*<<slice>> `%s` [%s:%s:%s] %s */' %(value, lower, upper, step, type)]
+			if '<' in type and '>' in type:
+				type = type.split('<')[-1].split('>')[0]
 
 			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO
 				if self._memory[-1]=='STACK':
@@ -817,7 +819,9 @@ negative slice is not fully supported, only `-1` literal works.
 			return '\n'.join(slice)
 
 		else:  ## SEGFAULTS - TODO FIXME
-			raise RuntimeError('todo fix slice unknown type')
+			#raise RuntimeError('todo fix slice unknown type')
+			return 'auto %s( %s->begin(), %s->end() );' %(target, value, value)
+
 			## note: `auto` can not be used to make c++11 guess the type from a constructor that takes start and end iterators.
 			#return 'auto _ref_%s( %s->begin()+START, %s->end()+END ); auto %s = &_ref_%s;' %(target, val, val, target, target)
 			#return 'std::vector<int> _ref_%s( %s->begin(), %s->end() ); auto %s = &_ref_%s;' %(target, val, val, target, target)

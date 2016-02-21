@@ -103,9 +103,10 @@ BENCHES = [
 	#'operator_overloading_functor.py',
 	#'operator_overloading_nonfunctor.py',
 	#'operator_overloading.py',
-	'add.py',
+	#'add.py',
 	#'float.py',
 	#'pystone.py',
+	'copy_list.py',
 ]
 TYPED = [
 	'fannkuch.py',
@@ -114,6 +115,7 @@ TYPED = [
 	'richards.py',
 	'operator_overloading.py',
 	'add.py',
+	'copy_list.py',
 ]
 
 for name in BENCHES:

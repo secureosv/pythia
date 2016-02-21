@@ -89,6 +89,12 @@ double sumd(std::shared_ptr<std::vector<double>> arr) {
 	std::for_each(arr->begin(),arr->end(),[&](double n){s += n;});
 	return s;
 }
+double sumd(std::vector<double>* arr) {
+	double s = 0.0;
+	std::for_each(arr->begin(),arr->end(),[&](double n){s += n;});
+	return s;
+}
+
 float sumf(std::shared_ptr<std::vector<float>> arr) {
 	float s = 0.0;
 	std::for_each(arr->begin(),arr->end(),[&](float n){s += n;});
