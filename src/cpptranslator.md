@@ -761,61 +761,64 @@ negative slice is not fully supported, only `-1` literal works.
 				#		isptr = True
 				if value in self._known_pointers:
 					isptr = True
-					self._known_pointers[target] = self._known_pointers[value]
+					if self._memory[-1]=='HEAP':
+						self._known_pointers[target] = self._known_pointers[value]
 				################################
 
-				if isptr:
-					slice.append('auto %s = new std::vector<%s>(' %(target, type))					
+				if isptr and self._memory[-1]=='HEAP':
+					slice.append(self.indent()+'auto %s = new std::vector<%s>(' %(target, type))					
 				elif self._memory[-1]=='STACK':
-					slice.append('std::vector<%s> %s(' %(type,target))
+					slice.append(self.indent()+'std::vector<%s> %s(' %(type,target))
 				else:
-					slice.append('std::vector<%s> _ref_%s(' %(type,target))
+					slice.append(self.indent()+'std::vector<%s> _ref_%s(' %(type,target))
 
 				if lower:
 					if isptr:
-						slice.append('%s->begin()+%s,' %(value, lower))
+						slice.append(self.indent()+'%s->begin()+%s,' %(value, lower))
 					elif self._memory[-1]=='STACK':
-						slice.append('%s.begin()+%s,' %(value, lower))
+						slice.append(self.indent()+'%s.begin()+%s,' %(value, lower))
 					else:
-						slice.append('%s->begin()+%s,' %(value, lower))
+						slice.append(self.indent()+'%s->begin()+%s,' %(value, lower))
 				else:
-					if self._memory[-1]=='STACK':
-						slice.append('%s.begin(),' %value)
+					if isptr:
+						slice.append(self.indent()+'%s->begin(),' %value)
+					elif self._memory[-1]=='STACK':
+						slice.append(self.indent()+'%s.begin(),' %value)
 					else:
-						slice.append('%s->begin(),' %value)
+						slice.append(self.indent()+'%s->begin(),' %value)
 
 				if upper:
 					if upper < 0:
 						if self._memory[-1]=='STACK':
-							slice.append('%s.end() %s'%(value, upper))
+							slice.append(self.indent()+'%s.end() %s'%(value, upper))
 						else:
-							slice.append('%s->end() %s'%(value, upper))
+							slice.append(self.indent()+'%s->end() %s'%(value, upper))
 					else:
 						if self._memory[-1]=='STACK':
-							slice.append('%s.begin()+%s'%(value, upper))
+							slice.append(self.indent()+'%s.begin()+%s'%(value, upper))
 						else:
-							slice.append('%s->begin()+%s'%(value, upper))
+							slice.append(self.indent()+'%s->begin()+%s'%(value, upper))
 
 				else:
 					if isptr:
-						slice.append('%s->end()'%value)
+						slice.append(self.indent()+'%s->end()'%value)
 					elif self._memory[-1]=='STACK':
-						slice.append('%s.end()'%value)
+						slice.append(self.indent()+'%s.end()'%value)
 					else:
-						slice.append('%s->end()'%value)
+						slice.append(self.indent()+'%s->end()'%value)
 
-				slice.append(');')
+				slice.append(self.indent()+');')
 
 			vectype = 'std::vector<%s>' %type
 
 			if self._memory[-1]=='STACK':
 				pass
 			elif not self._shared_pointers:
-				slice.append('%s* %s = &_ref_%s);' %(vectype, target, target))
+				slice.append(self.indent()+'%s* %s = &_ref_%s);' %(vectype, target, target))
 			elif self._unique_ptr:
-				slice.append('std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target))
+				slice.append(self.indent()+'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target))
 			else:
-				slice.append('std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target))
+				slice.append(self.indent()+'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target))
 			return '\n'.join(slice)
 
 		else:  ## SEGFAULTS - TODO FIXME

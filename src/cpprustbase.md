@@ -3852,12 +3852,14 @@ because they need some special handling in other places.
 						if T=='string': T = 'std::string'
 						self._known_arrays[ target ] = T
 						subvectype = 'std::vector<%s>' %T
-						if not self._shared_pointers:
-							vectype = 'std::vector< %s* >' %subvectype
+						if self._memory[-1]=='STACK':
+							vectype = 'std::vector<%s>' %subvectype
+						elif not self._shared_pointers:
+							vectype = 'std::vector<%s*>' %subvectype
 						elif self._unique_ptr:
-							vectype = 'std::vector< std::unique_ptr<%s> >' %subvectype
+							vectype = 'std::vector<std::unique_ptr<%s>>' %subvectype
 						else:
-							vectype = 'std::vector< std::shared_ptr<%s> >' %subvectype
+							vectype = 'std::vector<std::shared_ptr<%s>>' %subvectype
 
 
 						if isinstance(node.value.right, ast.Tuple):
@@ -3871,7 +3873,11 @@ because they need some special handling in other places.
 									for sarg in elt.elts:
 										if isinstance(sarg, ast.Name) and sarg.id in self._known_instances:
 											sharedptr = True
-											if not self._shared_pointers:
+											if self._memory[-1]=='STACK':
+												subvectype = 'std::vector<%s>' %T
+												vectype = 'std::vector<%s>' %subvectype
+
+											elif not self._shared_pointers:
 												subvectype = 'std::vector<%s*>' %T
 												vectype = 'std::vector<%s*>' %subvectype
 											elif self._unique_ptr:
@@ -3883,24 +3889,25 @@ because they need some special handling in other places.
 
 
 									subargs = [self.visit(sarg) for sarg in elt.elts]
-									#r.append('%s %s = {%s};' %(subvectype, subname, ','.join(subargs)))  ## direct ref
-
-									r.append('%s _r_%s = {%s};' %(subvectype, subname, ','.join(subargs)))
-
-									if not self._shared_pointers:
-										r.append(
-											'%s* %s = &_r_%s;' %(subvectype, subname, subname)
-										)
-
-									elif self._unique_ptr:
-										r.append(
-											'std::unique_ptr<%s> %s = _make_unique<%s>(_r_%s);' %(subvectype, subname, subvectype, subname)
-										)
-
+									if self._memory[-1]=='STACK':
+										r.append('%s %s = {%s};' %(subvectype, subname, ','.join(subargs)))  ## direct ref
 									else:
-										r.append(
-											'std::shared_ptr<%s> %s = std::make_shared<%s>(_r_%s);' %(subvectype, subname, subvectype, subname)
-										)
+										r.append(self.indent()+'%s _r_%s = {%s};' %(subvectype, subname, ','.join(subargs)))
+
+										if not self._shared_pointers:
+											r.append(
+												self.indent()+'%s* %s = &_r_%s;' %(subvectype, subname, subname)
+											)
+
+										elif self._unique_ptr:
+											r.append(
+												self.indent()+'std::unique_ptr<%s> %s = _make_unique<%s>(_r_%s);' %(subvectype, subname, subvectype, subname)
+											)
+
+										else:
+											r.append(
+												self.indent()+'std::shared_ptr<%s> %s = std::make_shared<%s>(_r_%s);' %(subvectype, subname, subvectype, subname)
+											)
 
 								elif isinstance(elt, ast.ListComp):
 									r.extend(result)
@@ -3909,21 +3916,26 @@ because they need some special handling in other places.
 								else:
 									args.append( self.visit(elt) )
 
-							r.append('%s _ref_%s = {%s};' %(vectype, target, ','.join(args)))
+							if self._memory[-1]=='STACK':
+								r.append(self.indent()+'%s %s = {%s};' %(vectype, target, ','.join(args)))
 
-							if not self._shared_pointers:
-								r.append(
-									'%s* %s = &_ref_%s;' %(vectype, target, target)
-								)
-
-							elif self._unique_ptr:
-								r.append(
-									'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target)
-								)
 							else:
-								r.append(
-									'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target)
-								)
+								r.append(self.indent()+'%s _ref_%s = {%s};' %(vectype, target, ','.join(args)))
+
+								if not self._shared_pointers:
+									r.append(
+										self.indent()+'%s* %s = &_ref_%s;' %(vectype, target, target)
+									)
+
+								elif self._unique_ptr:
+									r.append(
+										self.indent()+'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target)
+									)
+								else:
+									r.append(
+										self.indent()+'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target)
+									)
+
 							return (self.indent()+'\n').join(r)
 
 						elif isinstance(node.value.right, ast.ListComp):

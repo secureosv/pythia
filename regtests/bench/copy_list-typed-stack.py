@@ -9,7 +9,7 @@ with stack:
 			b = a[:]
 			for j in range(10):
 				b.push_back( j )
-			x.append( b )
+			x.push_back( b )
 		return x
 
 	def test():
@@ -17,7 +17,7 @@ with stack:
 		times = []double()
 		for i in range(4):
 			t0 = clock()
-			res = copy_list(a, 10000)
+			res = copy_list(addr(a), 10000)
 			tk = clock()
 			times.append(tk - t0)
 		avg = sumd(times) / len(times)
