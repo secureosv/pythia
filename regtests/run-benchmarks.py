@@ -102,8 +102,8 @@ BENCHES = [
 	#'nbody.py',
 	#'operator_overloading_functor.py',
 	#'operator_overloading_nonfunctor.py',
-	'operator_overloading.py',
-	#'add.py',
+	#'operator_overloading.py',
+	'add.py',
 	#'float.py',
 	#'pystone.py',
 ]
@@ -113,6 +113,7 @@ TYPED = [
 	'pystone.py',
 	'richards.py',
 	'operator_overloading.py',
+	'add.py',
 ]
 
 for name in BENCHES:
@@ -132,8 +133,10 @@ for name in BENCHES:
 	if name in TYPED:
 		nametyped = name.replace('.py','-typed.py')
 		#times['rust'] = runbench('./bench', nametyped, 'rust')
-		#try: times['go']   = runbench('./bench', nametyped, 'go')
-		#except: pass
+
+		if '--go' in sys.argv:
+			times['go'] = runbench('./bench', nametyped, 'go')
+
 
 		times['c++']  = runbench('./bench', nametyped, 'c++')
 		if os.path.isfile('rusthon-c++-build.gcda'):

@@ -4,20 +4,21 @@ loop and add (integer)
 from time import clock
 
 class A:
-	def __init__(self, x,y,z):
+	def __init__(self, x:int,y:int,z:int):
 		self.x = x; self.y = y; self.z = z
 
-	def add(self, other):
-		return A(self.x+other.x, self.y+other.y, self.z+other.z)
+	def add(self, other:A) ->A:
+		a = A(self.x+other.x, self.y+other.y, self.z+other.z)
+		return a
 
-	def iadd(self, other):
+	def iadd(self, other:A):
 		self.x += other.x
 		self.y += other.y
 		self.z += other.z
 
 class M:
 
-	def f2(self, step, a, b, c, x,y,z):
+	def f2(self, step:int, a:A, b:A, c:A, x:int,y:int,z:int) ->A:
 		s = A(0,0,0)
 		for j in range(step):
 			u = A(x,y,z)
@@ -25,7 +26,7 @@ class M:
 			s.iadd(w)
 		return s
 
-	def f1(self, x, y, a, b, c ):
+	def f1(self, x:int, y:int, a:A, b:A, c:A ) -> A:
 		w = A(0,0,0)
 		flip = False
 		for i in range(x):
@@ -49,5 +50,3 @@ def main():
 	w = m.f1(xsteps, ysteps, a,b,c)
 	print(clock()-start)
 	print(w)  ## go will not allow unused variables
-
-main()
