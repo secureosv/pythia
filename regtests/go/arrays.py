@@ -29,5 +29,11 @@ def main():
 	e = range(2,10)
 	assert len(e)==8
 
-	#f = range(2,10, 2)
-	#assert len(f)==4
+	f = range(2,10, 2)
+	assert len(f)==4
+
+	print 'testing 2d array'
+	s = [][]int()
+	print s
+
+	print 'OK'

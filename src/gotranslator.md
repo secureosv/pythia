@@ -1132,9 +1132,13 @@ class GoGenerator( JSGenerator ):
 			if isinstance(node.value, ast.Subscript) and isinstance(node.value.slice, ast.Slice):
 				if not node.value.slice.lower and not node.value.slice.upper and not node.value.slice.step:  ## copy array
 					value = self.visit(node.value.value)
+					self._known_arrays[target] = '?'
 
 			if value is None:
 				value = self.visit(node.value)
+				## temp hack for 2D arrays
+				if value.startswith('(*[][]') and value.endswith(')') and ' << ' in value:
+					value = '&' + value.split('<<')[0][2:].strip()
 
 			if not self._function_stack:
 				if isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in self._classes:

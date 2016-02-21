@@ -87,7 +87,7 @@ func range2( start int, stop int ) *[]int {
 }
 
 func range3( start int, stop int, step int ) *[]int {
-	arr := make([]int, stop-start)
+	arr := make([]int, (stop-start)/step)
 	j := 0
 	for i := start; i < stop; i+=step {
 		arr[j]=i; j++
