@@ -661,6 +661,9 @@ negative slice is not fully supported, only `-1` literal works.
 			slice = ['/*<<slice>> `%s` [%s:%s:%s] %s */' %(value, lower, upper, step, type)]
 			if '<' in type and '>' in type:
 				type = type.split('<')[-1].split('>')[0]
+				if self._memory[-1]=='HEAP':
+					if not self.is_prim_type(type):
+						type = 'std::shared_ptr<%s>' %type
 
 			if step=="-1":  ##if step.isdigit() and int(step)<0: TODO
 				if self._memory[-1]=='STACK':
