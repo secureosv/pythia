@@ -3616,6 +3616,17 @@ because they need some special handling in other places.
 			else: ## Go
 				return '%s <- %s;' % (target, value)
 
+		elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='__go__':
+			thread = target
+			spawn_func = self.visit(node.value.args[0])
+			if isinstance(node.value.args[0], ast.Name):
+				spawn_func += '()'
+			closure_wrapper = '[&]{%s;}'%spawn_func
+			if self._memory[-1]=='STACK':
+				return 'std::thread %s( %s );' %(thread, closure_wrapper)
+			else:
+				return 'auto %s = std::shared_ptr<std::thread>( new std::thread(%s) );' %(thread, closure_wrapper)
+
 		elif not self._function_stack:  ## global level
 			value = self.visit(node.value)
 			if isinstance(value, tuple):
