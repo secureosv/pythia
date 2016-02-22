@@ -63,7 +63,7 @@ def runbench_py(path, name, interp='python3'):
 		except ValueError:
 			print line
 
-	return str(T)
+	return T
 
 def runbench(path, name, backend='javascript', pgo=False):
 	cmd = [
@@ -94,21 +94,25 @@ def runbench(path, name, backend='javascript', pgo=False):
 		js = name[:-2] + 'js'
 		passed[ name ] = open('/tmp/'+js).read().split('/*end-builtins*/')[-1]
 
-	return str(T)
+	return T
 
 BENCHES = [
-	#'richards.py',
+	'recursive_fib.py',
 	#'fannkuch.py',
-	#'nbody.py',
-	#'operator_overloading_functor.py',
-	#'operator_overloading_nonfunctor.py',
 	#'operator_overloading.py',
 	#'add.py',
 	#'float.py',
+	#'copy_list.py',
+
+
+	#'richards.py',
+	#'nbody.py',
+	#'operator_overloading_functor.py',
+	#'operator_overloading_nonfunctor.py',
 	#'pystone.py',
-	'copy_list.py',
 ]
 TYPED = [
+	'recursive_fib.py',
 	'fannkuch.py',
 	'float.py',
 	'pystone.py',
@@ -118,9 +122,19 @@ TYPED = [
 	'copy_list.py',
 ]
 
+VsPython = {
+	'pypy' : [],
+	'javascript':[],
+	'c++' : [],
+	'c++stack' : [],
+	'go' : [],
+}
+
+
 for name in BENCHES:
 	print name
 	times = {}
+
 	#try:
 	#	times['rapyd'] = runbench_rs('./bench', name)
 	#except:
@@ -136,12 +150,11 @@ for name in BENCHES:
 		nametyped = name.replace('.py','-typed.py')
 		#times['rust'] = runbench('./bench', nametyped, 'rust')
 
-		if '--go' in sys.argv:
-			gotyped = name.replace('.py','-typed-go.py')
-			if os.path.isfile('./bench/'+gotyped):
-				times['go'] = runbench('./bench', gotyped, 'go')
-			else:
-				times['go'] = runbench('./bench', nametyped, 'go')
+		gotyped = name.replace('.py','-typed-go.py')
+		if os.path.isfile('./bench/'+gotyped):
+			times['go'] = runbench('./bench', gotyped, 'go')
+		elif '--go' in sys.argv:
+			times['go'] = runbench('./bench', nametyped, 'go')
 
 
 		times['c++']  = runbench('./bench', nametyped, 'c++')
@@ -172,24 +185,24 @@ for name in BENCHES:
 		perf_header.append('ylabel=seconds')
 
 	perf = [
-		'Python3 ' + times['python'],
-		'PyPy ' + times['pypy'],
-		'Pythia->JS ' + times['javascript'],
+		'Python3 %s' % times['python'],
+		'PyPy %s' % times['pypy'],
+		'Pythia->JS %s' % times['javascript'],
 	]
 	if 'rapyd' in times:
-		perf.append('RapydScript ' + times['rapyd'])
+		perf.append('RapydScript %s' % times['rapyd'])
 	if 'c++' in times:
-		perf.append('Pythia->C++ ' + times['c++'])
+		perf.append('Pythia->C++ %s' % times['c++'])
 
 	if 'c++stack' in times:
-		perf.append('Pythia->C++STACK ' + times['c++stack'])
+		perf.append('Pythia->C++STACK %s' % times['c++stack'])
 
 	if 'c++PGO' in times:
-		perf.append('Pythia->C++PGO ' + times['c++PGO'])
+		perf.append('Pythia->C++PGO %s' % times['c++PGO'])
 
 
 	if 'go' in times:
-		perf.append('Pythia->Go ' + times['go'])
+		perf.append('Pythia->Go %s' % times['go'])
 
 
 	perf_path = '/tmp/%s.perf' %name
@@ -204,4 +217,49 @@ for name in BENCHES:
 		'./bench/%s.png' % name
 	])
 
+	for tag in times:
+		if tag=='python':
+			continue
+		score = times['python'] / times[tag]
+		print '%s: %s times faster than python' %(tag, score)
+		VsPython[tag].append(score)
 
+print VsPython
+
+if len(BENCHES) > 4:
+
+	Titles = {
+		'python' : 'Python3 %s',
+		'pypy' : 'PyPy %s',
+		'javascript' : 'Pythia->JS %s',
+		'c++' : 'Pythia->C++ %s',
+		'c++stack' : 'Pythia->C++STACK %s',
+		'go' : 'Pythia->GO %s',
+	}
+
+	perf = [
+		'font=Helvetica',
+		'fontsz=12',
+		'=color_per_datum',
+		'yformat=%g',
+		'ylabel=speed'
+	]
+
+	for key in VsPython:
+		if VsPython[key] and key in Titles and len(VsPython[key]) >= 4:
+			scores = VsPython[key]
+			avg =  sum(scores) / len(scores)
+			perf.append( Titles[key] % avg )
+
+	name = 'speed-vs-python'
+	perf_path = '/tmp/%s.perf' %name
+	open( perf_path, 'wb' ).write( '\n'.join( perf ).encode('utf-8') )
+	os.system( './bargraph.pl -eps %s > /tmp/%s.eps' %(perf_path,name))
+	subprocess.check_call([
+		'convert', 
+		'-density', '400', 
+		'/tmp/%s.eps' % name, 
+		'-resize', '1400x1600', 
+		'-transparent', 'white',
+		'./bench/%s.png' % name
+	])
