@@ -3296,16 +3296,17 @@ class PythonToPythonJS(NodeVisitorBase):
 				if a: writer.write(a)
 			self._with_ll = False
 
-		elif isinstance( node.context_expr, Name ) and node.context_expr.id == 'javascript':  ## deprecated
-			raise RuntimeError('with javascript deprecated')
-		elif isinstance( node.context_expr, Name ) and node.context_expr.id == 'python':  ## deprecated
-			raise RuntimeError('with python deprecated')
 
-		elif isinstance( node.context_expr, Name ) and node.context_expr.id == 'fastdef':
-			raise RuntimeError('with fastdef deprecated')
+		elif isinstance( node.context_expr, Name ) and node.context_expr.id == 'atomic':
+			writer.write('with %s:' %self.visit(node.context_expr))
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
 
 		elif isinstance( node.context_expr, Name ) and node.context_expr.id == 'static':
-			raise RuntimeError('with static: is deprecated')
+			raise RuntimeError('with static: is reserved for future use')
 
 		elif isinstance( node.context_expr, Name ) and node.context_expr.id in EXTRA_WITH_TYPES:
 			writer.write('with %s:' %self.visit(node.context_expr))

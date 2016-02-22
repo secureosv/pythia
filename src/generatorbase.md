@@ -832,7 +832,18 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id == 'stack':
+			if node.context_expr.id == 'atomic':
+				self._has_gnu_stm = True
+				r = ['__transaction_atomic {']
+				self.push()
+				for b in node.body:
+					a = self.visit(b)
+					if a: r.append(self.indent()+a)
+				self.pull()
+				r.append(self.indent()+'}')
+				return '\n'.join(r)
+
+			elif node.context_expr.id == 'stack':
 				self._memory.append('STACK')
 				r = []
 				for b in node.body:

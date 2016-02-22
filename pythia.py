@@ -1534,7 +1534,7 @@ def build( modules, module_path, datadirs=None ):
 			)
 			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
 
-		else:
+		else:  ## regular linux build
 
 			for n in output['datafiles'].keys():
 				if '/' in n:
@@ -1549,6 +1549,11 @@ def build( modules, module_path, datadirs=None ):
 				cmd.extend(['g++-4.9', '-std=c++1y'])
 			else:
 				cmd.extend(['g++', '-std=c++11'])
+
+
+			has_stm = '__transaction_atomic {' in data
+			if '--stm' in sys.argv or has_stm:
+				cmd.append('-fgnu-tm')
 
 			if has_seastar:
 				cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())

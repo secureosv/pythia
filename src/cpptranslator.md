@@ -334,6 +334,7 @@ casting works fine with `static_cast` and `std::static_pointer_cast`.
 		self._user_class_headers = dict()
 		self._finally_id = 0
 		self._use_try = use_try
+		self._has_gnu_stm = False
 
 	def visit_Delete(self, node):
 		targets = [self.visit(t) for t in node.targets]
