@@ -763,6 +763,8 @@ negative slice is not fully supported, only `-1` literal works.
 					isptr = True
 					if self._memory[-1]=='HEAP':
 						self._known_pointers[target] = self._known_pointers[value]
+				if self._memory[-1]=='STACK':
+					self._known_refs[target] = type
 				################################
 
 				if isptr and self._memory[-1]=='HEAP':

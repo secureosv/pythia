@@ -157,10 +157,12 @@ hooks into bad magic hack, 2nd pass rustc compile.
 				if self._cpp:
 					if arrname in self._known_arrays:
 						if isinstance(self._known_arrays[arrname], tuple):
-							lines.append('for (int __idx=0; __idx<%s; __idx++) {' %self._known_arrays[arrname][1])
+							lines.append('for (int __idx=0; __idx<%s; __idx++) { /*loop over fixed array*/' %self._known_arrays[arrname][1])
 							lines.append(self.indent()+'%s %s = %s[__idx];' %(self._known_arrays[arrname][0], target, iter))
+						elif arrname in self._known_refs:
+							lines.append('for (auto &%s: %s) { /*loop over stack vector*/' %(target, iter))
 						else:
-							lines.append('for (auto &%s: (*%s)) {' %(target, iter))
+							lines.append('for (auto &%s: (*%s)) { /*loop over heap vector*/' %(target, iter))
 					elif arrname in self._known_maps:
 						lines.append('for (auto &_pair_%s: (*%s)) {' %(target, iter))
 						lines.append('  auto %s = _pair_%s.second;')
@@ -169,7 +171,7 @@ hooks into bad magic hack, 2nd pass rustc compile.
 							lines.append('PyObject *__pyiterator = PyObject_GetIter(%s);' %iter)
 							lines.append('while (auto %s = PyIter_Next(__pyiterator)) {' %target)
 						else:
-							lines.append('for (auto &%s: *%s) {' %(target, iter))
+							lines.append('for (auto &%s: *%s) { /*loop over unknown type*/' %(target, iter))
 
 				else:
 					lines.append('for &%s in %s.borrow_mut().iter() { //magic:%s' %(target, iter, node.iter.uid))
