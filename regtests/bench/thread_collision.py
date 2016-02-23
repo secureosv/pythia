@@ -12,7 +12,7 @@ C = 0
 
 def test_globals():
 	global A, B, C
-	for i in range(10000):
+	for i in range(1024*1024):
 		A += 1
 		B += 2
 		C = A + B
@@ -22,7 +22,7 @@ def main():
 	print( 'starting threading test')
 	starttime = clock()
 	threads = []
-	for i in range(10):
+	for i in range(4):
 		t = threading.Thread( target=test_globals, args=() )
 		t.start()
 		threads.append( t )
@@ -30,6 +30,7 @@ def main():
 	for t in threads:
 		t.join()
 
+	print( clock()-starttime)
 	print( A)
 	print( B)
 	print( C)

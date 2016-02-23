@@ -97,21 +97,24 @@ def runbench(path, name, backend='javascript', pgo=False):
 	return T
 
 BENCHES = [
+	'thread_collision.py',
+]
+[
+	'pystone.py',
 	'recursive_fib.py',
-	#'fannkuch.py',
-	#'operator_overloading.py',
-	#'add.py',
-	#'float.py',
-	#'copy_list.py',
-
+	'fannkuch.py',
+	'operator_overloading.py',
+	'add.py',
+	'float.py',
+	'copy_list.py',
 
 	#'richards.py',
 	#'nbody.py',
 	#'operator_overloading_functor.py',
 	#'operator_overloading_nonfunctor.py',
-	#'pystone.py',
 ]
 TYPED = [
+	'thread_collision.py',
 	'recursive_fib.py',
 	'fannkuch.py',
 	'float.py',
@@ -143,8 +146,8 @@ for name in BENCHES:
 	times['python'] = runbench_py('./bench', name)
 	times['pypy'] = runbench_py('./bench', name, interp='pypy')
 
-
-	times['javascript'] = runbench('./bench', name, 'javascript')
+	if not name.startswith('thread_'):
+		times['javascript'] = runbench('./bench', name, 'javascript')
 
 	if name in TYPED:
 		nametyped = name.replace('.py','-typed.py')
@@ -187,8 +190,10 @@ for name in BENCHES:
 	perf = [
 		'Python3 %s' % times['python'],
 		'PyPy %s' % times['pypy'],
-		'Pythia->JS %s' % times['javascript'],
 	]
+	if 'javascript' in times:
+		perf.append('Pythia->JS %s' % times['javascript'])
+
 	if 'rapyd' in times:
 		perf.append('RapydScript %s' % times['rapyd'])
 	if 'c++' in times:
@@ -220,7 +225,10 @@ for name in BENCHES:
 	for tag in times:
 		if tag=='python':
 			continue
-		score = times['python'] / times[tag]
+		if name=='pystone.py':
+			score = times[tag] / times['python']
+		else:
+			score = times['python'] / times[tag]
 		print '%s: %s times faster than python' %(tag, score)
 		VsPython[tag].append(score)
 
