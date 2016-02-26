@@ -31,8 +31,8 @@ def main():
 		t.join()
 
 	print( clock()-starttime)
-	print( A)
-	print( B)
-	print( C)
+	print('A:', A)
+	print('B:', B)
+	print('C:', C)
 
 main()

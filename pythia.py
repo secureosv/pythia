@@ -1552,6 +1552,9 @@ def build( modules, module_path, datadirs=None ):
 
 
 			has_stm = '__transaction_atomic {' in data
+			if not has_stm:
+				has_stm = '__transaction_relaxed {' in data
+
 			if '--stm' in sys.argv or has_stm:
 				cmd.append('-fgnu-tm')
 

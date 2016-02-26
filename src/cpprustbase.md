@@ -2159,6 +2159,7 @@ TODO clean up go stuff.
 ```python
 
 	def _visit_function(self, node):
+		func_pre = []
 		out = []
 
 		is_declare = hasattr(node, 'declare_only') and node.declare_only  ## see pythonjs.py visit_With
@@ -2266,6 +2267,10 @@ TODO clean up go stuff.
 				assert self._cpp
 				out.append('/* abstractmethod: %s */' %node.name)
 				node.is_abstract = True
+			elif isinstance(decor, ast.Attribute) and decor.attr=='safe':  ## GCC STM
+				func_pre.append('__attribute__((transaction_safe))')
+			elif isinstance(decor, ast.Attribute) and decor.attr=='pure':  ## GCC STM
+				func_pre.append('__attribute__((transaction_pure))')
 
 		for name in arrays:
 			arrtype = args_typedefs[name]#arrays[ name ]
@@ -2542,6 +2547,9 @@ TODO clean up go stuff.
 			node._arg_names.append( starargs )
 
 		prefix = ''
+		if func_pre:
+			prefix +=  ' '.join(func_pre) + ' '
+
 		if options['classmethod']:
 			prefix += 'static '
 			if args and 'object ' in args[0]:  ## classmethods output from java2python produces `cls:object`

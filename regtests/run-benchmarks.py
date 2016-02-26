@@ -97,7 +97,8 @@ def runbench(path, name, backend='javascript', pgo=False):
 	return T
 
 BENCHES = [
-	'thread_collision.py',
+	'thread_shared_vector.py',
+	#'thread_collision.py',
 ]
 [
 	'pystone.py',
@@ -114,6 +115,7 @@ BENCHES = [
 	#'operator_overloading_nonfunctor.py',
 ]
 TYPED = [
+	'thread_shared_vector.py',
 	'thread_collision.py',
 	'recursive_fib.py',
 	'fannkuch.py',
@@ -127,6 +129,7 @@ TYPED = [
 
 VsPython = {
 	'pypy' : [],
+	'pypy-STM': [],
 	'javascript':[],
 	'c++' : [],
 	'c++stack' : [],
@@ -142,9 +145,14 @@ for name in BENCHES:
 	#	times['rapyd'] = runbench_rs('./bench', name)
 	#except:
 	#	pass
+	pypystm = False
+	if os.path.isfile( os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm') ):
+		pypystm = os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm')
 
 	times['python'] = runbench_py('./bench', name)
 	times['pypy'] = runbench_py('./bench', name, interp='pypy')
+	if pypystm:
+		times['pypy-stm'] = runbench_py('./bench', name, interp=pypystm)
 
 	if not name.startswith('thread_'):
 		times['javascript'] = runbench('./bench', name, 'javascript')
@@ -191,6 +199,9 @@ for name in BENCHES:
 		'Python3 %s' % times['python'],
 		'PyPy %s' % times['pypy'],
 	]
+	if 'pypy-stm' in times:
+		perf.append('PyPy-STM %s' % times['pypy-stm'])
+
 	if 'javascript' in times:
 		perf.append('Pythia->JS %s' % times['javascript'])
 
@@ -239,6 +250,7 @@ if len(BENCHES) > 4:
 	Titles = {
 		'python' : 'Python3 %s',
 		'pypy' : 'PyPy %s',
+		'pypy-stm' : 'PyPy-STM %s',
 		'javascript' : 'Pythia->JS %s',
 		'c++' : 'Pythia->C++ %s',
 		'c++stack' : 'Pythia->C++STACK %s',

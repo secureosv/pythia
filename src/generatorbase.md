@@ -832,9 +832,14 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id == 'atomic':
+			if node.context_expr.id in ('atomic', 'relaxed'):
 				self._has_gnu_stm = True
-				r = ['__transaction_atomic {']
+				r = []
+				if node.context_expr.id=='atomic':
+					r.append('__transaction_atomic {')
+				else:
+					r.append('__transaction_relaxed {')  ## slightly slower
+
 				self.push()
 				for b in node.body:
 					a = self.visit(b)
