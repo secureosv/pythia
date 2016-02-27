@@ -56,6 +56,6 @@ def main():
 
 	print clock()-starttime
 
-	print A
-	print B
-	print C
+	print 'A:', A
+	print 'B:', B
+	print 'C:', C

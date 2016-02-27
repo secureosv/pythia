@@ -33,7 +33,7 @@ def runbench_rs(path, name, strip=False):
 	T = proc.stdout.read().splitlines()[0]  ## extra lines could contain compiler warnings, etc.
 	return str(float(T.strip()))
 
-def runbench_py(path, name, interp='python3'):
+def runbench_py(path, name, interp='python3', cores=None):
 	data = open(os.path.join(path, name), 'rb').read()
 	data = data.replace('from runtime import *', '')
 	data = data.replace('with oo:', '')
@@ -41,6 +41,8 @@ def runbench_py(path, name, interp='python3'):
 	for ln in data.splitlines():
 		if ln.strip().startswith('v8->('):
 			continue
+		elif ln.startswith('THREAD=') and cores:
+			ln = 'THREAD=%s' %cores
 		lines.append(ln)
 	open('/tmp/input.py', 'wb').write('\n'.join(lines))
 
@@ -49,7 +51,6 @@ def runbench_py(path, name, interp='python3'):
 		'--convert2python=/tmp/output.py',
 		'/tmp/input.py'
 	])
-
 
 	proc = subprocess.Popen(
 		[interp, '/tmp/output.py',], stdout=subprocess.PIPE
@@ -65,7 +66,7 @@ def runbench_py(path, name, interp='python3'):
 
 	return T
 
-def runbench(path, name, backend='javascript', pgo=False):
+def runbench(path, name, backend='javascript', pgo=False, cores=None):
 	cmd = [
 		'pythia', 
 		'--'+backend,
@@ -97,7 +98,8 @@ def runbench(path, name, backend='javascript', pgo=False):
 	return T
 
 BENCHES = [
-	'thread_collision.py',
+	'thread_shared_vector.py',
+	#'thread_collision.py',
 ]
 [
 	'pystone.py',
@@ -114,6 +116,7 @@ BENCHES = [
 	#'operator_overloading_nonfunctor.py',
 ]
 TYPED = [
+	'thread_shared_vector.py',
 	'thread_collision.py',
 	'recursive_fib.py',
 	'fannkuch.py',
@@ -127,6 +130,7 @@ TYPED = [
 
 VsPython = {
 	'pypy' : [],
+	'pypy-stm': [],
 	'javascript':[],
 	'c++' : [],
 	'c++stack' : [],
@@ -142,9 +146,21 @@ for name in BENCHES:
 	#	times['rapyd'] = runbench_rs('./bench', name)
 	#except:
 	#	pass
+	pypystm = False
+	if os.path.isfile( os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm') ):
+		pypystm = os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm')
 
 	times['python'] = runbench_py('./bench', name)
 	times['pypy'] = runbench_py('./bench', name, interp='pypy')
+
+	if name.startswith('thread_'):
+		times['python(single)'] = runbench_py('./bench', name, cores=1)
+		times['pypy(single)'] = runbench_py('./bench', name, interp=pypystm, cores=1)
+
+	if pypystm:
+		times['pypy-stm'] = runbench_py('./bench', name, interp=pypystm)
+		if name.startswith('thread_'):
+			times['pypy-stm(single)'] = runbench_py('./bench', name, interp=pypystm, cores=1)
 
 	if not name.startswith('thread_'):
 		times['javascript'] = runbench('./bench', name, 'javascript')
@@ -165,6 +181,8 @@ for name in BENCHES:
 			print 'removing old .gcda (PGO dump)'
 			os.unlink('rusthon-c++-build.gcda')
 
+		if name.startswith('thread_'):
+			times['c++(single)']  = runbench('./bench', nametyped, 'c++', cores=1)
 
 		nametyped = name.replace('.py','-typed-stack.py')
 		if os.path.isfile('./bench/'+nametyped):
@@ -191,13 +209,33 @@ for name in BENCHES:
 		'Python3 %s' % times['python'],
 		'PyPy %s' % times['pypy'],
 	]
+	if 'python(single)' in times:
+		'Python3(single) %s' % times['python(single)'],
+
+	if 'pypy(single)' in times:
+		'PyPy(single) %s' % times['pypy(single)'],
+
+	if 'pypy-stm' in times:
+		if 'pypy-stm(single)' in times:
+			perf.append('PyPy-STM(single) %s' % times['pypy-stm(single)'])
+			perf.append('PyPy-STM(multi) %s' % times['pypy-stm'])
+		else:
+			perf.append('PyPy-STM %s' % times['pypy-stm'])
+
 	if 'javascript' in times:
 		perf.append('Pythia->JS %s' % times['javascript'])
 
 	if 'rapyd' in times:
 		perf.append('RapydScript %s' % times['rapyd'])
 	if 'c++' in times:
-		perf.append('Pythia->C++ %s' % times['c++'])
+		if 'thread' in name:
+			if 'c++(single)' in times:
+				perf.append('Pythia->C++STM(single) %s' % times['c++(single)'])
+				perf.append('Pythia->C++STM(multi) %s' % times['c++'])
+			else:
+				perf.append('Pythia->C++STM %s' % times['c++'])
+		else:
+			perf.append('Pythia->C++ %s' % times['c++'])
 
 	if 'c++stack' in times:
 		perf.append('Pythia->C++STACK %s' % times['c++stack'])
@@ -239,6 +277,7 @@ if len(BENCHES) > 4:
 	Titles = {
 		'python' : 'Python3 %s',
 		'pypy' : 'PyPy %s',
+		'pypy-stm' : 'PyPy-STM %s',
 		'javascript' : 'Pythia->JS %s',
 		'c++' : 'Pythia->C++ %s',
 		'c++stack' : 'Pythia->C++STACK %s',
