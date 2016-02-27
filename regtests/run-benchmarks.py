@@ -41,8 +41,8 @@ def runbench_py(path, name, interp='python3', cores=None):
 	for ln in data.splitlines():
 		if ln.strip().startswith('v8->('):
 			continue
-		elif ln.startswith('THREAD=') and cores:
-			ln = 'THREAD=%s' %cores
+		elif ln.startswith('THREADS=') and cores:
+			ln = 'THREADS=%s' %cores
 		lines.append(ln)
 	open('/tmp/input.py', 'wb').write('\n'.join(lines))
 
@@ -67,12 +67,24 @@ def runbench_py(path, name, interp='python3', cores=None):
 	return T
 
 def runbench(path, name, backend='javascript', pgo=False, cores=None):
+	srcpath = os.path.join(path, name)
+	if cores:
+		data = open(os.path.join(path, name), 'rb').read()
+		srcpath = '/tmp/_benchmark.py'
+		lines = []
+		for ln in data.splitlines():
+			if ln.startswith('THREADS='):
+				ln = 'THREADS=%s' %cores
+			lines.append(ln)
+		open(srcpath, 'wb').write('\n'.join(lines))
+
+
 	cmd = [
 		'pythia', 
 		'--'+backend,
 		'--v8-natives',
 		'--release',
-		os.path.join(path, name)
+		srcpath
 	]
 	if pgo:
 		cmd.append('--gcc-pgo')
@@ -150,11 +162,14 @@ for name in BENCHES:
 	if os.path.isfile( os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm') ):
 		pypystm = os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm')
 
-	times['python'] = runbench_py('./bench', name)
+	if not '--skip-python' in sys.argv:
+		times['python'] = runbench_py('./bench', name)
 	times['pypy'] = runbench_py('./bench', name, interp='pypy')
 
 	if name.startswith('thread_'):
-		times['python(single)'] = runbench_py('./bench', name, cores=1)
+		if not '--skip-python' in sys.argv:
+			times['python(single)'] = runbench_py('./bench', name, cores=1)
+
 		times['pypy(single)'] = runbench_py('./bench', name, interp=pypystm, cores=1)
 
 	if pypystm:
@@ -205,15 +220,16 @@ for name in BENCHES:
 	else:
 		perf_header.append('ylabel=seconds')
 
-	perf = [
-		'Python3 %s' % times['python'],
-		'PyPy %s' % times['pypy'],
-	]
+	perf = []
+	if 'python' in times:
+		perf.append('Python3 %s' % times['python'])
+	if 'pypy' in times:
+		perf.append('PyPy %s' % times['pypy'])
 	if 'python(single)' in times:
-		'Python3(single) %s' % times['python(single)'],
-
+		perf.append('Python3(single) %s' % times['python(single)'])
+		
 	if 'pypy(single)' in times:
-		'PyPy(single) %s' % times['pypy(single)'],
+		perf.append('PyPy(single) %s' % times['pypy(single)'])
 
 	if 'pypy-stm' in times:
 		if 'pypy-stm(single)' in times:

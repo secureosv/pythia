@@ -20,8 +20,8 @@ def is_prime(n):
 					return False
 	return True
 
-def findprimes(N):
-	for i in range(N):
+def findprimes(start, end):
+	for i in range(start, end):
 		if i not in Checked:
 			Checked.append(i)
 			if is_prime(i):
@@ -31,10 +31,12 @@ def main():
 	print( 'starting threading test')
 	starttime = clock()
 	threads = []
+	start = 0
 	for i in range(THREADS):
-		t = threading.Thread( target=findprimes, args=(1000,) )
+		t = threading.Thread( target=findprimes, args=(start, 1000,) )
 		t.start()
 		threads.append( t )
+		start += 500
 
 	for t in threads:
 		t.join()
