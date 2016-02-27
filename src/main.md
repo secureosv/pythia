@@ -1,8 +1,10 @@
-Rusthon Source Code
+Pythia Source Code
 -------------------
 
-You need to be familiar with the Python AST module to understand how Rusthon works.
+You need to be familiar with the Python AST module to understand how Pythia works.
 The best guide to Python AST is here: [Green Tree Snakes](https://greentreesnakes.readthedocs.org/en/latest/)
+
+Pythia was branched from the Rusthon project.
 
 ![toplevel](http://rusthon.github.io/Rusthon/images/RusthonToplevel.svg)
 
