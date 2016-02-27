@@ -33,8 +33,8 @@ def is_prime(n:int) ->bool:
 		return True
 
 def findprimes(start:int, end:int):
-	print 'thread:start', start
-	print 'thread:end', end
+	#print 'thread:start', start
+	#print 'thread:end', end
 
 	invec = False
 	ispri = False
@@ -42,15 +42,17 @@ def findprimes(start:int, end:int):
 	for i in range(start, end):
 		with transaction:
 			invec = in_vector(Checked, i)
-			if not invec:
+		if not invec:
+			with transaction:
 				Checked.push_back(i)
-				#with atomic:
-				ispri = is_prime(i)
-				if ispri:
-					found += 1
+			#with atomic:  ## wrapping `is_prime` in `with atomic` is slow and not required
+			ispri = is_prime(i)
+			if ispri:
+				#found += 1
+				with transaction:
 					Primes.push_back(i)
 
-	print 'thread found:', found
+	#print 'thread found:', found
 
 def main():
 	print( 'starting shared vector test')
@@ -65,8 +67,8 @@ def main():
 	for t in threads:
 		t.join()
 
-	while len(Primes) < 181:
-		sleep(0.01)
+	#while len(Primes) < 181:
+	#	sleep(0.01)
 
 	print( clock()-starttime)
 	#print(Primes)
