@@ -3629,7 +3629,10 @@ because they need some special handling in other places.
 			spawn_func = self.visit(node.value.args[0])
 			if isinstance(node.value.args[0], ast.Name):
 				spawn_func += '()'
-			closure_wrapper = '[&]{%s;}'%spawn_func
+
+			#closure_wrapper = '[&]{%s;}'%spawn_func  ## do not capture loop variants
+			closure_wrapper = '[=]{%s;}'%spawn_func
+
 			if self._memory[-1]=='STACK':
 				return 'std::thread %s( %s );' %(thread, closure_wrapper)
 			else:

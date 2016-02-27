@@ -832,7 +832,7 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id in ('atomic', 'relaxed'):
+			if node.context_expr.id in ('atomic', 'relaxed', 'transaction'):
 				self._has_gnu_stm = True
 				r = []
 				if node.context_expr.id=='atomic':
@@ -1068,7 +1068,14 @@ TODO clean up.
 				## simple auto threads
 				thread = '__thread%s__' %len(self._threads)
 				self._threads.append(thread)
-				closure_wrapper = '[&]{%s;}'%self.visit(node.args[0])
+				## do not capture all variables by reference `&`,
+				## because threads spawned in a for loop will all share
+				## references to loop variants.
+				#closure_wrapper = '[&]{%s;}'%self.visit(node.args[0])
+				## TODO: capture by reference list of arrays and objects,
+				## unknown variables default to copy into thread.
+				closure_wrapper = '[=]{%s;}'%self.visit(node.args[0])
+
 				return 'std::thread %s( %s );' %(thread, closure_wrapper)
 			elif self._rust:
 				return 'thread::spawn( move || {%s;} );' % self.visit(node.args[0])
