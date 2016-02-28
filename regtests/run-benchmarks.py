@@ -176,6 +176,7 @@ for name in BENCHES:
 		times['pypy-stm'] = runbench_py('./bench', name, interp=pypystm)
 		if name.startswith('thread_'):
 			times['pypy-stm(single)'] = runbench_py('./bench', name, interp=pypystm, cores=1)
+			times['pypy-stm(custom)'] = runbench_py('./bench', name.replace('.py','-pypy.py'), interp=pypystm)
 
 	if not name.startswith('thread_'):
 		times['javascript'] = runbench('./bench', name, 'javascript')
@@ -223,18 +224,25 @@ for name in BENCHES:
 	perf = []
 	if 'python' in times:
 		perf.append('Python3 %s' % times['python'])
-	if 'pypy' in times:
-		perf.append('PyPy %s' % times['pypy'])
 	if 'python(single)' in times:
 		perf.append('Python3(single) %s' % times['python(single)'])
 		
 	if 'pypy(single)' in times:
+		perf.append('PyPy(multi) %s' % times['pypy'])
 		perf.append('PyPy(single) %s' % times['pypy(single)'])
+		if 'pypy(custom)' in times:
+			perf.append('PyPy(custom) %s' % times['pypy(custom)'])
+	elif 'pypy' in times:
+		perf.append('PyPy %s' % times['pypy'])
 
 	if 'pypy-stm' in times:
 		if 'pypy-stm(single)' in times:
 			perf.append('PyPy-STM(single) %s' % times['pypy-stm(single)'])
 			perf.append('PyPy-STM(multi) %s' % times['pypy-stm'])
+
+			if 'pypy-stm(custom)' in times:
+				perf.append('PyPy-STM(custom) %s' % times['pypy-stm(custom)'])
+
 		else:
 			perf.append('PyPy-STM %s' % times['pypy-stm'])
 
@@ -276,15 +284,29 @@ for name in BENCHES:
 		'./bench/%s.png' % name
 	])
 
-	for tag in times:
-		if tag=='python':
-			continue
-		if name=='pystone.py':
-			score = times[tag] / times['python']
-		else:
-			score = times['python'] / times[tag]
-		print '%s: %s times faster than python' %(tag, score)
-		VsPython[tag].append(score)
+	if 'python' in times:
+
+		for tag in times:
+			if tag=='python':
+				continue
+			if name=='pystone.py':
+				score = times[tag] / times['python']
+			else:
+				score = times['python'] / times[tag]
+			print '%s: %s times faster than python' %(tag, score)
+			VsPython[tag].append(score)
+
+	elif 'pypy' in times:
+		for tag in times:
+			if tag.startswith('pypy'):
+				continue
+			if name=='pystone.py':
+				score = times[tag] / times['pypy']
+			else:
+				score = times['pypy'] / times[tag]
+			print '%s: %s times faster than pypy' %(tag, score)
+			VsPython[tag].append(score)
+
 
 print VsPython
 
