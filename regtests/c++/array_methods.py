@@ -4,23 +4,27 @@ array methods: append, pop, etc.
 
 def somefunc():
 	a = []int(1,2,3,4,5)
-	print('len a:', len(a))
+	assert 5 in a
+	assert 100 not in a
+	assert a.at(4)==5
+
+	#print('len a:', len(a))
 	assert len(a)==5
 	b = a.pop()
-	print('len a after pop:', len(a))
+	#print('len a after pop:', len(a))
 	assert len(a)==4
 	assert b==5
 
 	#b = a[len(a)-1]
 	a.pop()
-	print('len a:', len(a))
+	#print('len a:', len(a))
 	assert len(a)==3
-	print(b)
+	#print(b)
 	a.insert(0, 1000)
 	#a.insert(a.begin(), 1000)
 
-	print('len a:', len(a))
-	print(a[0])
+	#print('len a:', len(a))
+	#print(a[0])
 	assert a[0]==1000
 	assert len(a)==4
 

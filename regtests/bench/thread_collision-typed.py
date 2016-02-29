@@ -3,6 +3,7 @@ multi-threading
 '''
 
 from time import clock
+THREADS=2
 
 A = 0
 B = 0
@@ -30,7 +31,7 @@ def test_nosync():
 	C = 0
 
 	threads = []std::thread()
-	for i in range(4):
+	for i in range(THREADS):
 		t = spawn( test_globals )
 		threads.append( t )
 
@@ -47,7 +48,7 @@ def main():
 	starttime = clock()
 
 	tmthreads = []std::thread()
-	for i in range(4):
+	for i in range(THREADS):
 		t = spawn( test_globals_tm )
 		tmthreads.append( t )
 
