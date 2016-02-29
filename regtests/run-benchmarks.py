@@ -111,7 +111,7 @@ def runbench(path, name, backend='javascript', pgo=False, cores=None):
 
 BENCHES = [
 	'thread_shared_vector.py',
-	#'thread_collision.py',
+	'thread_collision.py',
 ]
 [
 	'pystone.py',
@@ -170,7 +170,7 @@ for name in BENCHES:
 		if not '--skip-python' in sys.argv:
 			times['python(single)'] = runbench_py('./bench', name, cores=1)
 
-		times['pypy(single)'] = runbench_py('./bench', name, interp=pypystm, cores=1)
+		times['pypy(single)'] = runbench_py('./bench', name, interp='pypy', cores=1)
 
 	if pypystm:
 		times['pypy-stm'] = runbench_py('./bench', name, interp=pypystm)
