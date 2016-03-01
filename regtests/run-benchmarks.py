@@ -111,7 +111,7 @@ def runbench(path, name, backend='javascript', pgo=False, cores=None):
 
 BENCHES = [
 	'thread_shared_vector.py',
-	'thread_collision.py',
+	#'thread_collision.py',
 ]
 [
 	'pystone.py',
@@ -294,6 +294,7 @@ for name in BENCHES:
 			else:
 				score = times['python'] / times[tag]
 			print '%s: %s times faster than python' %(tag, score)
+			if tag not in VsPython: VsPython[tag] = []
 			VsPython[tag].append(score)
 
 	elif 'pypy' in times:
@@ -305,6 +306,7 @@ for name in BENCHES:
 			else:
 				score = times['pypy'] / times[tag]
 			print '%s: %s times faster than pypy' %(tag, score)
+			if tag not in VsPython: VsPython[tag] = []
 			VsPython[tag].append(score)
 
 
