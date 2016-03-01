@@ -1429,6 +1429,11 @@ def build( modules, module_path, datadirs=None ):
 		data = '\n'.join(source)
 		open(tmpfile, 'wb').write( data )
 
+		has_stm = '__transaction_atomic {' in data
+		if not has_stm:
+			has_stm = '__transaction_relaxed {' in data
+
+
 		global has_seastar
 		if links:
 			for lib in links:
@@ -1469,6 +1474,9 @@ def build( modules, module_path, datadirs=None ):
 			]
 			if HAS_CPP14:
 				cmd = []
+				if '--stm' in sys.argv or has_stm:
+					cmd.append('-fgnu-tm')
+
 				if has_seastar:
 					cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
 					cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
@@ -1549,11 +1557,6 @@ def build( modules, module_path, datadirs=None ):
 				cmd.extend(['g++-4.9', '-std=c++1y'])
 			else:
 				cmd.extend(['g++', '-std=c++11'])
-
-
-			has_stm = '__transaction_atomic {' in data
-			if not has_stm:
-				has_stm = '__transaction_relaxed {' in data
 
 			if '--stm' in sys.argv or has_stm:
 				cmd.append('-fgnu-tm')
