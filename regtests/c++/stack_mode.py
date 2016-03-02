@@ -84,4 +84,10 @@ with stack:
 
 
 def main():
+	j = 0
+	for i in grange:
+		print i
+		assert i==j
+		j+=1
+
 	stack_test()

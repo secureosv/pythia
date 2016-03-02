@@ -30,6 +30,7 @@ class CppRustBase( GoGenerator ):
 		self._force_cstr = False
 		self._known_pointers = {}
 		self._global_arrays  = {}
+		self._global_refs    = {}
 		self.macros = {}
 
 
@@ -2179,6 +2180,7 @@ TODO clean up go stuff.
 			self._known_strings   = set()
 			self._known_pyobjects = dict()
 			self._known_refs      = dict()
+			self._known_refs.update( self._global_refs )
 			self._known_pointers  = dict()
 
 		elif len(self._function_stack) > 1:
@@ -3405,12 +3407,17 @@ because they need some special handling in other places.
 
 		if isinstance(node.targets[0], ast.Name) and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id=='range':
 			self._known_arrays[node.targets[0].id] = 'int'
-			## TODO move this to new builtin `fixedrange(...)`
 			#if len(node.value.args)==1:
 			#	alen = self.visit(node.value.args[0])
 			#	self._known_arrays[node.targets[0].id] = ('int', alen)
 			#	if not len(self._function_stack):
 			#		self._global_arrays[node.targets[0].id] = ('int', alen)
+			if not len(self._function_stack):
+				self._global_arrays[node.targets[0].id] = 'int'
+				if self._memory[-1]=='STACK':
+					## note: __range#__ returns a copy of std::vector<T>
+					## TODO `range(start,stop,step, fixed=True/False)
+					self._global_refs[node.targets[0].id] = 'std::vector<int>'
 
 		#######################
 		if isinstance(node.targets[0], ast.Tuple):

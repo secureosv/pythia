@@ -183,12 +183,15 @@ with stack:
 
 	class Bar:
 		def __init__(self, x:[2]int ):
-			self.x[:] = x
+			#self.x[:] = x  ## this works but is not required
+			## the translator is able to detect in this case 
+			## that this needs to be an array copy.
+			self.x = x
 
 	class Foo( Bar ):
 		def __init__(self, x:[2]int, y:[4]A ):
-			self.x[:] = x
-			self.y[:] = y
+			self.x = x
+			self.y = y
 
 	def test_normal_array( arr:[]int )->int:
 		return len(arr)
@@ -230,7 +233,18 @@ with stack:
 
 		test_pointer_decay(i2) == len(i2)
 
-
+		a = Bar(i2)
+		arr = [2]int(6,7)
+		b = Bar(arr)
+		## test fixed size array assignment from object to object
+		assert a.x[0]==i2[0]
+		assert a.x[1]==i2[1]
+		## direct assignment not allowed
+		#a.x = b.x  # error: invalid array assignment
+		#a.x[:] = b.x  ## error unknown array fixed size
+		a.x[:2] = b.x  ## workaround: slice assignment with upper bound
+		assert a.x[0]==b.x[0]
+		assert a.x[1]==b.x[1]
 
 def main():
 	stack_test()
@@ -287,8 +301,7 @@ int test_pointer_decay(int arr[2]) {
 
 	
 	int b[2] = {0,0};
-	b[0] = arr[0];
-b[1] = arr[1];
+	b[0] = arr[0]; b[1] = arr[1];
 	if (!(( b[0] == arr[0] ))) {throw std::runtime_error("assertion failed: ( b[0] == arr[0] )"); }
 	if (!(( b[1] == arr[1] ))) {throw std::runtime_error("assertion failed: ( b[1] == arr[1] )"); }
 	return 2;
@@ -314,7 +327,18 @@ i2[1] = i4[1];
 	if (!(( i2[0] == i4[0] ))) {throw std::runtime_error("assertion failed: ( i2[0] == i4[0] )"); }
 	if (!(( i2[1] == i4[1] ))) {throw std::runtime_error("assertion failed: ( i2[1] == i4[1] )"); }
 	( test_pointer_decay(i2) == 2 );
+	auto a = Bar().__init__(i2); // new object
+	int arr[2] = {6,7};
+	auto b = Bar().__init__(arr); // new object
+	if (!(( a.x[0] == i2[0] ))) {throw std::runtime_error("assertion failed: ( a.x[0] == i2[0] )"); }
+	if (!(( a.x[1] == i2[1] ))) {throw std::runtime_error("assertion failed: ( a.x[1] == i2[1] )"); }
+	for (int __i=0; __i<2; __i++) {
+	  a.x[__i] = b.x[__i];
+	}
+	if (!(( a.x[0] == b.x[0] ))) {throw std::runtime_error("assertion failed: ( a.x[0] == b.x[0] )"); }
+	if (!(( a.x[1] == b.x[1] ))) {throw std::runtime_error("assertion failed: ( a.x[1] == b.x[1] )"); }
 	/* arrays:
+		arr : ('int', '2')
 		i2 : ('int', '2')
 		alist : ('A', '4')
 		i4 : ('int', '4')
@@ -323,12 +347,8 @@ i2[1] = i4[1];
 	Foo Foo::__init__(int x[2], A y[4]) {
 
 		
-		(*this).x[0] = x[0];
-(*this).x[1] = x[1];
-		(*this).y[0] = y[0];
-(*this).y[1] = y[1];
-(*this).y[2] = y[2];
-(*this).y[3] = y[3];
+		(*this).x[0] = x[0]; (*this).x[1] = x[1];
+		(*this).y[0] = y[0]; (*this).y[1] = y[1]; (*this).y[2] = y[2]; (*this).y[3] = y[3];
 		return *this;
 		/* arrays:
 			y : ('A', '4')
@@ -338,8 +358,7 @@ i2[1] = i4[1];
 	Foo Foo::__init__(int x[2]) {
 
 		
-		(*this).x[0] = x[0];
-(*this).x[1] = x[1];
+		(*this).x[0] = x[0]; (*this).x[1] = x[1];
 		return *this;
 		/* arrays:
 			x : ('int', '2')
@@ -348,8 +367,7 @@ i2[1] = i4[1];
 	Bar Bar::__init__(int x[2]) {
 
 		
-		(*this).x[0] = x[0];
-(*this).x[1] = x[1];
+		(*this).x[0] = x[0]; (*this).x[1] = x[1];
 		return *this;
 		/* arrays:
 			x : ('int', '2')
@@ -532,16 +550,7 @@ void somefunc() {
 
 	
 	for (int step=0; step<2; step++) {
-		w[0] = range1(10)[0];
-w[1] = range1(10)[1];
-w[2] = range1(10)[2];
-w[3] = range1(10)[3];
-w[4] = range1(10)[4];
-w[5] = range1(10)[5];
-w[6] = range1(10)[6];
-w[7] = range1(10)[7];
-w[8] = range1(10)[8];
-w[9] = range1(10)[9];
+		auto w = range1(10);			/* new variable*/
 		if (!(( w->size() == 10 ))) {throw std::runtime_error("assertion failed: ( w->size() == 10 )"); }
 		if (!(( (*w)[0] == 0 ))) {throw std::runtime_error("assertion failed: ( (*w)[0] == 0 )"); }
 		if (!(( (*w)[9] == 9 ))) {throw std::runtime_error("assertion failed: ( (*w)[9] == 9 )"); }
@@ -554,23 +563,23 @@ std::cout << a;std::cout << std::endl;
 		std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
 		if (!(( a->size() == 5 ))) {throw std::runtime_error("assertion failed: ( a->size() == 5 )"); }
-		/* <slice> 1 : None : None */
-std::vector<int> _ref_b(
-a->begin()+1,
-a->end()
-);
-std::shared_ptr<std::vector<int>> b = std::make_shared<std::vector<int>>(_ref_b);
+		/*<<slice>> `a` [1:None:None] int */
+		std::vector<int> _ref_b(
+		a->begin()+1,
+		a->end()
+		);
+		std::shared_ptr<std::vector<int>> b = std::make_shared<std::vector<int>>(_ref_b);
 		std::cout << std::string("b addr (should not be `a` above):");
 std::cout << b;std::cout << std::endl;
 		std::cout << std::string("len b  (should be 4):");
 std::cout << b->size();std::cout << std::endl;
 		if (!(( b->size() == 4 ))) {throw std::runtime_error("assertion failed: ( b->size() == 4 )"); }
-		/* <slice> None : None : None */
-std::vector<int> _ref_c(
-a->begin(),
-a->end()
-);
-std::shared_ptr<std::vector<int>> c = std::make_shared<std::vector<int>>(_ref_c);
+		/*<<slice>> `a` [None:None:None] int */
+		std::vector<int> _ref_c(
+		a->begin(),
+		a->end()
+		);
+		std::shared_ptr<std::vector<int>> c = std::make_shared<std::vector<int>>(_ref_c);
 		std::cout << std::string("c addr (should not be `a` or `b` above):");
 std::cout << c;std::cout << std::endl;
 		std::cout << std::string("len c:");
@@ -581,12 +590,12 @@ std::cout << c->size();std::cout << std::endl;
 std::cout << c->size();std::cout << std::endl;
 		if (!(( c->size() == 6 ))) {throw std::runtime_error("assertion failed: ( c->size() == 6 )"); }
 		if (!(( a->size() == 5 ))) {throw std::runtime_error("assertion failed: ( a->size() == 5 )"); }
-		/* <slice> None : 2 : None */
-std::vector<int> _ref_d(
-a->begin(),
-a->begin()+2
-);
-std::shared_ptr<std::vector<int>> d = std::make_shared<std::vector<int>>(_ref_d);
+		/*<<slice>> `a` [None:2:None] int */
+		std::vector<int> _ref_d(
+		a->begin(),
+		a->begin()+2
+		);
+		std::shared_ptr<std::vector<int>> d = std::make_shared<std::vector<int>>(_ref_d);
 		std::cout << std::string("len d:");
 std::cout << d->size();std::cout << std::endl;
 		if (!(( d->size() == 2 ))) {throw std::runtime_error("assertion failed: ( d->size() == 2 )"); }
@@ -594,34 +603,34 @@ std::cout << d->size();std::cout << std::endl;
 		if (!(( (*d)[1] == 2 ))) {throw std::runtime_error("assertion failed: ( (*d)[1] == 2 )"); }
 		std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
-		/* <slice> None : None : 1 */
+		/*<<slice>> `a` [None:None:1] int */
 std::vector<int> _ref_e;
 if(1<0){for(int _i_=a->size()-1;_i_>=0;_i_+=1){ _ref_e.push_back((*a)[_i_]);}} else {for(int _i_=0;_i_<a->size();_i_+=1){ _ref_e.push_back((*a)[_i_]);}}
-std::shared_ptr<std::vector<int>> e = std::make_shared<std::vector<int>>(_ref_e);
+		std::shared_ptr<std::vector<int>> e = std::make_shared<std::vector<int>>(_ref_e);
 		std::cout << std::string("len e should be same<<__as__<<a:");
 std::cout << e->size();std::cout << std::endl;
 		if (!(( e->size() == a->size() ))) {throw std::runtime_error("assertion failed: ( e->size() == a->size() )"); }
-		for (auto &i: (*e)) {
+		for (auto &i: (*e)) { /*loop over heap vector*/
 			std::cout << i << std::endl;
 		}
-		/* <slice> None : None : 2 */
+		/*<<slice>> `a` [None:None:2] int */
 std::vector<int> _ref_f;
 if(2<0){for(int _i_=a->size()-1;_i_>=0;_i_+=2){ _ref_f.push_back((*a)[_i_]);}} else {for(int _i_=0;_i_<a->size();_i_+=2){ _ref_f.push_back((*a)[_i_]);}}
-std::shared_ptr<std::vector<int>> f = std::make_shared<std::vector<int>>(_ref_f);
+		std::shared_ptr<std::vector<int>> f = std::make_shared<std::vector<int>>(_ref_f);
 		std::cout << std::string("len f:");
 std::cout << f->size();std::cout << std::endl;
 		if (!(( f->size() == 3 ))) {throw std::runtime_error("assertion failed: ( f->size() == 3 )"); }
 		if (!(( (*f)[0] == 1 ))) {throw std::runtime_error("assertion failed: ( (*f)[0] == 1 )"); }
 		if (!(( (*f)[1] == 3 ))) {throw std::runtime_error("assertion failed: ( (*f)[1] == 3 )"); }
 		if (!(( (*f)[2] == 5 ))) {throw std::runtime_error("assertion failed: ( (*f)[2] == 5 )"); }
-		/* <slice> None : None : -1 */
+		/*<<slice>> `a` [None:None:-1] int */
 		std::vector<int> _ref_g;
 for(int _i_=a->size()-1;_i_>=0;_i_-=1){
  _ref_g.push_back((*a)[_i_]);
 }
-std::shared_ptr<std::vector<int>> g = std::make_shared<std::vector<int>>(_ref_g);
+		std::shared_ptr<std::vector<int>> g = std::make_shared<std::vector<int>>(_ref_g);
 		std::cout << std::string("- - - -") << std::endl;
-		for (auto &v: (*g)) {
+		for (auto &v: (*g)) { /*loop over heap vector*/
 			std::cout << v << std::endl;
 		}
 		std::cout << std::string("len g:");
@@ -630,13 +639,13 @@ std::cout << g->size();std::cout << std::endl;
 		if (!(( (*g)[0] == 5 ))) {throw std::runtime_error("assertion failed: ( (*g)[0] == 5 )"); }
 		if (!(( (*g)[4] == 1 ))) {throw std::runtime_error("assertion failed: ( (*g)[4] == 1 )"); }
 		std::cout << std::string("---slice---") << std::endl;
-		/* <slice> 2 : None : -1 */
+		/*<<slice>> `a` [2:None:-1] int */
 		std::vector<int> _ref_h;
 for(int _i_=2;_i_>=0;_i_-=1){
  _ref_h.push_back((*a)[_i_]);
 }
-std::shared_ptr<std::vector<int>> h = std::make_shared<std::vector<int>>(_ref_h);
-		for (auto &i: (*h)) {
+		std::shared_ptr<std::vector<int>> h = std::make_shared<std::vector<int>>(_ref_h);
+		for (auto &i: (*h)) { /*loop over heap vector*/
 			std::cout << i << std::endl;
 		}
 		std::cout << std::string("len h:");
@@ -672,7 +681,7 @@ std::cout << a->size();std::cout << std::endl;
 		f : int
 		h : int
 		r : int
-		w : ('int', '10')
+		w : int
 */
 }
 int main() {
@@ -964,7 +973,7 @@ std::cout << 5;std::cout << std::endl;
 	std::cout << a[0] << std::endl;
 	std::cout << a[1] << std::endl;
 	std::cout << std::string("testing iter loop") << std::endl;
-	for (int __idx=0; __idx<5; __idx++) {
+	for (int __idx=0; __idx<5; __idx++) { /*loop over fixed array*/
 	int val = a[__idx];
 		std::cout << val << std::endl;
 	}
@@ -973,7 +982,7 @@ std::cout << 5;std::cout << std::endl;
 	int b[4] = {a[1],a[2],a[3],a[4]};
 	if (!(b[0])) {throw std::runtime_error("assertion failed: b[0]"); }
 	if (!(( 4 == ( (5 - 1) ) ))) {throw std::runtime_error("assertion failed: ( 4 == ( (5 - 1) ) )"); }
-	for (int __idx=0; __idx<4; __idx++) {
+	for (int __idx=0; __idx<4; __idx++) { /*loop over fixed array*/
 	int val = b[__idx];
 		std::cout << val << std::endl;
 	}
@@ -985,7 +994,7 @@ std::cout << 5;std::cout << std::endl;
 	/* <fixed size slice> None : 2 : None */
 	int c[3] = {a[0],a[1]};
 	if (!(( 2 == 2 ))) {throw std::runtime_error("assertion failed: ( 2 == 2 )"); }
-	for (int __idx=0; __idx<2; __idx++) {
+	for (int __idx=0; __idx<2; __idx++) { /*loop over fixed array*/
 	int val = c[__idx];
 		std::cout << val << std::endl;
 	}
@@ -1001,7 +1010,7 @@ std::cout << 5;std::cout << std::endl;
 std::cout << sizeof(d);std::cout << std::endl;
 		std::cout << std::string("len d:");
 std::cout << N;std::cout << std::endl;
-		for (int __idx=0; __idx<N; __idx++) {
+		for (int __idx=0; __idx<N; __idx++) { /*loop over fixed array*/
 		int v = d[__idx];
 			std::cout << v << std::endl;
 		}
@@ -1014,7 +1023,7 @@ std::cout << N;std::cout << std::endl;
 		  __L ++;
 		}
 		std::cout << e << std::endl;
-		for (int __idx=0; __idx<N-2; __idx++) {
+		for (int __idx=0; __idx<N-2; __idx++) { /*loop over fixed array*/
 		int ev = e[__idx];
 			std::cout << ev << std::endl;
 		}
@@ -1331,10 +1340,13 @@ int main() {
 	}
 	auto a = std::make_shared<std::vector<int>>(_comp_a);
 	std::cout << a->size() << std::endl;
-	for (auto &item: *a) {
+	for (auto &item: (*a)) { /*loop over heap vector*/
 		std::cout << item << std::endl;
 	}
 	return 0;
+	/* arrays:
+		a : int
+*/
 }
 ```
 * [while.py](c++/while.py)
@@ -1433,6 +1445,241 @@ int main() {
 	return 0;
 }
 ```
+* [shared_from_this.py](c++/shared_from_this.py)
+
+input:
+------
+```python
+'''
+std::enable_shared_from_this
+tests passing shared pointer to self to other functions,
+and subclasses that use std::static_pointer_cast to convert
+function arguments.
+'''
+
+
+class Foo():
+	def __init__(self, x:int):
+		self.x = x
+		let self.other : Foo = None
+
+	def bar(self) -> int:
+		return self.x
+
+	def test(self) ->int:
+		return callbar( self.shared_from_this() )
+
+def callbar( o:Foo ) -> int:
+	return o.bar()
+
+class Sub( Foo ):
+	def __init__(self, x:int, o:Foo ):
+		self.x = x
+		o.other = shared_from_this()
+
+	def submethod(self) -> int:
+		a = callbar( self.shared_from_this() )
+		return a * 2
+	def sub(self) -> int:
+		return self.x -1
+
+	## returns self.sub()
+	def testsub(self) -> int:
+		return callsub( shared_from_this() )
+
+	## returns self.sub()
+	def test_pass_self(self) -> int:
+		return self.callsub( shared_from_this() )
+
+	def callsub(self, other:Sub) -> int:
+		return other.sub()
+
+
+def callsub( s:Sub ) -> int:
+	return s.sub()
+
+
+def main():
+	f = Foo(10)
+	assert f.test()==10
+
+	s = Sub(100, f)
+	print 'should be 100:', s.test()
+	assert s.test()==100
+	assert s.submethod()==200
+	assert s.testsub()==99
+	assert s.test_pass_self()==99
+
+	ss = Sub(
+		10,
+		Sub(100, Sub(1))
+	)
+	#sa = Sub(1)
+	#ss = Sub(10,sa)
+	print ss
+	assert ss.x==10
+	assert ss.test_pass_self()==9
+
+	Sub(10,Sub(11))
+	#Sub(10,Sub(100, Sub(1)))  ## TODO nested > 1 levels
+
+	#Sub( Sub(10).sub() )  ## this is not allowed
+	sss = Sub( Sub(10).sub() )  ## this works but is not always shared_from_this
+	#sss = Sub(1, Sub(10).shared_from_this() )  ## this fails
+
+	let subs : [10]Sub
+	ptr = subs[0]
+	assert ptr is None
+	ps = ptr as Sub
+	assert ps is None
+	pss = ptr as Foo
+	assert pss is None
+```
+output:
+------
+```c++
+
+class Foo: public std::enable_shared_from_this<Foo> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	int  x;
+	std::shared_ptr<Foo>  other;
+	Foo* __init__(int x);
+	int bar();
+	int test();
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
+	std::string getclassname() {return this->__class__;}
+};
+int callbar(std::shared_ptr<Foo> o) {
+
+	
+	return o->bar();
+}
+class Sub:  public Foo {
+  public:
+//	members from class: Foo  ['x', 'other']
+	std::shared_ptr<Foo>  o;
+	Sub* __init__(int x);
+	Sub* __init__(int x, std::shared_ptr<Foo> o);
+	int submethod();
+	int sub();
+	int testsub();
+	int test_pass_self();
+	int callsub(std::shared_ptr<Sub> other);
+	inline int callsub(std::shared_ptr<Foo> other){ return callsub(
+std::static_pointer_cast<Sub>(other));}
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	Sub() {__class__ = std::string("Sub"); __initialized__ = true; __classid__=1;}
+	Sub(bool init) {__class__ = std::string("Sub"); __initialized__ = init; __classid__=1;}
+	std::string getclassname() {return this->__class__;}
+};
+int callsub(std::shared_ptr<Foo> __s){
+auto s = std::static_pointer_cast<Sub>(__s);
+
+return s->sub();
+}
+int callsub(std::shared_ptr<Sub> s) {
+
+	
+	return s->sub();
+}
+	int Sub::callsub(std::shared_ptr<Sub> other) {
+
+		
+		return other->sub();
+	}
+	int Sub::test_pass_self() {
+
+		
+		return this->callsub(shared_from_this());
+	}
+	int Sub::testsub() {
+
+		
+		return callsub(shared_from_this());
+	}
+	int Sub::sub() {
+
+		
+		return (this->x - 1);
+	}
+	int Sub::submethod() {
+
+		
+		auto a = callbar(this->shared_from_this());			/* new variable*/
+		return (a * 2);
+	}
+	Sub* Sub::__init__(int x, std::shared_ptr<Foo> o) {
+
+		
+		this->x = x;
+		o->other = shared_from_this();
+		return this;
+	}
+	Sub* Sub::__init__(int x) {
+
+		
+		this->x = x;
+		this->other = nullptr;
+		return this;
+	}
+	int Foo::test() {
+
+		
+		return callbar(this->shared_from_this());
+	}
+	int Foo::bar() {
+
+		
+		return this->x;
+	}
+	Foo* Foo::__init__(int x) {
+
+		
+		this->x = x;
+		this->other = nullptr;
+		return this;
+	}
+int main() {
+
+	
+	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(10); // new object
+	if (!(( f->test() == 10 ))) {throw std::runtime_error("assertion failed: ( f->test() == 10 )"); }
+	auto s = std::shared_ptr<Sub>((new Sub())); s->__init__(100, f); // new object
+	std::cout << std::string("should be 100:");
+std::cout << s->test();std::cout << std::endl;
+	if (!(( s->test() == 100 ))) {throw std::runtime_error("assertion failed: ( s->test() == 100 )"); }
+	if (!(( s->submethod() == 200 ))) {throw std::runtime_error("assertion failed: ( s->submethod() == 200 )"); }
+	if (!(( s->testsub() == 99 ))) {throw std::runtime_error("assertion failed: ( s->testsub() == 99 )"); }
+	if (!(( s->test_pass_self() == 99 ))) {throw std::runtime_error("assertion failed: ( s->test_pass_self() == 99 )"); }
+	auto Sub_140169074237648 = std::shared_ptr<Sub>(new Sub()); Sub_140169074237648->__init__(1);
+auto Sub_140169074216912 = std::shared_ptr<Sub>(new Sub()); Sub_140169074216912->__init__(100, Sub_140169074237648);
+auto ss = std::shared_ptr<Sub>((new Sub())); ss->__init__(10, Sub_140169074216912); // new object
+	std::cout << ss << std::endl;
+	if (!(( ss->x == 10 ))) {throw std::runtime_error("assertion failed: ( ss->x == 10 )"); }
+	if (!(( ss->test_pass_self() == 9 ))) {throw std::runtime_error("assertion failed: ( ss->test_pass_self() == 9 )"); }
+	auto Sub_140169074238736 = std::shared_ptr<Sub>(new Sub()); Sub_140169074238736->__init__(10, std::shared_ptr<Sub>((new Sub())->__init__(11)));
+	auto Sub_140169074239504 = std::shared_ptr<Sub>(new Sub()); Sub_140169074239504->__init__(10);
+auto sss = std::shared_ptr<Sub>((new Sub())); sss->__init__(Sub_140169074239504->sub()); // new object
+	auto subs = std::make_shared<std::vector<std::shared_ptr<Sub>>>(10);
+	auto ptr = (*subs)[0];  /* auto-fallback */
+	if (!(( ptr == nullptr ))) {throw std::runtime_error("assertion failed: ( ptr == nullptr )"); }
+		auto ps = std::static_pointer_cast<Sub>(ptr);
+	if (!(( ps == nullptr ))) {throw std::runtime_error("assertion failed: ( ps == nullptr )"); }
+		auto pss = std::static_pointer_cast<Foo>(ptr);
+	if (!(( pss == nullptr ))) {throw std::runtime_error("assertion failed: ( pss == nullptr )"); }
+	return 0;
+	/* arrays:
+		subs : ('Sub', '10')
+*/
+}
+```
 * [array_of_arrays.py](c++/array_of_arrays.py)
 
 input:
@@ -1489,17 +1736,17 @@ int main() {
 
 	
 	/* arr = vector of vectors to: int */	
-std::vector<int> _r__sub0_arr = {1,2,3};	
-std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
-std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
-std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
+	std::vector<int> _r__sub0_arr = {1,2,3};	
+	std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
+	std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
+	std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
 std::vector<int> _comp__subcomp_arr; /*comprehension*/
 	for (int x=0; x<20; x++) {
 		_comp__subcomp_arr.push_back(x);
 	}
 	auto _subcomp_arr = std::make_shared<std::vector<int>>(_comp__subcomp_arr);	
-std::vector< std::shared_ptr<std::vector<int>> > _ref_arr = {_sub0_arr,_sub1_arr,nullptr,_subcomp_arr};	
-std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::make_shared<std::vector< std::shared_ptr<std::vector<int>> >>(_ref_arr);
+	std::vector<std::shared_ptr<std::vector<int>>> _ref_arr = {_sub0_arr,_sub1_arr,nullptr,_subcomp_arr};	
+	std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(_ref_arr);
 	std::cout << arr->size() << std::endl;
 	std::cout << (*arr)[0]->size() << std::endl;
 	std::cout << (*arr)[1]->size() << std::endl;
@@ -1509,16 +1756,16 @@ std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::mak
 		std::cout << std::string("never reached") << std::endl;
 	}
 	std::cout << std::string("sub 0 items:") << std::endl;
-	for (auto &i: *(*arr)[0]) {
+	for (auto &i: *(*arr)[0]) { /*loop over unknown type*/
 		std::cout << i << std::endl;
 	}
 	std::cout << std::string("sub 1 items:") << std::endl;
 	auto sub = (*arr)[1];  /* auto-fallback */
-	for (auto &i: *sub) {
+	for (auto &i: *sub) { /*loop over unknown type*/
 		std::cout << i << std::endl;
 	}
 	std::cout << std::string("sub 3 items:") << std::endl;
-	for (auto &i: *(*arr)[3]) {
+	for (auto &i: *(*arr)[3]) { /*loop over unknown type*/
 		std::cout << i << std::endl;
 	}
 	std::cout << std::string("sub 3 items changed:") << std::endl;
@@ -1526,12 +1773,13 @@ std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::mak
 	(*(*arr)[3])[1] = 1001;
 	(*(*arr)[3])[2] = 1002;
 	(*(*arr)[3])[3] = 1003;
-	for (auto &i: *(*arr)[3]) {
+	for (auto &i: *(*arr)[3]) { /*loop over unknown type*/
 		std::cout << i << std::endl;
 	}
 	return 0;
 	/* arrays:
 		arr : int
+		_subcomp_arr : int
 */
 }
 ```
@@ -1581,7 +1829,7 @@ class A: public std::enable_shared_from_this<A> {
 A* create_A() {
 
 	
-	auto A_139858037203600 = (new A()); A_139858037203600->__init__(1, 2);
+	auto A_140575352595088 = (new A()); A_140575352595088->__init__(1, 2);
 auto a = (new A)->__init__(1,2);  /* new object */
 	return a;
 }
@@ -1661,7 +1909,7 @@ int main() {
 	auto c = cpp::channel<int>{};			/* new variable*/
 	std::cout << std::string("new channel") << std::endl;
 	std::cout << std::string("doing spawn thread") << std::endl;
-	std::thread __thread0__( [&]{sender_wrapper(17, c);} );
+	std::thread __thread0__( [=]{sender_wrapper(17, c);} );
 	std::cout << std::string("done spawning thread") << std::endl;
 	auto x = recv_wrapper(2, c);			/* new variable*/
 	std::cout << x << std::endl;
@@ -1768,7 +2016,7 @@ a->insert(a->begin(), b->begin(), b->end());
 	std::cout << std::string("len a:");
 std::cout << a->size();std::cout << std::endl;
 	if (!(( a->size() == ( ((lena - (two + 1)) + b->size()) ) ))) {throw std::runtime_error("assertion failed: ( a->size() == ( ((lena - (two + 1)) + b->size()) ) )"); }
-	for (auto &i: (*a)) {
+	for (auto &i: (*a)) { /*loop over heap vector*/
 		std::cout << i << std::endl;
 	}
 	if (!(( (*a)[0] == 6 ))) {throw std::runtime_error("assertion failed: ( (*a)[0] == 6 )"); }
@@ -1777,7 +2025,7 @@ std::cout << a->size();std::cout << std::endl;
 	std::cout << std::string("slice assign back") << std::endl;
 	b->erase(b->begin()+2, b->end());
 b->insert(b->end(), c->begin(), c->end());
-	for (auto &i: (*b)) {
+	for (auto &i: (*b)) { /*loop over heap vector*/
 		std::cout << i << std::endl;
 	}
 	if (!(( (*b)[0] == 6 ))) {throw std::runtime_error("assertion failed: ( (*b)[0] == 6 )"); }
@@ -1789,7 +2037,7 @@ b->insert(b->end(), c->begin(), c->end());
 	if (100 >= a->size()) { a->erase(a->begin(), a->end());
 } else { a->erase(a->begin(), a->begin()+100); }
 a->insert(a->begin(), b->begin(), b->end());
-	for (auto &v: (*a)) {
+	for (auto &v: (*a)) { /*loop over heap vector*/
 		std::cout << v << std::endl;
 	}
 	std::cout << std::string("len a:");
@@ -1816,7 +2064,7 @@ void stackfunc() {
 	  x[__i] = z[__L];
 	  __L ++;
 	}
-	for (int __idx=0; __idx<5; __idx++) {
+	for (int __idx=0; __idx<5; __idx++) { /*loop over fixed array*/
 	int item = x[__idx];
 		std::cout << item << std::endl;
 	}
@@ -2099,8 +2347,24 @@ with stack:
 			assert f is None
 		print 'foos initalized to None ok'
 
+		comp = [ Bar('hello') for i in range(10) ]
+		assert len(comp)==10
+		comp.append( Bar('world') )
+		assert len(comp)==11
+
+		s = []Bar()
+		s.append( Bar('xxx') )
+		assert len(s)==1
+
+
 
 def main():
+	j = 0
+	for i in grange:
+		print i
+		assert i==j
+		j+=1
+
 	stack_test()
 ```
 output:
@@ -2108,9 +2372,7 @@ output:
 ```c++
 
 int garr[10] = {0,0,0,0,0,0,0,0,0,0};
-grange[0] = __range1__(3)[0];
-grange[1] = __range1__(3)[1];
-grange[2] = __range1__(3)[2];
+auto grange = __range1__(3);
 class Bar: public std::enable_shared_from_this<Bar> {
   public:
 	std::string __class__;
@@ -2154,12 +2416,12 @@ void test_foos_vec(std::vector<Foo>* arr) {
 
 	
 	if (!(( arr->size() == 10 ))) {throw std::runtime_error("assertion failed: ( arr->size() == 10 )"); }
-	for (auto &item: (*arr)) {
+	for (auto &item: (*arr)) { /*loop over heap vector*/
 		if (!(( item == nullptr ))) {throw std::runtime_error("assertion failed: ( item == nullptr )"); }
 		if (!(( item.ok == false ))) {throw std::runtime_error("assertion failed: ( item.ok == false )"); }
 	}
 	/* arrays:
-		grange : ('int', '3')
+		grange : int
 		arr : std::vector<Foo>*
 		garr : ('int', '10')
 		Foos : ('Foo', '10')
@@ -2169,12 +2431,12 @@ void test_foos_fixedarr(Foo arr[10]) {
 
 	
 	if (!(( 10 == 10 ))) {throw std::runtime_error("assertion failed: ( 10 == 10 )"); }
-	for (int __idx=0; __idx<10; __idx++) {
+	for (int __idx=0; __idx<10; __idx++) { /*loop over fixed array*/
 	Foo item = arr[__idx];
 		if (!(( item.ok == false ))) {throw std::runtime_error("assertion failed: ( item.ok == false )"); }
 	}
 	/* arrays:
-		grange : ('int', '3')
+		grange : int
 		arr : ('Foo', '10')
 		garr : ('int', '10')
 		Foos : ('Foo', '10')
@@ -2193,36 +2455,47 @@ void stack_test() {
 	auto vec = std::vector<Foo>(std::begin(Foos), std::end(Foos));			/* new variable*/
 	test_foos_vec(&vec);
 	int arr[5] = {0,0,0,0,0};
-	for (int __idx=0; __idx<10; __idx++) {
+	for (int __idx=0; __idx<10; __idx++) { /*loop over fixed array*/
 	int i = garr[__idx];
 		std::cout << i << std::endl;
 		if (!(( i == 0 ))) {throw std::runtime_error("assertion failed: ( i == 0 )"); }
 	}
 	std::cout << std::string("global array iter ok") << std::endl;
-	for (int __idx=0; __idx<5; __idx++) {
+	for (int __idx=0; __idx<5; __idx++) { /*loop over fixed array*/
 	int i = arr[__idx];
 		std::cout << i << std::endl;
 		if (!(( i == 0 ))) {throw std::runtime_error("assertion failed: ( i == 0 )"); }
 	}
 	std::cout << std::string("local array iter ok") << std::endl;
 	auto j = 0;  /* auto-fallback */
-	for (int __idx=0; __idx<3; __idx++) {
-	int i = grange[__idx];
+	for (auto &i: grange) { /*loop over stack vector*/
 		std::cout << i << std::endl;
 		if (!(( i == j ))) {throw std::runtime_error("assertion failed: ( i == j )"); }
 		j ++;
 	}
 	std::cout << std::string("loop over global range ok") << std::endl;
-	for (int __idx=0; __idx<10; __idx++) {
+	for (int __idx=0; __idx<10; __idx++) { /*loop over fixed array*/
 	Foo f = Foos[__idx];
 		if (!(( f == nullptr ))) {throw std::runtime_error("assertion failed: ( f == nullptr )"); }
 	}
 	std::cout << std::string("foos initalized to None ok") << std::endl;
+	std::vector<Bar> comp; /*comprehension*/
+	for (int i=0; i<10; i++) {
+		comp.push_back(Bar().__init__(std::string("hello")));
+	}
+	if (!(( comp.size() == 10 ))) {throw std::runtime_error("assertion failed: ( comp.size() == 10 )"); }
+	comp.push_back(Bar().__init__(std::string("world")));
+	if (!(( comp.size() == 11 ))) {throw std::runtime_error("assertion failed: ( comp.size() == 11 )"); }
+	std::vector<Bar>* s = (new std::vector<Bar>({})); /* 1D Array */
+	s->push_back(Bar().__init__(std::string("xxx")));
+	if (!(( s->size() == 1 ))) {throw std::runtime_error("assertion failed: ( s->size() == 1 )"); }
 	/* arrays:
-		grange : ('int', '3')
 		bars : ('Bar', '4')
-		garr : ('int', '10')
+		comp : Bar
 		arr : ('int', '5')
+		grange : int
+		s : Bar
+		garr : ('int', '10')
 		Foos : ('Foo', '10')
 */
 }
@@ -2235,7 +2508,7 @@ void stack_test() {
 (*this).arr2[3] = arr2[3];
 		return *this;
 		/* arrays:
-			grange : ('int', '3')
+			grange : int
 			garr : ('int', '10')
 			arr2 : ('Bar', '4')
 			Foos : ('Foo', '10')
@@ -2248,7 +2521,7 @@ void stack_test() {
 		/* arr1 : [4]Bar */;
 		return *this;
 		/* arrays:
-			grange : ('int', '3')
+			grange : int
 			garr : ('int', '10')
 			Foos : ('Foo', '10')
 */
@@ -2259,7 +2532,7 @@ void stack_test() {
 		(*this).value = value;
 		return *this;
 		/* arrays:
-			grange : ('int', '3')
+			grange : int
 			garr : ('int', '10')
 			Foos : ('Foo', '10')
 */
@@ -2267,10 +2540,16 @@ void stack_test() {
 int main() {
 
 	
+	auto j = 0;  /* auto-fallback */
+	for (auto &i: grange) { /*loop over stack vector*/
+		std::cout << i << std::endl;
+		if (!(( i == j ))) {throw std::runtime_error("assertion failed: ( i == j )"); }
+		j ++;
+	}
 	stack_test();
 	return 0;
 	/* arrays:
-		grange : ('int', '3')
+		grange : int
 		garr : ('int', '10')
 		Foos : ('Foo', '10')
 */
@@ -2287,23 +2566,27 @@ array methods: append, pop, etc.
 
 def somefunc():
 	a = []int(1,2,3,4,5)
-	print('len a:', len(a))
+	assert 5 in a
+	assert 100 not in a
+	assert a.at(4)==5
+
+	#print('len a:', len(a))
 	assert len(a)==5
 	b = a.pop()
-	print('len a after pop:', len(a))
+	#print('len a after pop:', len(a))
 	assert len(a)==4
 	assert b==5
 
 	#b = a[len(a)-1]
 	a.pop()
-	print('len a:', len(a))
+	#print('len a:', len(a))
 	assert len(a)==3
-	print(b)
+	#print(b)
 	a.insert(0, 1000)
 	#a.insert(a.begin(), 1000)
 
-	print('len a:', len(a))
-	print(a[0])
+	#print('len a:', len(a))
+	#print(a[0])
 	assert a[0]==1000
 	assert len(a)==4
 
@@ -2382,24 +2665,17 @@ void somefunc() {
 
 	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4,5})) ); /* 1D Array */
-	std::cout << std::string("len a:");
-std::cout << a->size();std::cout << std::endl;
+	if (!(( (std::find(a->begin(), a->end(), 5) != a->end()) ))) {throw std::runtime_error("assertion failed: ( (std::find(a->begin(), a->end(), 5) != a->end()) )"); }
+	if (!(! (( (std::find(a->begin(), a->end(), 100) != a->end()) )))) {throw std::runtime_error("assertion failed: ! (( (std::find(a->begin(), a->end(), 100) != a->end()) ))"); }
+	if (!(( a->at(4) == 5 ))) {throw std::runtime_error("assertion failed: ( a->at(4) == 5 )"); }
 	if (!(( a->size() == 5 ))) {throw std::runtime_error("assertion failed: ( a->size() == 5 )"); }
 	auto b = (*a)[ a->size()-1 ];
 a->pop_back();
-	std::cout << std::string("len a after pop:");
-std::cout << a->size();std::cout << std::endl;
 	if (!(( a->size() == 4 ))) {throw std::runtime_error("assertion failed: ( a->size() == 4 )"); }
 	if (!(( b == 5 ))) {throw std::runtime_error("assertion failed: ( b == 5 )"); }
 	a->pop_back();
-	std::cout << std::string("len a:");
-std::cout << a->size();std::cout << std::endl;
 	if (!(( a->size() == 3 ))) {throw std::runtime_error("assertion failed: ( a->size() == 3 )"); }
-	std::cout << b << std::endl;
 	a->insert(a->begin()+0, 1000);
-	std::cout << std::string("len a:");
-std::cout << a->size();std::cout << std::endl;
-	std::cout << (*a)[0] << std::endl;
 	if (!(( (*a)[0] == 1000 ))) {throw std::runtime_error("assertion failed: ( (*a)[0] == 1000 )"); }
 	if (!(( a->size() == 4 ))) {throw std::runtime_error("assertion failed: ( a->size() == 4 )"); }
 	auto c = (*a)[0];
@@ -2409,7 +2685,7 @@ a->erase(a->begin(),a->begin()+1);
 	std::cout << std::string("testing insert empty array") << std::endl;
 	std::shared_ptr<std::vector<int>> empty( (new std::vector<int>({10,20})) ); /* 1D Array */
 	a->insert((a->begin() + 1), empty->begin(), empty->end());
-	for (auto &val: (*a)) {
+	for (auto &val: (*a)) { /*loop over heap vector*/
 		std::cout << val << std::endl;
 	}
 	/* arrays:
@@ -2452,7 +2728,7 @@ std::cout << sizeof(arr);std::cout << std::endl;
 	  s[__L] = arr2[__i];
 	  __L ++;
 	}
-	for (int __idx=0; __idx<5-k; __idx++) {
+	for (int __idx=0; __idx<5-k; __idx++) { /*loop over fixed array*/
 	int val = s[__idx];
 		std::cout << val << std::endl;
 	}
@@ -2466,7 +2742,7 @@ std::cout << sizeof(arr);std::cout << std::endl;
 	  arr3[__i-1] = arr3[__i];
 	}
 	arr3[k] = __front__;
-	for (int __idx=0; __idx<4; __idx++) {
+	for (int __idx=0; __idx<4; __idx++) { /*loop over fixed array*/
 	int val = arr3[__idx];
 		std::cout << val << std::endl;
 	}
@@ -2667,12 +2943,12 @@ int main() {
 	std::cout << c->__class__ << std::endl;
 	std::cout << std::string("- - - - - - -") << std::endl;
 	std::shared_ptr<std::vector<std::shared_ptr<A>>> arr( ( new std::vector<std::shared_ptr<A>>({a,b,c}) ) ); /* 1D Array */
-	for (auto &item: (*arr)) {
+	for (auto &item: (*arr)) { /*loop over heap vector*/
 		std::cout << item->__class__ << std::endl;
 		std::cout << my_generic(item) << std::endl;
 	}
 	std::cout << std::string("- - - - - - -") << std::endl;
-	for (auto &item: (*arr)) {
+	for (auto &item: (*arr)) { /*loop over heap vector*/
 		std::cout << item->getname() << std::endl;
 		std::cout << item->x << std::endl;
 		if ((item->__class__==std::string("B"))) {
@@ -3186,7 +3462,9 @@ with stack:
 		print a.is_initialized()
 		assert a.is_initialized()
 		if a is not None:
-			print 'a can be checked if not None'
+			print 'a is not None'
+			a = None
+			assert a is None
 
 		let b:A = None
 		print b.is_initialized()
@@ -3194,6 +3472,9 @@ with stack:
 			print 'b is acting like a nullptr'
 
 		assert b.is_initialized() is False
+		c = A()
+		## test that ensures `a` can be restored from nullptr back to an object.
+		a = c
 
 def main():
 	test()
@@ -3222,7 +3503,9 @@ void test() {
 	std::cout << a.is_initialized() << std::endl;
 	if (!(a.is_initialized())) {throw std::runtime_error("assertion failed: a.is_initialized()"); }
 	if (( a != nullptr )) {
-		std::cout << std::string("a can be checked if not None") << std::endl;
+		std::cout << std::string("a is not None") << std::endl;
+		a = nullptr;
+		if (!(( a == nullptr ))) {throw std::runtime_error("assertion failed: ( a == nullptr )"); }
 	}
 	A  b = A(false);
 	std::cout << b.is_initialized() << std::endl;
@@ -3230,6 +3513,8 @@ void test() {
 		std::cout << std::string("b is acting like a nullptr") << std::endl;
 	}
 	if (!(( b.is_initialized() == false ))) {throw std::runtime_error("assertion failed: ( b.is_initialized() == false )"); }
+	auto c = A().__init__(); // new object
+	a = c;
 }
 	bool A::is_initialized() {
 
@@ -3249,239 +3534,90 @@ int main() {
 	return 0;
 }
 ```
-* [shared_from_this.py](c++/shared_from_this.py)
+* [map_types.py](c++/map_types.py)
 
 input:
 ------
 ```python
 '''
-std::enable_shared_from_this
-tests passing shared pointer to self to other functions,
-and subclasses that use std::static_pointer_cast to convert
-function arguments.
+std::map<KEY, VALUE>
 '''
+mymap = {
+	'key1' : [1,2,3],
+	'key2' : [4,5,6,7]
+}
+
+with stack:
+	def test_stack():
+		print 'stack test...'
+		m1 = {
+			'K1' : [0,1],
+			'K2' : [2,3]
+		}
+		assert m1['K1'][0]==0
+		assert m1['K1'][1]==1
+		assert m1['K2'][0]==2
+		assert m1['K2'][1]==3
 
 
-class Foo():
-	def __init__(self, x:int):
-		self.x = x
-		let self.other : Foo = None
-
-	def bar(self) -> int:
-		return self.x
-
-	def test(self) ->int:
-		return callbar( self.shared_from_this() )
-
-def callbar( o:Foo ) -> int:
-	return o.bar()
-
-class Sub( Foo ):
-	def __init__(self, x:int, o:Foo ):
-		self.x = x
-		o.other = shared_from_this()
-
-	def submethod(self) -> int:
-		a = callbar( self.shared_from_this() )
-		return a * 2
-	def sub(self) -> int:
-		return self.x -1
-
-	## returns self.sub()
-	def testsub(self) -> int:
-		return callsub( shared_from_this() )
-
-	## returns self.sub()
-	def test_pass_self(self) -> int:
-		return self.callsub( shared_from_this() )
-
-	def callsub(self, other:Sub) -> int:
-		return other.sub()
-
-
-def callsub( s:Sub ) -> int:
-	return s.sub()
-
+def test_heap():
+	print 'heap test...'
+	m1 = {
+		'K1' : [0,1],
+		'K2' : [2,3]
+	}
+	assert m1['K1'][0]==0
+	assert m1['K1'][1]==1
+	assert m1['K2'][0]==2
+	assert m1['K2'][1]==3
 
 def main():
-	f = Foo(10)
-	assert f.test()==10
-
-	s = Sub(100, f)
-	print 'should be 100:', s.test()
-	assert s.test()==100
-	assert s.submethod()==200
-	assert s.testsub()==99
-	assert s.test_pass_self()==99
-
-	ss = Sub(
-		10,
-		Sub(100, Sub(1))
-	)
-	#sa = Sub(1)
-	#ss = Sub(10,sa)
-	print ss
-	assert ss.x==10
-	assert ss.test_pass_self()==9
-
-	Sub(10,Sub(11))
-	#Sub(10,Sub(100, Sub(1)))  ## TODO nested > 1 levels
-
-	#Sub( Sub(10).sub() )  ## this is not allowed
-	sss = Sub( Sub(10).sub() )  ## this works but is not always shared_from_this
-	#sss = Sub(1, Sub(10).shared_from_this() )  ## this fails
-
-	let subs : [10]Sub
-	ptr = subs[0]
-	assert ptr is None
-	ps = ptr as Sub
-	assert ps is None
-	pss = ptr as Foo
-	assert pss is None
+	print mymap
+	assert mymap['key1'][0]==1
+	assert mymap['key2'][1]==5
+	test_heap()
+	test_stack()
+	print 'OK'
+	
 ```
 output:
 ------
 ```c++
 
-class Foo: public std::enable_shared_from_this<Foo> {
-  public:
-	std::string __class__;
-	bool __initialized__;
-	int  __classid__;
-	int  x;
-	std::shared_ptr<Foo>  other;
-	Foo* __init__(int x);
-	int bar();
-	int test();
-	bool operator != (std::nullptr_t rhs) {return __initialized__;}
-	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
-	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
-	std::string getclassname() {return this->__class__;}
-};
-int callbar(std::shared_ptr<Foo> o) {
+auto mymap = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("key1"), new std::vector<int>{1, 2, 3}}
+,{std::string("key2"), new std::vector<int>{4, 5, 6, 7}}});
+void test_stack() {
 
 	
-	return o->bar();
+	std::cout << std::string("stack test...") << std::endl;
+	auto m1 = std::map<std::string,std::vector<int>>{{std::string("K1"),std::vector<int>{0, 1}}
+,{std::string("K2"),std::vector<int>{2, 3}}};
+	if (!(( m1[std::string("K1")][0] == 0 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K1\")][0] == 0 )"); }
+	if (!(( m1[std::string("K1")][1] == 1 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K1\")][1] == 1 )"); }
+	if (!(( m1[std::string("K2")][0] == 2 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K2\")][0] == 2 )"); }
+	if (!(( m1[std::string("K2")][1] == 3 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K2\")][1] == 3 )"); }
 }
-class Sub:  public Foo {
-  public:
-//	members from class: Foo  ['x', 'other']
-	std::shared_ptr<Foo>  o;
-	Sub* __init__(int x);
-	Sub* __init__(int x, std::shared_ptr<Foo> o);
-	int submethod();
-	int sub();
-	int testsub();
-	int test_pass_self();
-	int callsub(std::shared_ptr<Sub> other);
-	inline int callsub(std::shared_ptr<Foo> other){ return callsub(
-std::static_pointer_cast<Sub>(other));}
-	bool operator != (std::nullptr_t rhs) {return __initialized__;}
-	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Sub() {__class__ = std::string("Sub"); __initialized__ = true; __classid__=1;}
-	Sub(bool init) {__class__ = std::string("Sub"); __initialized__ = init; __classid__=1;}
-	std::string getclassname() {return this->__class__;}
-};
-int callsub(std::shared_ptr<Foo> __s){
-auto s = std::static_pointer_cast<Sub>(__s);
-
-return s->sub();
-}
-int callsub(std::shared_ptr<Sub> s) {
+void test_heap() {
 
 	
-	return s->sub();
+	std::cout << std::string("heap test...") << std::endl;
+	auto m1 = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("K1"),new std::vector<int>{0, 1}}
+,{std::string("K2"),new std::vector<int>{2, 3}}});
+	if (!(( (*(*m1)[std::string("K1")])[0] == 0 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K1\")])[0] == 0 )"); }
+	if (!(( (*(*m1)[std::string("K1")])[1] == 1 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K1\")])[1] == 1 )"); }
+	if (!(( (*(*m1)[std::string("K2")])[0] == 2 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K2\")])[0] == 2 )"); }
+	if (!(( (*(*m1)[std::string("K2")])[1] == 3 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K2\")])[1] == 3 )"); }
 }
-	int Sub::callsub(std::shared_ptr<Sub> other) {
-
-		
-		return other->sub();
-	}
-	int Sub::test_pass_self() {
-
-		
-		return this->callsub(shared_from_this());
-	}
-	int Sub::testsub() {
-
-		
-		return callsub(shared_from_this());
-	}
-	int Sub::sub() {
-
-		
-		return (this->x - 1);
-	}
-	int Sub::submethod() {
-
-		
-		auto a = callbar(this->shared_from_this());			/* new variable*/
-		return (a * 2);
-	}
-	Sub* Sub::__init__(int x, std::shared_ptr<Foo> o) {
-
-		
-		this->x = x;
-		o->other = shared_from_this();
-		return this;
-	}
-	Sub* Sub::__init__(int x) {
-
-		
-		this->x = x;
-		this->other = nullptr;
-		return this;
-	}
-	int Foo::test() {
-
-		
-		return callbar(this->shared_from_this());
-	}
-	int Foo::bar() {
-
-		
-		return this->x;
-	}
-	Foo* Foo::__init__(int x) {
-
-		
-		this->x = x;
-		this->other = nullptr;
-		return this;
-	}
 int main() {
 
 	
-	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(10); // new object
-	if (!(( f->test() == 10 ))) {throw std::runtime_error("assertion failed: ( f->test() == 10 )"); }
-	auto s = std::shared_ptr<Sub>((new Sub())); s->__init__(100, f); // new object
-	std::cout << std::string("should be 100:");
-std::cout << s->test();std::cout << std::endl;
-	if (!(( s->test() == 100 ))) {throw std::runtime_error("assertion failed: ( s->test() == 100 )"); }
-	if (!(( s->submethod() == 200 ))) {throw std::runtime_error("assertion failed: ( s->submethod() == 200 )"); }
-	if (!(( s->testsub() == 99 ))) {throw std::runtime_error("assertion failed: ( s->testsub() == 99 )"); }
-	if (!(( s->test_pass_self() == 99 ))) {throw std::runtime_error("assertion failed: ( s->test_pass_self() == 99 )"); }
-	auto Sub_140004374057168 = std::shared_ptr<Sub>(new Sub()); Sub_140004374057168->__init__(1);
-auto Sub_140004374040528 = std::shared_ptr<Sub>(new Sub()); Sub_140004374040528->__init__(100, Sub_140004374057168);
-auto ss = std::shared_ptr<Sub>((new Sub())); ss->__init__(10, Sub_140004374040528); // new object
-	std::cout << ss << std::endl;
-	if (!(( ss->x == 10 ))) {throw std::runtime_error("assertion failed: ( ss->x == 10 )"); }
-	if (!(( ss->test_pass_self() == 9 ))) {throw std::runtime_error("assertion failed: ( ss->test_pass_self() == 9 )"); }
-	auto Sub_140004374058256 = std::shared_ptr<Sub>(new Sub()); Sub_140004374058256->__init__(10, std::shared_ptr<Sub>((new Sub())->__init__(11)));
-	auto Sub_140004374059024 = std::shared_ptr<Sub>(new Sub()); Sub_140004374059024->__init__(10);
-auto sss = std::shared_ptr<Sub>((new Sub())); sss->__init__(Sub_140004374059024->sub()); // new object
-	auto subs = std::make_shared<std::vector<std::shared_ptr<Sub>>>(10);
-	auto ptr = (*subs)[0];  /* auto-fallback */
-	if (!(( ptr == nullptr ))) {throw std::runtime_error("assertion failed: ( ptr == nullptr )"); }
-		auto ps = std::static_pointer_cast<Sub>(ptr);
-	if (!(( ps == nullptr ))) {throw std::runtime_error("assertion failed: ( ps == nullptr )"); }
-		auto pss = std::static_pointer_cast<Foo>(ptr);
-	if (!(( pss == nullptr ))) {throw std::runtime_error("assertion failed: ( pss == nullptr )"); }
+	std::cout << mymap << std::endl;
+	if (!(( (*(*mymap)[std::string("key1")])[0] == 1 ))) {throw std::runtime_error("assertion failed: ( (*(*mymap)[std::string(\"key1\")])[0] == 1 )"); }
+	if (!(( (*(*mymap)[std::string("key2")])[1] == 5 ))) {throw std::runtime_error("assertion failed: ( (*(*mymap)[std::string(\"key2\")])[1] == 5 )"); }
+	test_heap();
+	test_stack();
+	std::cout << std::string("OK") << std::endl;
 	return 0;
-	/* arrays:
-		subs : ('Sub', '10')
-*/
 }
 ```
 * [array_of_arrays_objects.py](c++/array_of_arrays_objects.py)
@@ -3553,14 +3689,14 @@ int main() {
 	auto a1 = std::shared_ptr<A>((new A())); a1->__init__(1); // new object
 	auto a2 = std::shared_ptr<A>((new A())); a2->__init__(2); // new object
 	auto a3 = std::shared_ptr<A>((new A())); a3->__init__(3); // new object
-	auto A_140252303304848 = std::shared_ptr<A>(new A()); A_140252303304848->__init__(4);
+	auto A_140562129246352 = std::shared_ptr<A>(new A()); A_140562129246352->__init__(4);
 /* arr = vector of vectors to: A */	
-std::vector<  std::shared_ptr<A>  > _r__sub0_arr = {a1,a2,a3,std::shared_ptr<A>((new A())->__init__(4))};	
-std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub0_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub0_arr);	
-std::vector<  std::shared_ptr<A>  > _r__sub1_arr = {a1,nullptr};	
-std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub1_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub1_arr);	
-std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> > _ref_arr = {_sub0_arr,_sub1_arr,nullptr};	
-std::shared_ptr<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >> arr = std::make_shared<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >>(_ref_arr);
+	std::vector<  std::shared_ptr<A>  > _r__sub0_arr = {a1,a2,a3,std::shared_ptr<A>((new A())->__init__(4))};	
+	std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub0_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub0_arr);	
+	std::vector<  std::shared_ptr<A>  > _r__sub1_arr = {a1,nullptr};	
+	std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub1_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub1_arr);	
+	std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> > _ref_arr = {_sub0_arr,_sub1_arr,nullptr};	
+	std::shared_ptr<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >> arr = std::make_shared<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >>(_ref_arr);
 	std::cout << std::string("length of array: ");
 std::cout << arr->size();std::cout << std::endl;
 	std::cout << std::string("len subarray 0:  ");
@@ -3741,12 +3877,12 @@ std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> make_array() {
 
 	
 	/* arr = vector of vectors to: int */	
-std::vector<int> _r__sub0_arr = {1,2,3};	
-std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
-std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
-std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
-std::vector< std::shared_ptr<std::vector<int>> > _ref_arr = {_sub0_arr,_sub1_arr};	
-std::shared_ptr<std::vector< std::shared_ptr<std::vector<int>> >> arr = std::make_shared<std::vector< std::shared_ptr<std::vector<int>> >>(_ref_arr);
+	std::vector<int> _r__sub0_arr = {1,2,3};	
+	std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
+	std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
+	std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
+	std::vector<std::shared_ptr<std::vector<int>>> _ref_arr = {_sub0_arr,_sub1_arr};	
+	std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(_ref_arr);
 	return arr;
 	/* arrays:
 		arr : int
@@ -3931,7 +4067,14 @@ simple if/else
 def main():
 	a = 'x'
 	if a == 'x':
-		print('ok')
+		print('a ok')
+	else:
+		print('not a ok')
+	b = 'y'
+	if b == 'x':
+		print('b ok')
+	else:
+		print('b not ok')
 ```
 output:
 ------
@@ -3942,7 +4085,15 @@ int main() {
 	
 	auto a = std::string("x");  /* auto-fallback */
 	if (( a == std::string("x") )) {
-		std::cout << std::string("ok") << std::endl;
+		std::cout << std::string("a ok") << std::endl;
+	} else {
+		std::cout << std::string("not a ok") << std::endl;
+	}
+	auto b = std::string("y");  /* auto-fallback */
+	if (( b == std::string("x") )) {
+		std::cout << std::string("b ok") << std::endl;
+	} else {
+		std::cout << std::string("b not ok") << std::endl;
 	}
 	return 0;
 }
