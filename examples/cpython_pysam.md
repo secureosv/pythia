@@ -63,6 +63,17 @@ Below is the minimal set of files required to run Python and Pysam
 /usr/lib/python2.7/tempfile.py: /usr/lib/python2.7/tempfile.py
 /usr/lib/python2.7/random.py: /usr/lib/python2.7/random.py
 /usr/lib/python2.7/hashlib.py: /usr/lib/python2.7/hashlib.py
+/usr/lib/python2.7/contextlib.py: /usr/lib/python2.7/contextlib.py
+/usr/lib/python2.7/ctypes/**: /usr/lib/python2.7/ctypes/**
+
+/usr/lib/python2.7/lib-dynload/_ctypes.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/_ctypes.x86_64-linux-gnu.so
+/usr/lib/python2.7/lib-dynload/_hashlib.x86_64-linux-gnu.so: /usr/lib/python2.7/lib-dynload/_hashlib.x86_64-linux-gnu.so
+
+/usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0: /lib/x86_64-linux-gnu/libcrypto.so.1.0.0
+/usr/lib/x86_64-linux-gnu/libssl.so: /usr/lib/x86_64-linux-gnu/libssl.so
+/usr/lib/x86_64-linux-gnu/openssl-1.0.0/**: /usr/lib/x86_64-linux-gnu/openssl-1.0.0/**
+/usr/local/lib/python2.7/dist-packages/OpenSSL/**: /usr/local/lib/python2.7/dist-packages/OpenSSL/**
+
 
 /usr/lib/python2.7/bisect.py: /usr/lib/python2.7/bisect.py
 /usr/lib/python2.7/codecs.py: /usr/lib/python2.7/codecs.py
