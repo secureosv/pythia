@@ -498,7 +498,7 @@ Function Decorators
 				else:
 					raise SyntaxError('TODO return 2d array some backend')
 
-			if options['returns'] == 'self':
+			if options['returns'] == 'self' and len(self._class_stack):
 				options['returns_self'] = True
 				self.method_returns_multiple_subclasses[ self._class_stack[-1].name ].add(node.name)
 

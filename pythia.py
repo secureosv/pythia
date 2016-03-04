@@ -4,6 +4,12 @@ __version__ = '1.0.0'
 import os, sys, subprocess, hashlib, time
 import tempfile
 import webbrowser
+try:
+	import docker
+except ImportError:
+	print('to install docker-py run: `sudo pip install docker-py`')
+	#raise RuntimeError('can not load docker-py module')
+
 
 if '--usr-manifest' in sys.argv:
 	## generate usr.manifest for OSv image

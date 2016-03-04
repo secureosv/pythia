@@ -30,8 +30,6 @@ K_WORK = 1001
 
 BUFSIZE = 4
 
-BUFSIZE_RANGE = range(BUFSIZE)
-
 class Packet(object):
 	def __init__(self,l,i,k):
 		self.link = l
@@ -338,7 +336,7 @@ class WorkTask(Task):
 		pkt.ident = dest
 		pkt.datum = 0
 
-		for i in BUFSIZE_RANGE: # xrange(BUFSIZE)
+		for i in range(BUFSIZE):
 			w.count += 1
 			if w.count > 26:
 				w.count = 1
@@ -405,7 +403,7 @@ def entry_point(iterations):
 	#r.run(1)
 	#v8(r.run)
 	## above works, but it can also be done in a single line with `->` syntax
-	v8->( r.run(1) )
+	#v8->( r.run(1) )
 
 	startTime = clock()
 	result = r.run(iterations)

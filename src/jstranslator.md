@@ -44,6 +44,8 @@ class JSGenerator(NodeVisitorBase, GeneratorBase):
 		self._memory = ['HEAP']  ## used by c++ backend
 		self._with_type = []
 		self._classes = {}
+		self.method_returns_multiple_subclasses = {} # class name : set
+		self._class_stack = []
 
 		self._v8 = '--v8-natives' in sys.argv
 		self._ES6 = {

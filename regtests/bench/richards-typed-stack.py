@@ -29,7 +29,6 @@ K_WORK = 1001
 
 macro( BUFSIZE=4 )
 with stack:
-	BUFSIZE_RANGE = range(BUFSIZE)
 
 	class Packet(object):
 
@@ -342,7 +341,7 @@ with stack:
 			pkt.ident = dest
 			pkt.datum = 0
 
-			for i in BUFSIZE_RANGE: # xrange(BUFSIZE)
+			for i in range(BUFSIZE):
 				w.count += 1
 				if w.count > 26:
 					w.count = 1
@@ -372,18 +371,20 @@ with stack:
 			#pkt = None
 			#if tracing:
 			#	print("tcb =",t.ident)
+			print t->ident
 
 			if t->isTaskHoldingOrWaiting():
 				print 'holding.', t
 				t = t->link
 			else:
 				###########if tracing: trace(chr(ord("0")+t.ident))
-				print 'running.', t
+				#print 'running.', t
 				#t[...] = t->runTask()
 				res = t->runTask()
 				if res is None:
 					print 'res is null'
 					t = None
+					break
 				else:
 					ptr =  addr(res)
 					#print 'ptr to res:', ptr  ## BUG: always prints same address
