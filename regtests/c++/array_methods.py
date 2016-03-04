@@ -8,6 +8,13 @@ def somefunc():
 	assert 100 not in a
 	assert a.at(4)==5
 
+	a1,a2,a3,a4,a5 = a
+	assert a1==1
+	assert a2==2
+	assert a3==3
+	assert a4==4
+	assert a5==5
+
 	#print('len a:', len(a))
 	assert len(a)==5
 	b = a.pop()
@@ -46,6 +53,12 @@ def stackfunc():
 		arr = [5]int(1,2,3,4,5)
 		print('sizeof arr:', sizeof(arr))  ## says 20 bytes?
 		#val = a.pop()  ## not possible for stack allocated fixed size arrays
+		a1,a2,a3,a4,a5 = arr
+		assert a1==1
+		assert a2==2
+		assert a3==3
+		assert a4==4
+		assert a5==5
 
 		## pop and insert is allowed because the array remains the same size
 		## this generates a for loop that moves all elements past the insertion
