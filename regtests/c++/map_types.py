@@ -6,6 +6,12 @@ mymap = {
 	'key2' : [4,5,6,7]
 }
 
+FOO = 1.1
+mapx = {
+	'A': ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], FOO),
+	'B': ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], FOO*2.2)
+}
+
 with stack:
 	def test_stack():
 		print 'stack test...'

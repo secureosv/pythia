@@ -1825,11 +1825,14 @@ class PythonToPythonJS(NodeVisitorBase):
 			for i in range( len(node.value.keys) ):
 				k = node.value.keys[ i ]
 				v = node.value.values[i]
+
+				## key type ##
 				if isinstance(k, ast.Str):
 					key_type = 'string'
 				elif isinstance(k, ast.Num):
 					key_type = 'int'
 
+				## value type ##
 				if isinstance(v, ast.Str):
 					val_type = 'string'
 				elif isinstance(v, ast.Num):
@@ -1846,6 +1849,60 @@ class PythonToPythonJS(NodeVisitorBase):
 								val_type = '"[]double"'
 						elif isinstance(elt, ast.Str):
 							val_type = '"[]string"'
+				elif isinstance(v, ast.Tuple) and len(v.elts):
+					if val_type is None:
+						val_type = [None] * len(v.elts)
+
+					for vidx,elt in enumerate(v.elts):
+						if isinstance(elt, ast.Num):
+							if isinstance(elt.n, int):
+								val_type[vidx] = 'int'
+							else:
+								val_type[vidx] = 'double'
+						elif isinstance(elt, ast.Str):
+							val_type[vidx] = 'string'
+						elif isinstance(elt, ast.Name):
+							## TODO, check if named is a global
+							pass
+						elif isinstance(elt, ast.BinOp):
+
+							if isinstance(elt.left, ast.Num):
+								if isinstance(elt.left.n, int):
+									val_type[vidx] = 'int'
+								else:
+									val_type[vidx] = 'double'
+
+							elif isinstance(elt.right, ast.Num):
+								if isinstance(elt.right.n, int):
+									val_type[vidx] = 'int'
+								else:
+									val_type[vidx] = 'double'
+
+
+						elif isinstance(elt, ast.List) and len(elt.elts):
+							for et in elt.elts:
+								if isinstance(et, ast.Num):
+									if isinstance(et.n, int):
+										val_type[vidx] = '"[]int"'
+									else:
+										val_type[vidx] = '"[]double"'
+								elif isinstance(et, ast.Str):
+									val_type[vidx] = '"[]string"'
+								elif isinstance(et, ast.BinOp):
+									if isinstance(et.left, ast.Num):
+										raise RuntimeError('left is num')
+									elif isinstance(et.right, ast.Num):
+										raise RuntimeError('right is num')
+								else:
+									raise RuntimeError(et)
+						else:
+							raise RuntimeError(elt)
+
+
+			if type(val_type) is list and None in val_type:
+				print et
+				raise SyntaxError( self.format_error(val_type) )
+
 
 			if not key_type:
 				raise SyntaxError(  self.format_error('can not determine dict key type')  )
