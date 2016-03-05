@@ -1376,7 +1376,7 @@ def build( modules, module_path, datadirs=None ):
 					#gcc: fatal error: cannot specify -o with -c, -S or -E with multiple files
 					#cmd.extend(cbuild)  ## extra c files `/some/path/*.c`
 					raise RuntimeError('TODO fix building multiple .c files at once using gcc option -o')
-
+				
 				cmd.extend(['-o', object_path ])
 
 				print('========== compiling C static library =========')

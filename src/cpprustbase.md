@@ -2585,7 +2585,7 @@ TODO clean up go stuff.
 			args.append( '__vargs__ : Vec<%s>' %args_typedefs[starargs])
 			node._arg_names.append( starargs )
 
-		prefix = ''
+		prefix = '__attribute__((visibility("default"))) '
 		if func_pre:
 			prefix +=  ' '.join(func_pre) + ' '
 
