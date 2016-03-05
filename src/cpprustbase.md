@@ -1900,6 +1900,20 @@ regular Python has no support for.
 							v = self.visit(node.right.values[i])
 							if v.startswith('[') and v.endswith(']'):
 								v = ('new std::vector<%s>{'%value_vec) + v[1:-1] + '}'
+							elif isinstance(node.right.values[i], ast.Tuple): #elif v.startswith('{') and v.endswith('}'):
+								assert value_type.startswith('std::tuple')
+								targs = []
+								for ti,te in enumerate(node.right.values[i].elts):
+									tt = tupletype[ti]
+									tv = self.visit(te)
+									if tv.startswith('[') and tv.endswith(']'):
+										assert tt.startswith('std::vector')
+										if tt.endswith('*'):
+											tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+									targs.append(tv)
+
+								v = 'std::make_tuple(%s)' %','.join(targs)
+
 							items.append('{%s, %s}' %(k,v))
 
 						right = '{%s}' %'\n,'.join(items)
