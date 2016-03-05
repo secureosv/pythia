@@ -1396,6 +1396,8 @@ handles all special calls
 					d = node.args[2]
 					mtypek = self.visit(node.args[1].args[0])
 					mtypev = self.visit(node.args[1].args[1])
+					if mtypev.startswith('{') or '{' in mtypev:
+						raise RuntimeError(mtypev)
 					value = '(new std::map<%s, %s>)' %(mtypek, mtypev)
 					#raise SyntaxError(value)
 				if self._cpp:
@@ -1861,12 +1863,33 @@ regular Python has no support for.
 						key_type = node.left.args[0].s
 						if key_type.startswith('['):
 							raise SyntaxError(self.format_error('dictionary keys can not be a vector type'))
+
 					if isinstance(node.left.args[1], ast.Str):
 						value_type = node.left.args[1].s
 						if value_type.startswith('[]'):
 							value_vec = value_type.split(']')[-1]
 							value_type = 'std::vector<%s>*' % value_vec
+					elif isinstance(node.left.args[1], ast.Tuple):
+						tupletype = []
+						for telt in node.left.args[1].elts:
+							if isinstance(telt, ast.Str):
+								v = telt.s
+								if v.startswith('"') and v.endswith('"'):
+									v = v[1:-1]
+							else:
+								v = self.visit(telt)
+							if v.startswith('[]'):
+								t  = v.split(']')[-1]
+								if self._memory[-1]=='STACK':
+									v = 'std::vector<%s>' %t
+								else:
+									v = 'std::vector<%s>*' %t
 
+							tupletype.append(v)
+						value_type = 'std::tuple<%s>' %','.join(tupletype)
+						#raise RuntimeError(value_type)
+
+					#########################
 					if key_type == 'string':
 						key_type = 'std::string'
 
@@ -3996,14 +4019,19 @@ because they need some special handling in other places.
 							raise RuntimeError('TODO dict key type: %s' %value_type)
 
 						if isinstance(node.value.left.args[1], ast.Str):
-							#raise RuntimeError('TODO dict value type: %s' %value_type)
 							value_type = node.value.left.args[1].s
 							value_vec  = value_type.split(']')[-1]
 							if self._memory[-1]=='STACK':
 								value_type = 'std::vector<%s>' %value_vec
 							else:
 								value_type = 'std::vector<%s>*' %value_vec
-
+						elif isinstance(node.value.left.args[1], ast.Tuple):
+							raise RuntimeError('gottuple')
+						elif value_type.startswith('{') and value_type.endswith('}'):
+							raise RuntimeError(value_type)
+						elif '{' in value_type:
+							raise RuntimeError('xx')
+						#####################
 						if key_type=='string':
 							if self.usertypes and 'string' in self.usertypes:
 								key_type = self.usertypes['string']['type']
@@ -4017,7 +4045,7 @@ because they need some special handling in other places.
 
 						self._known_maps[ target ] = (key_type, value_type)
 
-						keyvalues = []
+						#keyvalues = []
 						a = []
 						for i in range( len(node.value.right.keys) ):
 							k = self.visit( node.value.right.keys[ i ] )
@@ -4027,9 +4055,8 @@ because they need some special handling in other places.
 									v = ('std::vector<%s>{'%value_vec) + v[1:-1] + '}'
 								else:
 									v = ('new std::vector<%s>{'%value_vec) + v[1:-1] + '}'
-
 							a.append( '{%s,%s}'%(k,v) )
-							keyvalues.append( (k,v) )
+						#	keyvalues.append( (k,v) )
 						#v = ', '.join( a )
 						initlist = '{%s}' %'\n,'.join(a)
 						map_type = 'std::map<%s,%s>' %(key_type, value_type)
@@ -4040,7 +4067,7 @@ because they need some special handling in other places.
 							return 'auto %s = std::shared_ptr<%s>(new %s%s);' %(target, map_type, map_type, initlist)
 
 
-						## c++11 shared pointer
+						## DEPRECATED c++11 shared pointer
 						if self.usertypes and 'map' in self.usertypes:
 							maptype = self.usertypes['map']['template'] % (key_type, value_type)
 							st = self.usertypes['shared']['template']

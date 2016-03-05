@@ -1899,9 +1899,11 @@ class PythonToPythonJS(NodeVisitorBase):
 							raise RuntimeError(elt)
 
 
-			if type(val_type) is list and None in val_type:
-				print et
-				raise SyntaxError( self.format_error(val_type) )
+			if type(val_type) is list:
+				if None in val_type:
+					raise SyntaxError( self.format_error(val_type) )
+				else:
+					val_type = tuple(val_type)
 
 
 			if not key_type:
