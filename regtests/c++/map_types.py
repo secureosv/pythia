@@ -7,9 +7,9 @@ mymap = {
 }
 
 FOO = 1.1
-mapx = {
-	'A': ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], FOO),
-	'B': ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], FOO*2.2)
+tuplemap = {
+	'A': ([1.0, 2.0, 3.0], [4.0, 5.0, 6.0], FOO),
+	'B': ([7.0, 8.0, 9.0], [0.0, 0.0, 0.0], FOO*2.2)
 }
 
 with stack:
@@ -35,6 +35,11 @@ def test_heap():
 	assert m1['K1'][1]==1
 	assert m1['K2'][0]==2
 	assert m1['K2'][1]==3
+
+	with get as 'std::get<%s>(%s)':
+		vec = get(0, tuplemap['A'])
+		assert vec[0]==1.0
+
 
 def main():
 	print mymap
