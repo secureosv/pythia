@@ -1390,34 +1390,33 @@ def build( modules, module_path, datadirs=None ):
 
 
 	if modules['c++']:
-		links = []
-		idirs = []
-		source = []
-		defines = []
-		mods_sorted_by_index = sorted(modules['c++'], key=lambda mod: mod.get('index'))
-		mainmod = None
+		#compile_mode = 'binary'
 		builddir = tempfile.gettempdir()
-
 		if '--osv' in sys.argv:
 			builddir = os.path.join(OSV_ROOT, 'apps/pythia_build')
 			if not os.path.isdir(builddir):
 				os.makedirs(builddir)
 
-		#compile_mode = 'binary'
+		mods_sorted_by_index = sorted(modules['c++'], key=lambda mod: mod.get('index'))
+		## save headers to temp build dir, and to output tar
 		for mod in mods_sorted_by_index:
 			if 'tag' in mod and mod['tag'] and ( mod['tag'].endswith('.hpp') or mod['tag'].endswith('.hpp') ):
 				## allows plain header files to be included in build directory ##
-				open(
-					os.path.join(builddir, mod['tag']), 'wb'
-				).write( mod['code'] )
+				open( os.path.join(builddir, mod['tag']), 'wb' ).write( mod['code'] )
 				output['c++'].append( mod )
-			else:
-				source.append( mod['code'] )
 
-			if 'name' in mod and mod['name']=='main':
-				mainmod = mod
-			elif mainmod is None:
-				mainmod = mod
+
+		for mod in mods_sorted_by_index:
+			links = []
+			idirs = []
+			source = []
+			defines = []
+
+			if 'tag' in mod and mod['tag'] and ( mod['tag'].endswith('.hpp') or mod['tag'].endswith('.hpp') ):
+				## allows plain header files to be included in build directory ##
+				continue
+
+
 			if 'links' in mod:
 				links.extend(mod['links'])
 			if 'include-dirs' in mod:
@@ -1431,55 +1430,139 @@ def build( modules, module_path, datadirs=None ):
 			if 'tag' in mod and mod['tag'] and '.' not in mod['tag']:
 				exename = mod['tag']
 
-		tmpfile = builddir + '/rusthon-c++-build.cpp'
-		data = '\n'.join(source)
-		open(tmpfile, 'wb').write( data )
+			tmpfile = builddir + '/rusthon-c++-build.cpp'
+			data = mod['code']
+			open(tmpfile, 'wb').write( data )
 
-		has_stm = '__transaction_atomic {' in data
-		if not has_stm:
-			has_stm = '__transaction_relaxed {' in data
-
-
-		global has_seastar
-		if links:
-			for lib in links:
-				if lib=='seastar':
-					has_seastar = True
-					break
-
-		if has_seastar:
-			## can not simply use -lseastar because its a static library with funky
-			## C++ static constructor trickery for self-registration of classes
-			links.remove('seastar')
-			if not HAS_CPP14:
-				raise RuntimeError('seastar requires a c++14 compatible compiler')
-
-		if '--osv' in sys.argv:
-			if os.path.isfile(builddir+'/myapp.so'):
-				os.unlink(builddir+'/myapp.so')
-			if os.path.isfile(builddir+'/myapp-stripped.so'):
-				os.unlink(builddir+'/myapp-stripped.so')
-			if os.path.isfile(os.path.join(OSV_ROOT,'build/last/usr.img')):
-				os.unlink(os.path.join(OSV_ROOT,'build/last/usr.img'))
-
-			linkdirs = '-I'+OSV_ROOT+'/include'
-			if idirs:
-				for idir in idirs:
-					linkdirs += ' -I'+idir
+			has_stm = '__transaction_atomic {' in data
+			if not has_stm:
+				has_stm = '__transaction_relaxed {' in data
 
 
-			linklibs = ''
+			global has_seastar
 			if links:
 				for lib in links:
-					linklibs += ' -l'+lib
+					if lib=='seastar':
+						has_seastar = True
+						break
 
-			makefile = [
-				'.PHONY: module',
-				'module: myapp.so',
-				'myapp.so:',
-			]
-			if HAS_CPP14:
+			if has_seastar:
+				## can not simply use -lseastar because its a static library with funky
+				## C++ static constructor trickery for self-registration of classes
+				links.remove('seastar')
+				if not HAS_CPP14:
+					raise RuntimeError('seastar requires a c++14 compatible compiler')
+
+			if '--osv' in sys.argv:
+				if os.path.isfile(builddir+'/myapp.so'):
+					os.unlink(builddir+'/myapp.so')
+				if os.path.isfile(builddir+'/myapp-stripped.so'):
+					os.unlink(builddir+'/myapp-stripped.so')
+				if os.path.isfile(os.path.join(OSV_ROOT,'build/last/usr.img')):
+					os.unlink(os.path.join(OSV_ROOT,'build/last/usr.img'))
+
+				linkdirs = '-I'+OSV_ROOT+'/include'
+				if idirs:
+					for idir in idirs:
+						linkdirs += ' -I'+idir
+
+
+				linklibs = ''
+				if links:
+					for lib in links:
+						linklibs += ' -l'+lib
+
+				makefile = [
+					'.PHONY: module',
+					'module: myapp.so',
+					'myapp.so:',
+				]
+				if HAS_CPP14:
+					cmd = []
+					if '--stm' in sys.argv or has_stm:
+						cmd.append('-fgnu-tm')
+
+					if has_seastar:
+						cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
+						cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
+						cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
+						## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
+						cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
+						cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
+
+					makefile.append(
+						'	g++-4.9 -std=c++1y -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s %s' %(' '.join(cmd),linkdirs, linklibs)
+					)
+				else:
+					if has_seastar:
+						raise RuntimeError('seastar requires g++4.9 or newer')
+					makefile.append(
+						'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs)
+					)
+
+
+				makefile.append(
+					'	pythia --usr-manifest myapp.so >> usr.manifest'
+				)
+				makefile.extend(
+					[
+						'.PHONY: clean',
+						'clean:',
+						'	rm -f myapp.so',
+					]
+				)
+				open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
+				## how come myapp.so is not copied to osv/build/last ?
+				usrmanifest = [
+					'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
+				]
+				## copy all datafiles into osv image
+				for n in output['datafiles'].keys():
+					if n=='usr.manifest':
+						usrmanifest.append( output['datafiles']['usr.manifest'] )
+					else:
+						if '/' in n:
+							p,f = os.path.split(n)
+							if not os.path.isdir('/tmp/'+p):
+								os.makedirs('/tmp/'+p)
+
+						d = output['datafiles'][n]
+						open('/tmp/%s' %n, 'wb').write(d)
+						usrmanifest.append('/%s: /tmp/%s' %(n,n))
+
+				print '\n'.join(usrmanifest)
+
+				open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
+
+				modulepy = [
+					'from osv.modules import api',
+					'default = api.run("/tools/myapp.so")'
+				]
+				open(builddir+'/module.py', 'wb').write('\n'.join(modulepy))
+				subprocess.check_call(['./scripts/build', 'image=pythia_build'], cwd=OSV_ROOT)
+				#subprocess.check_call(['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--execute', '/tools/myapp.so'], cwd=OSV_ROOT)
+				subprocess.check_call(
+					['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--with-signals'], 
+					cwd=OSV_ROOT
+				)
+				output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
+
+			else:  ## regular linux build
+
+				for n in output['datafiles'].keys():
+					if '/' in n:
+						p,f = os.path.split(n)
+						if not os.path.isdir('/tmp/'+p):
+							os.makedirs('/tmp/'+p)
+					d = output['datafiles'][n]
+					open('/tmp/%s' %n, 'wb').write(d)
+
 				cmd = []
+				if HAS_CPP14:
+					cmd.extend(['g++-4.9', '-std=c++1y'])
+				else:
+					cmd.extend(['g++', '-std=c++11'])
+
 				if '--stm' in sys.argv or has_stm:
 					cmd.append('-fgnu-tm')
 
@@ -1491,201 +1574,119 @@ def build( modules, module_path, datadirs=None ):
 					cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
 					cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
 
-				makefile.append(
-					'	g++-4.9 -std=c++1y -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s %s' %(' '.join(cmd),linkdirs, linklibs)
-				)
-			else:
-				if has_seastar:
-					raise RuntimeError('seastar requires g++4.9 or newer')
-				makefile.append(
-					'	cc -std=c++11 -shared -o myapp.so -fPIC rusthon-c++-build.cpp %s %s' %(linkdirs, linklibs)
-				)
+				if compile_mode=='binary':
+					cmd.append('-O3')
+
+					#cmd.append('-faggressive-loop-optimizations')
+					#cmd.append('-ffast-math')
+					#cmd.append('-fconserve-stack')
+					#cmd.append('-floop-nest-optimize')
+					#cmd.append('-fmove-loop-invariants')
+
+					if '--gcc-pgo' in sys.argv:
+						cmd.append('-fprofile-generate')
+					cmd.extend(['-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
+
+				cmd.append('-Wl,-rpath,/usr/local/lib/')  ## extra user installed dynamic libs
+				cmd.append('-Wl,-rpath,./')  ## can not load dynamic libs from same directory without this
+				cmd.append(tmpfile)
+
+				if '/' in exename and not os.path.isdir( os.path.join(builddir,os.path.split(exename)[0]) ):
+					os.makedirs(os.path.join(builddir,os.path.split(exename)[0]))
+
+				if compile_mode == 'binary':
+					cmd.extend(['-o', os.path.join(builddir,exename)])
+				elif compile_mode == 'dynamiclib':
+					cmd.extend(
+						['-shared', '-fPIC']
+					)
+					exename += '.so'
+					cmd.extend(['-o', os.path.join(builddir,exename)])
+
+				cmd.append('-pthread')
+
+				for D in defines:
+					cmd.append('-D%s' %D)
+
+				if nuitka:
+					## note: linking happens after the object-bin above is created `-o ruston-c++-bin`,
+					## fixes the error: undefined reference to `_PyThreadState_Current', etc.
+					#if not nuitka_include_path:
+					#	nuitka_include_path = '/usr/local/lib/python2.7/dist-packages/nuitka/build/include'
+					#cmd.append('-I'+nuitka_include_path)
+					cmd.append('-I/usr/include/python2.7')
+					cmd.append('-lpython2.7')
+
+				if idirs:
+					for idir in idirs:
+						cmd.append('-I'+idir)
+
+				if links:
+					for lib in links:
+						cmd.append('-l'+lib)
+
+				## always link to libdl, external libraries may require dl_open, etc.
+				cmd.append('-ldl')
 
 
-			makefile.append(
-				'	pythia --usr-manifest myapp.so >> usr.manifest'
-			)
-			makefile.extend(
-				[
-					'.PHONY: clean',
-					'clean:',
-					'	rm -f myapp.so',
-				]
-			)
-			open(builddir+'/Makefile', 'wb').write('\n'.join(makefile))
-			## how come myapp.so is not copied to osv/build/last ?
-			usrmanifest = [
-				'/tools/myapp.so: ../../apps/pythia_build/myapp.so',
-			]
-			## copy all datafiles into osv image
-			for n in output['datafiles'].keys():
-				if n=='usr.manifest':
-					usrmanifest.append( output['datafiles']['usr.manifest'] )
-				else:
-					if '/' in n:
-						p,f = os.path.split(n)
-						if not os.path.isdir('/tmp/'+p):
-							os.makedirs('/tmp/'+p)
+				if link or giws:
 
-					d = output['datafiles'][n]
-					open('/tmp/%s' %n, 'wb').write(d)
-					usrmanifest.append('/%s: /tmp/%s' %(n,n))
+					if giws:   ## link to the JVM if giws bindings were compiled ##
+						cmd.append('-ljvm')
 
-			print '\n'.join(usrmanifest)
+						os.environ['LD_LIBRARY_PATH']=''
+						#for jrepath in 'include include/linux jre/lib/i386 jre/lib/i386/client/'.split():
+						for jrepath in 'include include/linux'.split():
+							cmd.append('-I%s/%s' %(os.environ['JAVA_HOME'], jrepath))
+						for jrepath in 'jre/lib/amd64 jre/lib/amd64/server/'.split():
+							cmd.append('-L%s/%s' %(os.environ['JAVA_HOME'], jrepath))
+							os.environ['LD_LIBRARY_PATH'] += ':%s/%s'%(os.environ['JAVA_HOME'], jrepath)
+						#raise RuntimeError(os.environ['LD_LIBRARY_PATH'])
 
-			open(builddir+'/usr.manifest', 'wb').write('\n'.join(usrmanifest))
+					#else:  ## TODO fix jvm with static c libs
+					#	cmd.append('-static')
 
-			modulepy = [
-				'from osv.modules import api',
-				'default = api.run("/tools/myapp.so")'
-			]
-			open(builddir+'/module.py', 'wb').write('\n'.join(modulepy))
-			subprocess.check_call(['./scripts/build', 'image=pythia_build'], cwd=OSV_ROOT)
-			#subprocess.check_call(['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--execute', '/tools/myapp.so'], cwd=OSV_ROOT)
-			subprocess.check_call(
-				['./scripts/run.py', '--memsize', '512M', '--vcpus', '2', '--with-signals'], 
-				cwd=OSV_ROOT
-			)
-			output['datafiles']['myapp.img'] = open(os.path.join(OSV_ROOT,'build/last/usr.img'), 'rb').read()
+					if link:  ## c staticlibs or giws c++ wrappers ##
+						cmd.append('-L' + tempfile.gettempdir() + '/.')
+						for libname in link:
+							cmd.append('-l'+libname)
 
-		else:  ## regular linux build
-
-			for n in output['datafiles'].keys():
-				if '/' in n:
-					p,f = os.path.split(n)
-					if not os.path.isdir('/tmp/'+p):
-						os.makedirs('/tmp/'+p)
-				d = output['datafiles'][n]
-				open('/tmp/%s' %n, 'wb').write(d)
-
-			cmd = []
-			if HAS_CPP14:
-				cmd.extend(['g++-4.9', '-std=c++1y'])
-			else:
-				cmd.extend(['g++', '-std=c++11'])
-
-			if '--stm' in sys.argv or has_stm:
-				cmd.append('-fgnu-tm')
-
-			if has_seastar:
-				cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
-				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
-				cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
-				## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
-				cmd.extend('-Wl,--whole-archive,-lseastar,--no-whole-archive -g -Wl,--no-as-needed'.split())
-				cmd.extend('-laio -lboost_program_options -lboost_system -lstdc++ -lm -lboost_unit_test_framework -lboost_thread -lcryptopp -lrt -lgnutls -lgnutlsxx -lxenstore -lhwloc -lnuma -lpciaccess -lxml2 -lz'.split())
-
-			if compile_mode=='binary':
-				cmd.append('-O3')
-
-				#cmd.append('-faggressive-loop-optimizations')
-				#cmd.append('-ffast-math')
-				#cmd.append('-fconserve-stack')
-				#cmd.append('-floop-nest-optimize')
-				#cmd.append('-fmove-loop-invariants')
-
-				if '--gcc-pgo' in sys.argv:
-					cmd.append('-fprofile-generate')
-				cmd.extend(['-march=native', '-mtune=native', '-I'+tempfile.gettempdir()])
-
-			cmd.append('-Wl,-rpath,/usr/local/lib/')  ## extra user installed dynamic libs
-			cmd.append('-Wl,-rpath,./')  ## can not load dynamic libs from same directory without this
-			cmd.append(tmpfile)
-
-			if '/' in exename and not os.path.isdir( os.path.join(builddir,os.path.split(exename)[0]) ):
-				os.makedirs(os.path.join(builddir,os.path.split(exename)[0]))
-
-			if compile_mode == 'binary':
-				cmd.extend(['-o', os.path.join(builddir,exename)])
-			elif compile_mode == 'dynamiclib':
-				cmd.extend(
-					['-shared', '-fPIC']
-				)
-				exename += '.so'
-				cmd.extend(['-o', os.path.join(builddir,exename)])
-
-			cmd.append('-pthread')
-
-			for D in defines:
-				cmd.append('-D%s' %D)
-
-			if nuitka:
-				## note: linking happens after the object-bin above is created `-o ruston-c++-bin`,
-				## fixes the error: undefined reference to `_PyThreadState_Current', etc.
-				#if not nuitka_include_path:
-				#	nuitka_include_path = '/usr/local/lib/python2.7/dist-packages/nuitka/build/include'
-				#cmd.append('-I'+nuitka_include_path)
-				cmd.append('-I/usr/include/python2.7')
-				cmd.append('-lpython2.7')
-
-			if idirs:
-				for idir in idirs:
-					cmd.append('-I'+idir)
-
-			if links:
-				for lib in links:
-					cmd.append('-l'+lib)
-
-			## always link to libdl, external libraries may require dl_open, etc.
-			cmd.append('-ldl')
-
-
-			if link or giws:
-
-				if giws:   ## link to the JVM if giws bindings were compiled ##
-					cmd.append('-ljvm')
-
-					os.environ['LD_LIBRARY_PATH']=''
-					#for jrepath in 'include include/linux jre/lib/i386 jre/lib/i386/client/'.split():
-					for jrepath in 'include include/linux'.split():
-						cmd.append('-I%s/%s' %(os.environ['JAVA_HOME'], jrepath))
-					for jrepath in 'jre/lib/amd64 jre/lib/amd64/server/'.split():
-						cmd.append('-L%s/%s' %(os.environ['JAVA_HOME'], jrepath))
-						os.environ['LD_LIBRARY_PATH'] += ':%s/%s'%(os.environ['JAVA_HOME'], jrepath)
-					#raise RuntimeError(os.environ['LD_LIBRARY_PATH'])
-
-				#else:  ## TODO fix jvm with static c libs
-				#	cmd.append('-static')
-
-				if link:  ## c staticlibs or giws c++ wrappers ##
-					cmd.append('-L' + tempfile.gettempdir() + '/.')
-					for libname in link:
-						cmd.append('-l'+libname)
-
-			print('========== g++ : compile main ==========')
-			print(' '.join(cmd))
-			try:
-				subprocess.check_call( cmd )
-			except:
+				print('========== g++ : compile main ==========')
 				print(' '.join(cmd))
+				try:
+					subprocess.check_call( cmd )
+				except:
+					print(' '.join(cmd))
 
-			mainmod['build'] = {
-				'source':data, 
-				'binary':tempfile.gettempdir() + '/' + exename, 
-				'name':exename
-			}
+				mod['build'] = {
+					'source':data, 
+					'binary':tempfile.gettempdir() + '/' + exename, 
+					'name':exename
+				}
 
-			if '--gcc-pgo' in sys.argv and compile_mode=='binary':
-				print '<testing binary...'
-				print mainmod['build']['binary']
-				ok = subprocess.check_call( mainmod['build']['binary'] )
-				print ok
-				subprocess.check_call(['md5sum', mainmod['build']['binary']])
+				if '--gcc-pgo' in sys.argv and compile_mode=='binary':
+					print '<testing binary...'
+					print mod['build']['binary']
+					ok = subprocess.check_call( mod['build']['binary'] )
+					print ok
+					subprocess.check_call(['md5sum', mod['build']['binary']])
 
-				print '<recompile...'
-				cmd.remove('-fprofile-generate')
-				cmd.insert(3,'-fprofile-use')
-				print cmd
-				subprocess.check_call( cmd )
-				print '<gcc optimized binary compiled OK>'
-				subprocess.check_call(['md5sum', mainmod['build']['binary']])
+					print '<recompile...'
+					cmd.remove('-fprofile-generate')
+					cmd.insert(3,'-fprofile-use')
+					print cmd
+					subprocess.check_call( cmd )
+					print '<gcc optimized binary compiled OK>'
+					subprocess.check_call(['md5sum', mod['build']['binary']])
 
-			if compile_mode == 'binary':
-				output['c++'].append( mainmod['build'] )
-				output['executeables'].append(tempfile.gettempdir() + '/' + exename)
-			else:
-				output['datafiles'][ exename ] = open(tempfile.gettempdir() + '/' + exename, 'rb').read()
+				if compile_mode == 'binary':
+					output['c++'].append( mod['build'] )
+					output['executeables'].append(tempfile.gettempdir() + '/' + exename)
+				else:
+					output['datafiles'][ exename ] = open(tempfile.gettempdir() + '/' + exename, 'rb').read()
 
+
+	######################### CPython ##########################
 	if python_main['script']:
 		python_main['script'] = '\n'.join(python_main['script'])
 		output['python'].append( python_main )

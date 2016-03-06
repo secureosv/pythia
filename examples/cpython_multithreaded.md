@@ -49,8 +49,8 @@ with pointers:
 	def thread_runner(pyob:PyObject):
 		print 'enter thread runner'
 		with gil:
-			pyob->run_thread()
-			#pyob->run()
+			pyob..run_thread()
+			#pyob..run()
 		print 'edit thread runner'
 
 
@@ -61,12 +61,12 @@ with pointers:
 				print 'pyob is None'
 				break
 			with gil:
-				v = pyob->value as int
+				v = pyob..value as int
 			print 'thread1:', v
 			sleep(0.5)
 
 		#for i in range(100):
-		#	v = pyob->value as int
+		#	v = pyob..value as int
 		#	print 'thread1:', v
 		#	#output <- pyob  ## sends to thread2
 		print 'end thread1'
@@ -74,7 +74,7 @@ with pointers:
 	def thread2( C: chan PyObject):
 		for i in range(100):
 			pyob = <- C
-			v = pyob->value as int
+			v = pyob..value as int
 			print 'thread2:', v
 
 
@@ -88,22 +88,22 @@ def main():
 	with gil:
 		a = cpython.A('xxx')
 		x = 99
-		a->value = PyInt_FromLong(x)
-		a->value = 1
+		a..value = PyInt_FromLong(x)
+		a..value = 1
 		for i in range(4):
-			b = a->array[i] as int
+			b = a..array[i] as int
 			print 'numpy array data:', b
-			a->array[i] = PyInt_FromLong(i*10)
+			a..array[i] = PyInt_FromLong(i*10)
 
-		a->show_array()
-		a->echo('hello world')
-		name = a->name as string
+		a..show_array()
+		a..echo('hello world')
+		name = a..name as string
 		print 'name:', name
-		n = a->number as float
+		n = a..number as float
 		print 'number:', n
-		n = a->number as f64
+		n = a..number as f64
 		print 'number:', n
-		f = a->flag as bool
+		f = a..flag as bool
 		print 'flag:', f
 
 	print 'addr of a:', a
@@ -124,7 +124,7 @@ def main():
 	print 'sending pyob'
 	while True:
 		with gil:
-			v = a->value as int
+			v = a..value as int
 
 		if v==10:
 			break

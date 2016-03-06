@@ -2585,7 +2585,8 @@ TODO clean up go stuff.
 			args.append( '__vargs__ : Vec<%s>' %args_typedefs[starargs])
 			node._arg_names.append( starargs )
 
-		prefix = '__attribute__((visibility("default"))) '
+		#prefix = '__attribute__((visibility("default"))) '  ## this fails to force functions to be available to ctypes in CPython.
+		prefix = ''
 		if func_pre:
 			prefix +=  ' '.join(func_pre) + ' '
 
