@@ -10,6 +10,10 @@ or at least ctypes is unable to reach it using `ctypes.CDLL('')`
 ```python
 import ctypes
 
+def test_func_ptr( fptr ):
+	print 'function pointer'
+	print fptr
+
 def run_test():
 	print 'cpython: running test...'
 	lib = ctypes.CDLL('')
@@ -40,12 +44,23 @@ void say_hi_c() {
 }
 ```
 
+C++ Dynamic Library
+-------------------
+@libmymodule
+```pythia
+#backend:c++ dynamiclib
+with extern():
+	def hello_worldXXX():
+		print 'hello worldXXX'
+
+
+```
 
 Build Options
 -------------
 * @link:python2.7
 * @include:/usr/include/python2.7
-```rusthon
+```pythia
 #backend:c++
 import cpython
 
@@ -61,6 +76,7 @@ def main():
 	state = cpython.initalize()
 
 	with gil:
+		#cpython.test_func_ptr( addr(hello_world) as int )
 		cpython.run_test()
 
 	cpython.finalize(state)
