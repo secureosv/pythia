@@ -16,17 +16,20 @@ def test_func_ptr( fptr ):
 
 def run_test():
 	print 'cpython: running test...'
-	lib = ctypes.CDLL('')
+	lib = ctypes.CDLL('libmymodule.so')
 	print 'ctypes lib', lib
-	lib.say_hi_c()
+	lib.hello_worldXXX()
+
+	#lib.say_hi_c()
 
 	#lib.hello_world()
 	#lib._hello_world()
 	if not hasattr(lib, 'hello_world'):
 		print 'hello_world C function missing'
 	hw = getattr(lib, 'hello_world')  ## crashes here
-	#print 'got C function'
+	print 'got C function'
 	print hw
+	hw()
 	#hw.restype = ctypes..
 	#hw.argtypes = tuple(...)
 	print 'test OK'
@@ -60,6 +63,7 @@ Build Options
 -------------
 * @link:python2.7
 * @include:/usr/include/python2.7
+@myexe
 ```pythia
 #backend:c++
 import cpython
