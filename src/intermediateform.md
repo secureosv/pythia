@@ -1890,7 +1890,11 @@ class PythonToPythonJS(NodeVisitorBase):
 									val_type[vidx] = '"[]string"'
 								elif isinstance(et, ast.BinOp):
 									if isinstance(et.left, ast.Num):
-										raise RuntimeError('left is num')
+										if isinstance(et.left.n, int):
+											val_type[vidx] = '"[]int"'
+										else:
+											val_type[vidx] = '"[]double"'
+
 									elif isinstance(et.right, ast.Num):
 										raise RuntimeError('right is num')
 								else:

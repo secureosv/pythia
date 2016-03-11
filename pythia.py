@@ -1077,10 +1077,10 @@ def build( modules, module_path, datadirs=None ):
 				'tag'  : mod.get('tag', None),
 				'code' : cppcode, 
 				'index': n+1, 
-				'links': mod['links'], 
-				'include-dirs': mod['include-dirs'], 
-				'defines'     : mod['defines'],
-				'compile-mode': mod['compile-mode']
+				'links': mod.get('links', None), 
+				'include-dirs': mod.get('include-dirs'), 
+				'defines'     : mod.get('defines'),
+				'compile-mode': mod.get('compile-mode')
 			})
 
 
@@ -1435,11 +1435,11 @@ def build( modules, module_path, datadirs=None ):
 				continue
 
 
-			if 'links' in mod:
+			if 'links' in mod and mod['links']:
 				links.extend(mod['links'])
-			if 'include-dirs' in mod:
+			if 'include-dirs' in mod and mod['include-dirs']:
 				idirs.extend(mod['include-dirs'])
-			if 'defines' in mod:
+			if 'defines' in mod and mod['defines']:
 				defines.extend(mod['defines'])
 
 			if 'compile-mode' in mod:

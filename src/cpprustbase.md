@@ -4121,6 +4121,17 @@ because they need some special handling in other places.
 								else:
 									T = 'std::string'
 							self._known_arrays[ target ] = T
+							if T=='tuple':
+								tupleargs = []
+								for elt in node.value.right.elts:
+									#raise RuntimeError(elt.func.id)
+									tupleargs.append( self.visit(elt) )
+
+								#for arg in args:
+								#	if arg.startswith('[]')
+								#	args.append( self.visit(elt) )
+
+								return 'std::shared_ptr<std::tuple<%s>> %s;' %(','.join(tupleargs), target)
 
 							if self.usertypes and 'vector' in self.usertypes:
 								vtemplate = self.usertypes['vector']['template']
@@ -4452,8 +4463,21 @@ because they need some special handling in other places.
 						'"__setitem__"),"iO",'
 					)
 					return '%s, %s);' %( hack[:-1], value )
-				else:
 
+				elif isinstance(value, tuple):
+					assert isinstance(node.value, ast.BinOp)
+					assert isinstance(node.value.left, ast.Call)
+					assert node.value.left.func.id=='__go__array__'
+					#raise RuntimeError(value)
+					#raise RuntimeError(node.value.left.args[0].id)
+					#assert node.value.left.args[0].id=='tuple'
+					if target in self._vars:
+						self._vars.remove( target )
+						self._known_vars.add( target )
+						return 'auto %s = %s{%s}; /*somearray*/' %(target, value[0], ','.join(value[1]))
+					else:
+						return '%s = %s{%s}; /*somearray*/' %(target, value[0], ','.join(value[1]))
+				else:
 					if value in self._known_arrays and isinstance(self._known_arrays[value], tuple) and self._memory[-1]=='STACK':
 						atype, fixed_size = self._known_arrays[value]
 

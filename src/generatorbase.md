@@ -1123,15 +1123,26 @@ TODO clean up.
 		elif name == '__go__array__':
 			if isinstance(node.args[0], ast.BinOp):# and node.args[0].op == '<<':  ## todo assert right is `typedef`
 				a = self.visit(node.args[0].left)
-				if a in go_types:
-					if self._go:
-						return '*[]%s' %a
-					elif self._rust:
-						return '&mut Vec<%s>' %a  ## TODO test this
+				T = self.visit(node.args[0])
+				if type(T) is tuple:
+					assert T[1]=='typedef'
+					T = T[0]
+
+				if self._cpp:
+					if self._memory[-1]=='STACK':
+						raise RuntimeError('TODO goarr')
 					else:
-						raise RuntimeError('todo')
+						return 'std::vector<%s>' %T
 				else:
-					return '*[]*%s' %a  ## todo - self._catch_assignment_array_of_obs = true
+					if a in go_types:
+						if self._go:
+							return '*[]%s' %a
+						elif self._rust:
+							return '&mut Vec<%s>' %a  ## TODO test this
+						else:
+							raise RuntimeError('todo')
+					else:
+						return '*[]*%s' %a  ## todo - self._catch_assignment_array_of_obs = true
 
 			else:
 				a = self.visit(node.args[0])
