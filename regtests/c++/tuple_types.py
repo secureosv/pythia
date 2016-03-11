@@ -5,7 +5,9 @@ std::tuple<Type1, Type2, etc...>
 
 
 def main():
-	mytuple = []tuple( []float, []float, float )
-	print mytuple
+	tuplearray = []tuple( []float, []float, float )
+	print tuplearray
+	item = ( [1.1,2.2,3.3], [4.4,5.5], 100.0 )
+	tuplearray.append( item )
 	print 'OK'
 	

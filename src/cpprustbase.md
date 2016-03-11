@@ -4131,7 +4131,7 @@ because they need some special handling in other places.
 								#	if arg.startswith('[]')
 								#	args.append( self.visit(elt) )
 
-								return 'std::shared_ptr<std::tuple<%s>> %s;' %(','.join(tupleargs), target)
+								return 'std::shared_ptr<std::vector<std::tuple<%s>>> %s;' %(','.join(tupleargs), target)
 
 							if self.usertypes and 'vector' in self.usertypes:
 								vtemplate = self.usertypes['vector']['template']
@@ -4364,8 +4364,40 @@ because they need some special handling in other places.
 					elif isinstance(node.value, ast.BinOp) and isinstance(node.value.op, ast.RShift) and isinstance(node.value.left, ast.Name) and node.value.left.id=='__new__':
 						self._known_instances[target] = self.visit(node.value.right)
 						return 'auto %s = %s;  /* new object */' % (target, value)
+					elif isinstance(node.value, ast.Tuple):
+
+						tupletype = []
+						for telt in node.value.elts:
+							if isinstance(telt, ast.Str):
+								v = telt.s
+								if v.startswith('"') and v.endswith('"'):
+									v = v[1:-1]
+							else:
+								v = self.visit(telt)
+							if v.startswith('[]'):
+								t  = v.split(']')[-1]
+								if self._memory[-1]=='STACK':
+									v = 'std::vector<%s>' %t
+								else:
+									v = 'std::vector<%s>*' %t
+
+							tupletype.append(v)
+
+
+						targs = []
+						for ti,te in enumerate(node.value.elts):
+							tt = tupletype[ti]
+							tv = self.visit(te)
+							if tv.startswith('[') and tv.endswith(']'):
+								#assert tt.startswith('std::vector')
+								if tt.endswith('*'):
+									tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+							targs.append(tv)
+
+						return 'auto %s = std::make_tuple(%s)' %(target, ','.join(targs))
+
 					else:
-						return 'auto %s = %s;  /* auto-fallback */' % (target, value)
+						return 'auto %s = %s;  /* auto-fallback %s */' % (target, value, node.value)
 				else:
 					if value.startswith('Rc::new(RefCell::new('):
 						#return 'let _RC_%s = %s; let mut %s = _RC_%s.borrow_mut();	/* new array */' % (target, value, target, target)
