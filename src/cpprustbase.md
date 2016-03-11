@@ -4372,8 +4372,21 @@ because they need some special handling in other places.
 								v = telt.s
 								if v.startswith('"') and v.endswith('"'):
 									v = v[1:-1]
+							elif isinstance(telt, ast.List): #v.startswith('[') and v.endswith(']'):
+								tsubvec = None
+								for st in telt.elts:
+									if isinstance(st, ast.Num):
+										tsubvec = 'double'
+										break
+								assert tsubvec is not None
+								v = 'std::vector<%s>' %tsubvec
+
+
+							elif isinstance(telt, ast.Num):
+								v = 'double'
 							else:
 								v = self.visit(telt)
+
 							if v.startswith('[]'):
 								t  = v.split(']')[-1]
 								if self._memory[-1]=='STACK':
@@ -4389,12 +4402,14 @@ because they need some special handling in other places.
 							tt = tupletype[ti]
 							tv = self.visit(te)
 							if tv.startswith('[') and tv.endswith(']'):
-								#assert tt.startswith('std::vector')
+								assert tt.startswith('std::vector')
 								if tt.endswith('*'):
 									tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+								else:
+									tv = '{%s}' %tv[1:-1]
 							targs.append(tv)
 
-						return 'auto %s = std::make_tuple(%s)' %(target, ','.join(targs))
+						return 'auto %s = std::make_tuple(%s);' %(target, ','.join(targs))
 
 					else:
 						return 'auto %s = %s;  /* auto-fallback %s */' % (target, value, node.value)
