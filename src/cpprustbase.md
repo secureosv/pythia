@@ -957,12 +957,23 @@ Subscript `a[n]`
 				if self._cpp:
 					## default to deference shared pointer ##
 					value = self.visit(node.value)
+					is_tuple_index = isinstance(node.slice, ast.Index) and isinstance(node.slice.value, ast.Set)
+
 					if value in self._known_pointers:
-						r = '(*%s)[%s]' % (value, self.visit(node.slice))
+						if is_tuple_index:
+							r = 'std::get<%s>(*%s)' % (self.visit(node.slice.value.elts[0]), value)
+						else:
+							r = '(*%s)[%s]' % (value, self.visit(node.slice))
 					elif self._memory[-1]=='STACK':
-						r = '%s[%s]' % (value, self.visit(node.slice))
+						if is_tuple_index:
+							r = 'std::get<%s>(%s)' % (self.visit(node.slice.value.elts[0]), value)
+						else:
+							r = '%s[%s]' % (value, self.visit(node.slice))
 					else:
-						r = '(*%s)[%s]' % (value, self.visit(node.slice))
+						if is_tuple_index:
+							r = 'std::get<%s>(*%s)' % (self.visit(node.slice.value.elts[0]), value)
+						else:
+							r = '(*%s)[%s]' % (value, self.visit(node.slice))
 
 					#############################################
 					if value.startswith('PyObject_GetAttrString(') and value.endswith(')'):
