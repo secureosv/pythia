@@ -4376,14 +4376,14 @@ because they need some special handling in other places.
 								tsubvec = None
 								for st in telt.elts:
 									if isinstance(st, ast.Num):
-										tsubvec = 'double'
+										tsubvec = 'float'
 										break
 								assert tsubvec is not None
 								v = 'std::vector<%s>' %tsubvec
 
 
 							elif isinstance(telt, ast.Num):
-								v = 'double'
+								v = 'float'
 							else:
 								v = self.visit(telt)
 
@@ -4406,7 +4406,7 @@ because they need some special handling in other places.
 								if tt.endswith('*'):
 									tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
 								else:
-									tv = '{%s}' %tv[1:-1]
+									tv = '%s{%s}' %(tt, tv[1:-1])
 							targs.append(tv)
 
 						return 'auto %s = std::make_tuple(%s);' %(target, ','.join(targs))
