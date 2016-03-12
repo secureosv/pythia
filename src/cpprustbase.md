@@ -4132,8 +4132,12 @@ because they need some special handling in other places.
 								#	args.append( self.visit(elt) )
 
 								#return 'std::shared_ptr<std::vector<std::tuple<%s>>> %s;' %(','.join(tupleargs), target)
-								tuplevec = 'std::vector<std::tuple<%s>>' %','.join(tupleargs)
-								return 'auto %s = std::make_shared<%s>(%s());' %(target, tuplevec, tuplevec)
+								if self._memory[-1]=='STACK':
+									tuplevec = 'std::vector<std::tuple<%s>>' %','.join(tupleargs)
+									return 'auto %s = %s();' %(target, tuplevec)
+								else:
+									tuplevec = 'std::vector< std::shared_ptr<std::tuple<%s>> >' %','.join(tupleargs)
+									return 'auto %s = std::make_shared<%s>(%s());' %(target, tuplevec, tuplevec)
 
 							if self.usertypes and 'vector' in self.usertypes:
 								vtemplate = self.usertypes['vector']['template']
@@ -4409,10 +4413,19 @@ because they need some special handling in other places.
 									tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
 								else:
 									tv = '%s{%s}' %(tt, tv[1:-1])
+							elif tv.startswith('std::vector'):  ## never happens?
+								raise RuntimeError(tv)
+
+							if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
+								tupletype[ti] = 'std::shared_ptr<%s>' %tt
+								tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+
 							targs.append(tv)
 
-						return 'auto %s = std::make_tuple(%s);' %(target, ','.join(targs))
-
+						if self._memory[-1]=='STACK':
+							return 'auto %s = std::make_tuple(%s); /*new-tuple*/' %(target, ','.join(targs))
+						else:
+							return 'auto %s = std::make_shared<std::tuple<%s>>(std::make_tuple(%s)); /*new-tuple*/' %(target, ','.join(tupletype), ','.join(targs))
 					else:
 						return 'auto %s = %s;  /* auto-fallback %s */' % (target, value, node.value)
 				else:

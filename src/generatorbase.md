@@ -1130,9 +1130,9 @@ TODO clean up.
 
 				if self._cpp:
 					if self._memory[-1]=='STACK':
-						raise RuntimeError('TODO goarr')
-					else:
 						return 'std::vector<%s>' %T
+					else:
+						return 'std::shared_ptr<std::vector<%s>>' %T
 				else:
 					if a in go_types:
 						if self._go:
