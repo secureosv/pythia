@@ -4134,6 +4134,7 @@ because they need some special handling in other places.
 								#return 'std::shared_ptr<std::vector<std::tuple<%s>>> %s;' %(','.join(tupleargs), target)
 								if self._memory[-1]=='STACK':
 									tuplevec = 'std::vector<std::tuple<%s>>' %','.join(tupleargs)
+									self._known_refs[target] = tuplevec
 									return 'auto %s = %s();' %(target, tuplevec)
 								else:
 									tuplevec = 'std::vector< std::shared_ptr<std::tuple<%s>> >' %','.join(tupleargs)
@@ -4423,6 +4424,7 @@ because they need some special handling in other places.
 							targs.append(tv)
 
 						if self._memory[-1]=='STACK':
+							self._known_refs[target] = 'tuple<%s>' % ','.join(targs)
 							return 'auto %s = std::make_tuple(%s); /*new-tuple*/' %(target, ','.join(targs))
 						else:
 							return 'auto %s = std::make_shared<std::tuple<%s>>(std::make_tuple(%s)); /*new-tuple*/' %(target, ','.join(tupletype), ','.join(targs))
