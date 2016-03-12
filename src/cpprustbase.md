@@ -4131,7 +4131,9 @@ because they need some special handling in other places.
 								#	if arg.startswith('[]')
 								#	args.append( self.visit(elt) )
 
-								return 'std::shared_ptr<std::vector<std::tuple<%s>>> %s;' %(','.join(tupleargs), target)
+								#return 'std::shared_ptr<std::vector<std::tuple<%s>>> %s;' %(','.join(tupleargs), target)
+								tuplevec = 'std::vector<std::tuple<%s>>' %','.join(tupleargs)
+								return 'auto %s = std::make_shared<%s>(%s());' %(target, tuplevec, tuplevec)
 
 							if self.usertypes and 'vector' in self.usertypes:
 								vtemplate = self.usertypes['vector']['template']
