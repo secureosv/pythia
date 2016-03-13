@@ -1037,6 +1037,10 @@ handles all special calls
 			args = ','.join([self.visit(arg) for arg in node.args])
 			return 'std::move(%s)' %args
 
+		elif self._cpp and fname=='complex':
+			args = ','.join([self.visit(arg) for arg in node.args])
+			return 'std::complex<double>(%s)' %args
+
 		elif fname=='future':
 			if not len(self._function_stack):
 				raise SyntaxError('future() call used at global level')

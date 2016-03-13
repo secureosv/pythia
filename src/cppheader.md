@@ -22,6 +22,7 @@ CPP_HEADER = """
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <complex>
 
 typedef long   i64;
 typedef int    i32;
