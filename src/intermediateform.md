@@ -1465,6 +1465,9 @@ class PythonToPythonJS(NodeVisitorBase):
 			else:
 				return '%s.__mul__(%s)' %(left, right)
 
+		elif op == '**' and self._with_cpp:
+			return 'std.__doublecolon__.pow(%s,%s)' %(left, right)
+
 		elif op == '//' and self._with_cpp:
 			## note: std::floor(int,int) returns a double,
 			## because in C, with typed variables there is no need for
