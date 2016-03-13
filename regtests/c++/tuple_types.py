@@ -1,19 +1,27 @@
 '''
 std::tuple<Type1, Type2, etc...>
 '''
-#mytuple = []tuple( []double, []double, double )
+with typedef:
+	HeapTArray = []tuple( []double, []double, double )
 
-with constant:
-	IDX = 0
+## IDX needs to be a constant so std::get<IDX> can be resolved at compile time.
+with constant: IDX = 0
 
-def test_stack():
-	print 'stack test'
-	with stack:
+with stack:
+	with typedef:
+		StackTArray = []tuple( []float, []float, float )
+
+	def test_stack_array( arr: StackTArray ):
+		print 'len of arr:', len(arr)
+
+	def test_stack():
+		print 'stack test'
 		tuplearray = []tuple( []float, []float, float )
 		a = ( [1.1,2.2,3.3], [4.4,5.5], 100.0 )
 		b = ( [6.1,7.2,8.3], [9.4,0.5], 1.0 )
 		tuplearray.append( a )
 		tuplearray.append( b )
+		test_stack_array( tuplearray )
 
 		with get as "std::get<%s>(%s)":
 			for item in tuplearray:

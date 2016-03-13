@@ -832,7 +832,21 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id == 'constant':
+			if node.context_expr.id == 'typedef':
+				r = []
+				for b in node.body:
+					assert isinstance(b, ast.Assign)
+					tdef  = self.visit(b.value)
+					tname = self.visit(b.targets[0])
+					self._typedefs[tname] = tdef
+					if isinstance(tdef, tuple):
+						assert tdef[0]=='std::vector<tuple>'
+						tdef = 'std::vector<std::tuple<%s>>' %','.join(tdef[1])
+
+					r.append('typedef %s %s;' %(tdef, tname))
+				return '\n'.join(r)
+
+			elif node.context_expr.id == 'constant':
 				self._in_constant = True
 				r = []
 				for b in node.body:

@@ -31,6 +31,7 @@ class CppRustBase( GoGenerator ):
 		self._known_pointers = {}
 		self._global_arrays  = {}
 		self._global_refs    = {}
+		self._typedefs       = {}
 		self._in_constant    = False
 		self.macros = {}
 
