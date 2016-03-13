@@ -2,7 +2,7 @@
 std::tuple<Type1, Type2, etc...>
 '''
 with typedef:
-	HeapTArray = []tuple( []double, []double, double )
+	HeapTArray = []tuple( []float, []float, float )
 
 ## IDX needs to be a constant so std::get<IDX> can be resolved at compile time.
 with constant: IDX = 0
@@ -34,6 +34,10 @@ with stack:
 				assert v3[0]==vec3[0]
 
 
+def test_heap_array( arr: HeapTArray ):
+	print 'len of arr:', len(arr)
+
+
 def test_heap():
 	print 'heap test'
 	tuplearray = []tuple( []float, []float, float )
@@ -41,6 +45,8 @@ def test_heap():
 	b = ( [6.1,7.2,8.3], [9.4,0.5], 1.0 )
 	tuplearray.append( a )
 	tuplearray.append( b )
+
+	test_heap_array( tuplearray )
 
 	print a[{0}][1]
 	with constant:

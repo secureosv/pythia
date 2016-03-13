@@ -1449,8 +1449,6 @@ def build( modules, module_path, datadirs=None ):
 			#	exename = mod['tag']
 			if 'tag' in mod and mod['tag']:
 				exename = mod['tag']
-			else:
-				raise RuntimeError(mod.keys())
 
 
 			tmpfile = builddir + '/rusthon-c++-build.cpp'
