@@ -31,6 +31,7 @@ class CppRustBase( GoGenerator ):
 		self._known_pointers = {}
 		self._global_arrays  = {}
 		self._global_refs    = {}
+		self._in_constant    = False
 		self.macros = {}
 
 
@@ -3632,6 +3633,10 @@ because they need some special handling in other places.
 		else:
 			target = self.visit( node.targets[0] )
 			self._assign_var_name = target
+			if target.startswith('std::get<'):
+				## note: there is no `std::set` because tuples can not change once constructed.
+				#return 'std::set' + target[ len('std::set') : -1 ] + ',' + self.visit(node.value) + ');'
+				raise SyntaxError(self.format_error('tuple items can not be reassigned'))
 		#######################
 
 		if self._cpp and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and node.value.func.attr in ('pop', 'insert'):

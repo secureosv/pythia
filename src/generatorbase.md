@@ -832,7 +832,19 @@ Also implements extra syntax like `switch` and `select`.
 			return '\n'.join(r)
 
 		elif isinstance(node.context_expr, ast.Name):
-			if node.context_expr.id in ('atomic', 'relaxed', 'transaction'):
+			if node.context_expr.id == 'constant':
+				self._in_constant = True
+				r = []
+				for b in node.body:
+					a = self.visit(b)
+					if a:
+						if isinstance(b, ast.Assign) and '=' in a:
+							a = 'const ' + a
+						r.append(self.indent()+a)
+				self._in_constant = False
+				return '\n'.join(r)
+
+			elif node.context_expr.id in ('atomic', 'relaxed', 'transaction'):
 				self._has_gnu_stm = True
 				r = []
 				if node.context_expr.id=='atomic':
