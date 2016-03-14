@@ -467,7 +467,15 @@ Function Decorators
 			if options['returns'].startswith('[]'):
 				options['returns_array'] = True
 				options['returns_array_dim'] = options['returns'].count('[]')
-				options['returns_array_type'] = options['returns'].split(']')[-1]
+
+				vectype = options['returns'].split(']')[-1]
+				if self._cpp and vectype.startswith('tuple(') and vectype.endswith(')'):
+					tupletypes = vectype[ len('tuple(') : -1 ].split(',')
+					vectype = 'std::tuple<%s>' %','.join(tupletypes)
+					if self._memory[-1]=='HEAP':
+						vectype = 'std::shared_ptr<%s>' %vectype
+				options['returns_array_type'] = vectype
+
 				if self._cpp:
 					if options['returns_array_type']=='string':
 						options['returns_array_type'] = 'std::string'

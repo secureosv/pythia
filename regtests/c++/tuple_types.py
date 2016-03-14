@@ -37,9 +37,18 @@ with stack:
 def test_heap_array( arr: HeapTArray ):
 	print 'len of arr:', len(arr)
 
+def test_returns_array_of_tuples(n) -> []tuple(float, float):
+	r = []tuple( float, float )
+	for i in range(n):
+		t = (1.1, 1.2)
+		r.append(t)
+	return r
 
 def test_heap():
 	print 'heap test'
+	tarr = test_returns_array_of_tuples(3)
+	assert len(tarr)==3
+
 	tuplearray = []tuple( []float, []float, float )
 	a = ( [1.1,2.2,3.3], [4.4,5.5], 100.0 )
 	b = ( [6.1,7.2,8.3], [9.4,0.5], 1.0 )

@@ -2352,6 +2352,9 @@ TODO clean up go stuff.
 		node.returns_self = returns_self = options['returns_self']
 		return_type = options['returns']
 		generic_base_class = options['generic_base_class']
+		#if self._cpp and return_type and return_type.startswith('tuple('):
+		#	raise RuntimeError(return_type)
+
 		if returns_self and self._cpp:
 			return_type = self._class_stack[-1].name
 
