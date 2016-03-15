@@ -994,7 +994,7 @@ def parse_and_fix_code(r, output):
 		eline = output[e.lineno-1]
 		echar = None
 		echar_prev = None
-		if e.offset < len(eline):
+		if e.offset is not None and e.offset < len(eline):
 			echar = eline[ e.offset ]
 			echar_next = None
 			echar_prev = None
