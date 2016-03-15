@@ -348,7 +348,7 @@ def schedule():
 	t = taskWorkArea.taskList
 	while t is not None:
 		pkt = None
-
+		print t.ident
 		if tracing:
 			print("tcb =",t.ident)
 
