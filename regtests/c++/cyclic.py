@@ -11,7 +11,11 @@ class Parent:
 		self.children.push_back( child )
 		return child
 
-	def say(self, msg:string):
+	## TODO: find out why `void` must be returned here, and `auto` fails with this error:
+	## error: use of ‘auto Parent::say(std::string)’ before deduction of ‘auto’
+	## this->parent.lock()->say(std::string("hello parent"));
+	#def say(self, msg:string):
+	def say(self, msg:string) ->void:
 		print(msg)
 
 class Child:

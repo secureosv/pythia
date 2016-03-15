@@ -1,6 +1,14 @@
 '''
 returns auto
 '''
+
+def returns_void() -> void:
+	print 'returns void'
+
+def returns_nothing():
+	print 'returns nothing'
+
+
 ## this test fails is flag is not typed as `bool`
 ## g++ will compile with flag untyped (defaults to `auto`),
 ## but the test will fail when run.
@@ -19,6 +27,8 @@ class Foo:
 		return 3
 	def get_float(self):
 		return 4.4
+	def do_nothing(self):
+		pass
 
 def main():
 	print returns_int( False )
@@ -29,6 +39,7 @@ def main():
 	f = Foo()
 	assert f.get_int()==3
 	assert f.get_float()==4.4
+	f.do_nothing()
 
 	print('OK')
 

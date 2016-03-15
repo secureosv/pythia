@@ -1584,11 +1584,14 @@ def build( modules, module_path, datadirs=None ):
 				else:
 					cmd.extend(['g++', '-std=c++11'])
 
+				if '--debugger' in sys.argv:
+					cmd.append('-g')  ## compile with gdb debugger flags
+
 				if '--stm' in sys.argv or has_stm:
 					cmd.append('-fgnu-tm')
 
 				if has_seastar:
-					cmd.extend('-g -Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
+					cmd.extend('-Wall -fvisibility=hidden -DHAVE_XEN -DHAVE_HWLOC -DHAVE_NUMA'.split())
 					cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar'))
 					cmd.append('-I' + os.path.expanduser('~/rusthon_cache/seastar/build/release/gen'))
 					## note: when static linking, order is important, the libs linked after must fill-in missing refs that came before.
@@ -2059,12 +2062,14 @@ def main():
 					print(package[k])
 
 		for exe in package['executeables']:
-			print('running: %s' %exe)
+			ecmd = []
+			if '--debugger' in sys.argv: ecmd.append('gdb')
+			ecmd.append(exe)
 			if has_seastar:
-				exe = [exe, '--memory', '1G']  ## support older hardware for testing
-
+				ecmd.extend(['--memory', '1G'])  ## support older hardware for testing
+			print('running: %s' %ecmd)
 			subprocess.check_call(
-				exe,
+				ecmd,
 				cwd=tmpdir ## jvm needs this to find the .class files
 			)
 
