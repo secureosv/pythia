@@ -2749,7 +2749,7 @@ TODO clean up go stuff.
 						else:
 							out.append( self.indent() + 'fn %s(%s) -> %s {' % (node.name, ', '.join(args), return_type) )
 
-			else:  ## function with no return type
+			else:  ## function with no return type, `auto` can be used in c++14 to find the return type.
 
 				if self._cpp: ## c++ ##
 					if is_method or options['classmethod']:
@@ -2766,14 +2766,14 @@ TODO clean up go stuff.
 								self._cpp_class_header.append(sig + ';')
 
 						else:
-							sig = 'void %s::%s(%s)' %(classname, fname, ', '.join(args))
+							sig = 'auto %s::%s(%s)' %(classname, fname, ', '.join(args))
 							if self._noexcept:
 								out.append( self.indent() + '%s noexcept {\n' % sig  )
-								sig = '%svoid %s(%s)' % (prefix,fname, ', '.join(args))
+								sig = '%sauto %s(%s)' % (prefix,fname, ', '.join(args))
 								self._cpp_class_header.append(sig + ' noexcept;')
 							else:
 								out.append( self.indent() + '%s {\n' % sig  )
-								sig = '%svoid %s(%s)' % (prefix,fname, ', '.join(args))
+								sig = '%sauto %s(%s)' % (prefix,fname, ', '.join(args))
 
 								if virtualoverride:
 									sig = 'virtual %s override' %sig
@@ -2781,11 +2781,11 @@ TODO clean up go stuff.
 								self._cpp_class_header.append(sig + ';')
 					else:
 						if self._noexcept:
-							sig = '%svoid %s(%s)' %(prefix, fname, ', '.join(args))
+							sig = '%sauto %s(%s)' %(prefix, fname, ', '.join(args))
 							out.append( self.indent() + '%s noexcept {\n' % sig  )
 							if not is_main: self._cheader.append( sig + ' noexcept;' )
 						else:
-							sig = '%svoid %s(%s)' %(prefix, fname, ', '.join(args))
+							sig = '%sauto %s(%s)' %(prefix, fname, ', '.join(args))
 							out.append( self.indent() + '%s {\n' % sig  )
 							if not is_main: self._cheader.append( sig + ';' )
 
