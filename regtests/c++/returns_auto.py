@@ -34,19 +34,33 @@ class Foo:
 	def get_self(self):
 		return self
 
+
 with stack:
 	class FooStack:
 		def __init__(self, bar:int):
 			self.bar = bar
 		def get_self(self):
 			return self
+		def test_indirect(self):
+			return self.test_abstract()
+
+		#@abstractmethod
+		def test_abstract(self):
+			return self
+
 
 	class FooStackSub( FooStack ):
-		def __init__(self, bar:int, value:float):
+		def __init__(self, bar:int, value:string):
 			self.bar = bar
 			self.value = value
 		## TODO: subclasses should automatically generate this
 		def get_self(self):
+			return self
+		## TODO: subclasses should automatically generate this
+		def test_indirect(self):
+			return self.test_abstract()
+		## TODO: subclasses should automatically generate this
+		def test_abstract(self):
 			return self
 
 
@@ -68,17 +82,25 @@ def main():
 		assert sf.bar==100
 		assert sf.get_self().bar==100
 
-		subf = FooStackSub(10, 1.1)
+		subf = FooStackSub(10, 'hello')
 		print subf.bar
 		print subf.value
 		assert subf.bar == 10
-		#assert subf.value == 1.1
+		assert subf.value == 'hello'
 		o = subf.get_self()
 		assert o.bar == 10
-		#assert o.value == 1.1
+		assert o.value == 'hello'
 
 		print o.bar
 		print o.value
+
+		## explicit casting to FooStackSub is not required if subclass contains its own versions
+		## of methods from its parent classes.
+		#x = o.test_indirect() as FooStackSub
+		x = o.test_indirect()
+		assert x.bar == 10
+		assert x.value == 'hello'
+
 
 	print('OK')
 
