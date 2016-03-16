@@ -12,31 +12,44 @@ def main():
 		#(x*x for x in range(4)),  ## TODO fix listcomps
 		(x for x in range(20)),
 	)
-	print( len(arr))
-	print( len(arr[0]) )
-	print( len(arr[1]) )
-	if arr[2] is None:
-		print('nullptr works ok!')
-	else:
-		print('never reached')
 
-	print('sub 0 items:')
+	a,b,c = arr[0]
+	assert a==1
+	assert b==2
+	assert c==3
+
+	for vec in arr:
+		print vec
+		if vec is not None:
+			x,y,z = vec
+			print x,y,z
+
+	assert len(arr)==4
+	assert len(arr[0])==3
+	assert len(arr[1])==5
+	assert len(arr[3])==20
+	assert arr[2] is None
+
+	v = 1
 	for i in arr[0]:
-		print( i )
+		assert i==v
+		v+=1
 
-	print('sub 1 items:')
 	sub = arr[1]
+	v = sub[0]
 	for i in sub:
-		print(i)
+		assert i == v
+		v+=1
 
-	print('sub 3 items:')
+	v = 0
 	for i in arr[3]:
-		print(i)
+		assert i==v
+		v+=1
 
-	print('sub 3 items changed:')
 	arr[3][0] = 1000
 	arr[3][1] = 1001
-	arr[3][2] = 1002
-	arr[3][3] = 1003
-	for i in arr[3]:
-		print(i)
+
+	assert arr[3][0] == 1000
+	assert arr[3][1] == 1001
+
+	print 'OK'
