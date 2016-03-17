@@ -181,11 +181,23 @@ hooks into bad magic hack, 2nd pass rustc compile.
 			else:
 				lines.append('for %s in %s.borrow_mut().iter() { //magic:%s' %(target, iter, node.iter.uid))
 
+		clean_up_scope = []
 		self.push()
 		for b in node.body:
 			lines.append( self.indent()+self.visit(b) )
+			## after `b` has been visited, if it was an assignment node,
+			## it will then need to be removed from the known variables list,
+			## because C++ is block scoped, and in regular python variables escape for loops.
+			if hasattr(b, '_new_assignment'):
+				clean_up_scope.append(b._new_assignment)
+
 		self.pull()
 		lines.append( self.indent()+'}' )  ## end of for loop
+
+		for name in clean_up_scope:
+			self._known_vars.remove(name)
+			self._vars.add(name)
+
 		return '\n'.join(lines)
 
 
@@ -3771,8 +3783,14 @@ because they need some special handling in other places.
 
 		elif isinstance(node.targets[0], ast.Name) and node.targets[0].id in self._vars:
 			## first assignment of a known variable, this requires 'auto' in c++, or `let` in rust.
+			## note that the first pass of translation picks up all local variables traversing into
+			## all nested structures and loops (not block scoped)
 			self._vars.remove( target )
 			self._known_vars.add( target )
+			node._new_assignment = target
+
+			#if len(self._stack)>=2 and isinstance(self._stack[-2], ast.For):
+			#	raise RuntimeError(self._stack)
 
 			if isinstance(node.value, ast.Str):  ## catch strings for `+=` hack
 				self._known_strings.add( target )
