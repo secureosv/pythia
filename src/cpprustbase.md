@@ -625,9 +625,11 @@ note: `nullptr` is c++11
 				for b in bnode.body:
 					if isinstance(b, ast.FunctionDef):
 						overload_nodes.append( b )
-						if hasattr(b, 'returns_self') and b.returns_self:
-							if b.name != '__init__' and not b.is_abstract:
-								overloaded_returns_self.append(b)
+						#if hasattr(b, 'returns_self') and b.returns_self:
+						#	if b.name != '__init__' and not b.is_abstract:
+						#		overloaded_returns_self.append(b)
+						if b.name != '__init__' and b.name not in method_names:
+							overloaded_returns_self.append(b)
 
 						## catch_call trick is used to call methods on base classes from the subclass.
 						if self._cpp:

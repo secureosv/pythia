@@ -53,15 +53,15 @@ with stack:
 		def __init__(self, bar:int, value:string):
 			self.bar = bar
 			self.value = value
-		## TODO: subclasses should automatically generate this
-		def get_self(self):
-			return self
-		## TODO: subclasses should automatically generate this
-		def test_indirect(self):
-			return self.test_abstract()
-		## TODO: subclasses should automatically generate this
-		def test_abstract(self):
-			return self
+		## subclasses automatically generate this
+		#def get_self(self):
+		#	return self
+		## subclasses automatically generate this
+		#def test_indirect(self):
+		#	return self.test_abstract()
+		## subclasses automatically generate this
+		#def test_abstract(self):
+		#	return self
 
 
 def main():
