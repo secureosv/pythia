@@ -2105,7 +2105,7 @@ def main():
 						## https://github.com/nwjs/nw.js/issues/2833
 						nwcfg += '"window":{"width":1200, "height":680, "toolbar":false, "as_desktop":true, "frame":false}}'
 					else:
-						nwcfg += '"window":{"width":1200, "height":680, "toolbar":false}}'
+						nwcfg += '"window":{"width":1200, "height":680, "toolbar":true}}'
 
 					open(os.path.join(tmpdir,"package.json"),'wb').write(nwcfg)
 					nwcmd = [nodewebkit]

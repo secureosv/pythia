@@ -49,7 +49,7 @@ with stack:
 			return self
 
 
-	class FooStackSub( FooStack ):
+	class FooStackA( FooStack ):
 		def __init__(self, bar:int, value:string):
 			self.bar = bar
 			self.value = value
@@ -62,6 +62,11 @@ with stack:
 		## subclasses automatically generate this
 		#def test_abstract(self):
 		#	return self
+
+	class FooStackB( FooStack ):
+		def __init__(self, bar:int, value:int):
+			self.bar = bar
+			self.value = value
 
 
 def main():
@@ -82,7 +87,7 @@ def main():
 		assert sf.bar==100
 		assert sf.get_self().bar==100
 
-		subf = FooStackSub(10, 'hello')
+		subf = FooStackA(10, 'hello')
 		print subf.bar
 		print subf.value
 		assert subf.bar == 10
@@ -95,12 +100,33 @@ def main():
 		print o.value
 
 		## explicit casting to FooStackSub is not required if subclass contains its own versions
-		## of methods from its parent classes.
-		#x = o.test_indirect() as FooStackSub
+		## of methods from its parent classes, these are auto generated durring translation.
 		x = o.test_indirect()
 		assert x.bar == 10
 		assert x.value == 'hello'
 
+
+		sub = FooStackB(10, 4)
+		assert sub.bar == 10
+		assert sub.value == 4
+		oo = sub.get_self()
+		assert oo.bar == 10
+		assert oo.value == 4
+
+		print oo.bar
+		print oo.value
+
+		## explicit casting to FooStackSub is not required if subclass contains its own versions
+		## of methods from its parent classes, these are auto generated durring translation.
+		xx = oo.test_indirect()
+		assert xx.bar == 10
+		assert xx.value == 4
+
+		#assert isinstance(xx, FooStackB)  ## TODO: fixme
+		if isinstance(xx, FooStackB):
+			print 'xx is FooStackB'
+		else:
+			raise RuntimeError('test failed')
 
 	print('OK')
 
