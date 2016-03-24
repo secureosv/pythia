@@ -851,30 +851,6 @@ negative slice is not fully supported, only `-1` literal works.
 			else:
 				raise RuntimeError('TODO slice unknown')
 
-			## note: `auto` can not be used to make c++11 guess the type from a constructor that takes start and end iterators.
-			#return 'auto _ref_%s( %s->begin()+START, %s->end()+END ); auto %s = &_ref_%s;' %(target, val, val, target, target)
-			#return 'std::vector<int> _ref_%s( %s->begin(), %s->end() ); auto %s = &_ref_%s;' %(target, val, val, target, target)
-
-			## this sefaults because _ref_ is on the stack and gets cleaned up, while the new smart pointer also has a reference
-			## to it and also cleans it up.  TODO how to force _ref_ onto the heap instead?
-			slice = [
-				'auto _ref_%s = *%s' %(target,value), ## deference and copy vector
-				'auto %s = %s' %(target, value), ## copy shared_ptr
-				'%s.reset( &_ref_%s )' %(target, target)  ## segfaults
-				#'auto _ptr_%s = &_ref_%s' %(target,target),
-				#'%s.reset( _ptr_%s )' %(target,target)
-			]
-			if lower:
-				N = lower
-				slice.append('_ref_%s.erase(_ref_%s.begin(), _ref_%s.begin()+%s)' %(target, target, target, N))
-
-			if upper:  ## BROKEN, TODO FIXME
-				N = upper
-				slice.append( '_ref_%s.erase(_ref_%s.begin()+_ref_%s.size()-%s+1, _ref_%s.end())'   %(target, target, target, N, target))
-
-
-			#return 'auto _ref_%s= *%s;%s;auto %s = &_ref_%s;' %(target, val, slice, target, target)
-			return ';\n'.join(slice) + ';'
 
 ```
 

@@ -33,6 +33,10 @@ with stack:
 				v3 = item[{ IDX }]
 				assert v3[0]==vec3[0]
 
+				v4 = tuple.get(item, 0)
+				assert v4[0]==v3[0]
+
+
 
 def test_heap_array( arr: HeapTArray ):
 	print 'len of arr:', len(arr)
