@@ -828,14 +828,25 @@ negative slice is not fully supported, only `-1` literal works.
 			return '\n'.join(slice)
 
 		else:  ## slice an unknown type of array ##
-			if not lower and not upper and not step:
-				return 'auto %s( %s->begin(), %s->end() );' %(target, value, value)
+			if not lower and not upper and not step:  ## slice copy `myarr[:]`
+				if self._memory[-1]=='STACK':
+					return 'std::vector< decltype(%s->begin())::value_type > %s( %s->begin(), %s->end() );' %(value, target, value, value)
+				else:
+					vectype = 'std::vector<decltype(%s->begin())::value_type>' %value
+					return 'auto %s = std::make_shared<%s>( %s(%s->begin(),%s->end()) );' %(target, vectype,vectype, value, value)
+
 			elif lower and not upper and not step:
 				if self._memory[-1]=='STACK':
 					return 'std::vector< decltype(%s->begin())::value_type > %s( %s->begin()+%s, %s->end() );' %(value, target, value, lower, value)
 				else:
 					vectype = 'std::vector<decltype(%s->begin())::value_type>' %value
 					return 'auto %s = std::make_shared<%s>( %s(%s->begin()+%s,%s->end()) );' %(target, vectype,vectype, value, lower, value)
+			elif upper and not lower and not step:
+				if self._memory[-1]=='STACK':
+					return 'std::vector< decltype(%s->begin())::value_type > %s( %s->begin(), %s->begin()+%s );' %(value, target, value, value, upper)
+				else:
+					vectype = 'std::vector<decltype(%s->begin())::value_type>' %value
+					return 'auto %s = std::make_shared<%s>( %s(%s->begin(),%s->begin()+%s) );' %(target, vectype,vectype, value, value, upper)
 
 			else:
 				raise RuntimeError('TODO slice unknown')

@@ -14,7 +14,18 @@ def test_unknown_vectypes():
 	assert v2[1]==3
 	assert v2[2]==4
 	assert len(v2)==3
+
+	v3 = v1[ :2 ]
+	assert v3[0]==1
+	assert v3[1]==2
+	assert len(v3)==2
+
+	v4 = v1[:]
+	assert len(v4)==len(v1)
+	assert v4[0]==v1[0]
+
 	print 'OK'
+
 
 def test_known_vectypes():
 	for step in range(2):
