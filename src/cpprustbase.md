@@ -4433,9 +4433,9 @@ because they need some special handling in other places.
 
 						tupletype = []
 						for telt in node.value.elts:
-							if isinstance(telt, ast.Str):
+							if isinstance(telt, ast.Str):  ## TODO test tuple with strings
 								v = telt.s
-								if v.startswith('"') and v.endswith('"'):
+								if v.startswith('"') and v.endswith('"'):  ## TODO this looks like a bug
 									v = v[1:-1]
 							elif isinstance(telt, ast.List): #v.startswith('[') and v.endswith(']'):
 								tsubvec = None
@@ -4449,6 +4449,8 @@ because they need some special handling in other places.
 
 							elif isinstance(telt, ast.Num):
 								v = 'float'
+							elif isinstance(telt, ast.Name):
+								v = 'decltype(%s)' % self.visit(telt)
 							else:
 								v = self.visit(telt)
 

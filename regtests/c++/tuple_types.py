@@ -48,8 +48,27 @@ def test_returns_array_of_tuples(n) -> []tuple(float, float):
 		r.append(t)
 	return r
 
+## note: g++4.9 can not guess a complex return type, when the parameter `n` is untyped, 
+## so `n:int` is required so the return type can automatically be deduced by g++.
+def test_array_of_nested_tuples(n:int):
+	with typedef: T = tuple(float,float)
+	r = []tuple( T, T )
+
+	for i in range(n):
+		a = (1.1, 1.2)
+		b = (2.2, 2.3)
+		#r.append( (a,b) )  ## TODO
+		c = (a,b)
+		r.append( c )
+	return r
+
+
+
 def test_heap():
 	print 'heap test'
+	nested = test_array_of_nested_tuples(4)
+	assert len(nested)==4
+
 	tarr = test_returns_array_of_tuples(3)
 	assert len(tarr)==3
 

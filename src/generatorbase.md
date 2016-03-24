@@ -856,6 +856,11 @@ Also implements extra syntax like `switch` and `select`.
 							tdef = 'std::vector<std::tuple<%s>>' %','.join(tdef[1])
 						else:
 							tdef = 'std::shared_ptr< std::vector<std::shared_ptr<std::tuple<%s>>> >' %','.join(tdef[1])
+					elif tdef.startswith('tuple('):
+						if self._memory[-1]=='STACK':
+							tdef = 'std::tuple<%s>' %','.join([self.visit(t) for t in b.value.args])
+						else:
+							tdef = 'std::shared_ptr<std::tuple<%s>>' %','.join([self.visit(t) for t in b.value.args])
 
 					r.append('typedef %s %s;' %(tdef, tname))
 				return '\n'.join(r)
