@@ -2,7 +2,21 @@
 array slice syntax
 '''
 
-def somefunc():
+def some_vec():
+	a = []int(1,2,3,4)
+	return a
+
+def test_unknown_vectypes():
+	print 'testing unknown vec types'
+	v1 = some_vec()
+	v2 = v1[ 1: ]
+	assert v2[0]==2
+	assert v2[1]==3
+	assert v2[2]==4
+	assert len(v2)==3
+	print 'OK'
+
+def test_known_vectypes():
 	for step in range(2):
 		w = range(10)
 		assert len(w)==10
@@ -93,10 +107,8 @@ def somefunc():
 
 def main():
 	print('calling somefunc')
-	somefunc()
-
-	## never reached because there is a segfault at the end
-	## of somefunc when the slices go out of scope, they are free'ed twice.
+	test_known_vectypes()
+	test_unknown_vectypes()
 	print('OK')
 
 #main()

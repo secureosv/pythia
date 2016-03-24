@@ -827,9 +827,18 @@ negative slice is not fully supported, only `-1` literal works.
 				slice.append(self.indent()+'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target))
 			return '\n'.join(slice)
 
-		else:  ## SEGFAULTS - TODO FIXME
-			#raise RuntimeError('todo fix slice unknown type')
-			return 'auto %s( %s->begin(), %s->end() );' %(target, value, value)
+		else:  ## slice an unknown type of array ##
+			if not lower and not upper and not step:
+				return 'auto %s( %s->begin(), %s->end() );' %(target, value, value)
+			elif lower and not upper and not step:
+				if self._memory[-1]=='STACK':
+					return 'std::vector< decltype(%s->begin())::value_type > %s( %s->begin()+%s, %s->end() );' %(value, target, value, lower, value)
+				else:
+					vectype = 'std::vector<decltype(%s->begin())::value_type>' %value
+					return 'auto %s = std::make_shared<%s>( %s(%s->begin()+%s,%s->end()) );' %(target, vectype,vectype, value, lower, value)
+
+			else:
+				raise RuntimeError('TODO slice unknown')
 
 			## note: `auto` can not be used to make c++11 guess the type from a constructor that takes start and end iterators.
 			#return 'auto _ref_%s( %s->begin()+START, %s->end()+END ); auto %s = &_ref_%s;' %(target, val, val, target, target)
