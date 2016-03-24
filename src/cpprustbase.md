@@ -1061,6 +1061,12 @@ handles all special calls
 			args = ','.join([self.visit(arg) for arg in node.args])
 			return 'std::complex<double>(%s)' %args
 
+		elif self._cpp and fname =='tuple->get':
+			return 'std::get<%s>(*%s)' %(self.visit(node.args[1]), self.visit(node.args[0]))
+
+		elif self._cpp and fname == 'tuple.get':
+			return 'std::get<%s>(%s)' %(self.visit(node.args[1]), self.visit(node.args[0]))
+
 		elif fname=='future':
 			if not len(self._function_stack):
 				raise SyntaxError('future() call used at global level')

@@ -74,8 +74,8 @@ def test_heap():
 		v3 = item[{ 0 }]
 		assert v3[0]==vec3[0]
 
-		#for s in item:
-		#	print s
+		v4 = tuple.get(item, 0)
+		assert v4[0]==v3[0]
 
 def main():
 	test_stack()
