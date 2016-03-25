@@ -74,9 +74,9 @@ def test_array_of_nested_tuples(n:int):
 	for i in range(n):
 		a = (1.1, 1.2)
 		b = (2.2, 2.3)
-		#r.append( (a,b) )  ## TODO
-		c = (a,b)
-		r.append( c )
+		r.append( (a,b) )
+		#c = (a,b)
+		#r.append( c )
 	return r
 
 
