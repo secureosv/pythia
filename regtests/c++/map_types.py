@@ -36,10 +36,12 @@ def test_heap():
 	assert m1['K2'][0]==2
 	assert m1['K2'][1]==3
 
-	with get as 'std::get<%s>(%s)':
+	with get as 'std::get<%s>(*%s)':
 		vec = get(0, tuplemap['A'])
 		assert vec[0]==1.0
 
+	vecx = tuple.get( tuplemap['A'], 0 )
+	assert vecx[0]==1.0
 
 def main():
 	print mymap

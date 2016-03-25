@@ -1928,7 +1928,7 @@ regular Python has no support for.
 									v = 'std::vector<%s>*' %t
 
 							tupletype.append(v)
-						value_type = 'std::tuple<%s>' %','.join(tupletype)
+						value_type = 'std::shared_ptr<std::tuple<%s>>' %','.join(tupletype)
 						#raise RuntimeError(value_type)
 
 					#########################
@@ -1943,8 +1943,8 @@ regular Python has no support for.
 							if v.startswith('[') and v.endswith(']'):
 								v = ('new std::vector<%s>{'%value_vec) + v[1:-1] + '}'
 							elif isinstance(node.right.values[i], ast.Tuple): #elif v.startswith('{') and v.endswith('}'):
-								assert value_type.startswith('std::tuple')
 								targs = []
+								tuptargs = []
 								for ti,te in enumerate(node.right.values[i].elts):
 									tt = tupletype[ti]
 									tv = self.visit(te)
@@ -1954,7 +1954,7 @@ regular Python has no support for.
 											tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
 									targs.append(tv)
 
-								v = 'std::make_tuple(%s)' %','.join(targs)
+								v = 'std::make_shared<std::tuple<%s>>(std::make_tuple(%s))' %(','.join(tupletype), ','.join(targs))
 
 							items.append('{%s, %s}' %(k,v))
 
