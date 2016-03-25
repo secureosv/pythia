@@ -14,6 +14,18 @@ with stack:
 	def test_stack_array( arr: StackTArray ):
 		print 'len of arr:', len(arr)
 
+	def test_array_of_nested_tuples_stack(n:int):
+		with typedef: T = tuple(float,float)
+		r = []tuple( T, T )
+		for i in range(n):
+			a = (1.1, 1.2)
+			b = (2.2, 2.3)
+			r.append( (a,b) )
+			#c = (a,b)
+			#r.append( c )
+		return r
+
+
 	def test_stack():
 		print 'stack test'
 		tuplearray = []tuple( []float, []float, float )
@@ -35,6 +47,11 @@ with stack:
 
 				v4 = tuple.get(item, 0)
 				assert v4[0]==v3[0]
+
+		tu = test_array_of_nested_tuples_stack(6)
+		assert len(tu)
+
+
 
 
 

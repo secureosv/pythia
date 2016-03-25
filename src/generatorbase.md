@@ -40,6 +40,8 @@ class GeneratorBase( CLikeLanguage ):
 		if self._rust:
 			return 'vec!(%s)' % ', '.join(map(self.visit, node.elts))
 		elif self._cpp:
+			if len(self._stack) >= 2 and isinstance(self._stack[-2], ast.Call):
+				return 'std::make_tuple(%s)' %','.join(map(self.visit, node.elts))
 			return '{%s}' %','.join(map(self.visit, node.elts))
 		else:
 			return '[%s]' % ', '.join(map(self.visit, node.elts))
