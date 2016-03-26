@@ -1052,6 +1052,8 @@ handles all special calls
 				ainit = self.visit(node.args[3])
 				self._known_arrays[aname] = (atype, asize)
 				return '%s %s[%s] = %s;' %(atype, aname, asize, ainit)
+			else:
+				raise SyntaxError(self.format_error('invalid __array__'))
 
 		elif self._cpp and fname=='move':
 			args = ','.join([self.visit(arg) for arg in node.args])
