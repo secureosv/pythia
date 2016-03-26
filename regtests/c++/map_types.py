@@ -13,6 +13,11 @@ tuplemap = {
 }
 
 with stack:
+	tuplemap_stack = {
+		'A': ([1.0, 2.0, 3.0], [4.0, 5.0, 6.0], FOO),
+		'B': ([7.0, 8.0, 9.0], [0.0, 0.0, 0.0], FOO*2.2)
+	}
+
 	def test_stack():
 		print 'stack test...'
 		m1 = {
@@ -23,6 +28,9 @@ with stack:
 		assert m1['K1'][1]==1
 		assert m1['K2'][0]==2
 		assert m1['K2'][1]==3
+
+		vecx = tuple.get( tuplemap_stack['A'], 0 )
+		assert vecx[0]==1.0
 
 
 def test_heap():

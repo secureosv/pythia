@@ -1928,7 +1928,10 @@ regular Python has no support for.
 									v = 'std::vector<%s>*' %t
 
 							tupletype.append(v)
-						value_type = 'std::shared_ptr<std::tuple<%s>>' %','.join(tupletype)
+						if self._memory[-1]=='STACK':
+							value_type = 'std::tuple<%s>' %','.join(tupletype)
+						else:
+							value_type = 'std::shared_ptr<std::tuple<%s>>' %','.join(tupletype)
 						#raise RuntimeError(value_type)
 
 					#########################
@@ -1952,19 +1955,24 @@ regular Python has no support for.
 										assert tt.startswith('std::vector')
 										if tt.endswith('*'):
 											tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+										else:
+											tv = '%s{%s}' %(tt, tv[1:-1])
 									targs.append(tv)
 
-								v = 'std::make_shared<std::tuple<%s>>(std::make_tuple(%s))' %(','.join(tupletype), ','.join(targs))
+								if self._memory[-1]=='STACK':
+									v = 'std::make_tuple(%s)' %','.join(targs)
+								else:
+									v = 'std::make_shared<std::tuple<%s>>(std::make_tuple(%s))' %(','.join(tupletype), ','.join(targs))
 
 							items.append('{%s, %s}' %(k,v))
 
 						right = '{%s}' %'\n,'.join(items)
 
-					## TODO check where this is used,
-					## this should actually return the map wrapped in std::shared_ptr
-					map_type = 'std::map<%s,%s>' %(key_type, value_type)
-					#return 'std::map<%s, %s>%s' %(key_type, value_type, right)
-					return 'std::shared_ptr<%s>(new %s%s)' %(map_type, map_type, right)
+					if self._memory[-1]=='STACK':
+						return 'std::map<%s, %s>%s' %(key_type, value_type, right)
+					else:
+						map_type = 'std::map<%s,%s>' %(key_type, value_type)
+						return 'std::shared_ptr<%s>(new %s%s)' %(map_type, map_type, right)
 				else:
 					if isinstance(node.right, ast.Name):
 						raise SyntaxError(node.right.id)
