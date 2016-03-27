@@ -27,7 +27,9 @@ CPP_HEADER = """
 typedef long   i64;
 typedef int    i32;
 typedef double f64;
+typedef double float64;
 typedef float  f32;
+typedef float  float32;
 typedef const char*  cstring;
 
 """

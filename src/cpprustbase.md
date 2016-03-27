@@ -4451,14 +4451,14 @@ because they need some special handling in other places.
 								tsubvec = None
 								for st in telt.elts:
 									if isinstance(st, ast.Num):
-										tsubvec = 'float'
+										tsubvec = 'float64'
 										break
 								assert tsubvec is not None
 								v = 'std::vector<%s>' %tsubvec
 
 
 							elif isinstance(telt, ast.Num):
-								v = 'float'
+								v = 'float64'
 							elif isinstance(telt, ast.Name):
 								v = 'decltype(%s)' % self.visit(telt)
 							else:

@@ -207,7 +207,7 @@ or something that needs to be wrapped by a pointer/shared-reference.
 ```python
 
 	def is_prim_type(self, T):
-		prims = 'auto void bool int float double long string str char byte u32 u64 i32 i64 f32 f64 std::string cstring'.split()
+		prims = 'auto void bool int float double long string str char byte u32 u64 i32 i64 f32 f64 float32 float64 std::string cstring'.split()
 		if hasattr(self, '_typedefs'):
 			prims.extend( self._typedefs.keys() )
 
@@ -860,11 +860,17 @@ Also implements extra syntax like `switch` and `select`.
 					tname = self.visit(b.targets[0])
 					self._typedefs[tname] = tdef
 					if isinstance(tdef, tuple):
-						assert tdef[0]=='std::vector<tuple>'
-						if self._memory[-1]=='STACK':
-							tdef = 'std::vector<std::tuple<%s>>' %','.join(tdef[1])
+						if tdef[0]=='std::vector<tuple>':
+							if self._memory[-1]=='STACK':
+								tdef = 'std::vector<std::tuple<%s>>' %','.join(tdef[1])
+							else:
+								tdef = 'std::shared_ptr< std::vector<std::shared_ptr<std::tuple<%s>>> >' %','.join(tdef[1])
 						else:
-							tdef = 'std::shared_ptr< std::vector<std::shared_ptr<std::tuple<%s>>> >' %','.join(tdef[1])
+							## ignore constructor part `foo = []bar()` ##
+							if self._memory[-1]=='STACK':
+								tdef = tdef[0]
+							else:
+								tdef = 'std::shared_ptr<%s>' %tdef[0]
 					elif tdef.startswith('tuple('):
 						if self._memory[-1]=='STACK':
 							tdef = 'std::tuple<%s>' %','.join([self.visit(t) for t in b.value.args])
