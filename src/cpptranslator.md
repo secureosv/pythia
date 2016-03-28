@@ -34,6 +34,60 @@ TODO: make inline cpp-channel.h an option.
 
 class CppGenerator( RustGenerator, CPythonGenerator ):
 
+	def make_tuple(self, elts):
+		tupletype = []
+		for telt in elts:
+			if isinstance(telt, ast.Str):  ## TODO test tuple with strings
+				v = telt.s
+				if v.startswith('"') and v.endswith('"'):  ## TODO this looks like a bug
+					v = v[1:-1]
+			elif isinstance(telt, ast.List): #v.startswith('[') and v.endswith(']'):
+				tsubvec = None
+				for st in telt.elts:
+					if isinstance(st, ast.Num):
+						tsubvec = 'float64'
+						break
+				assert tsubvec is not None
+				v = 'std::vector<%s>' %tsubvec
+
+			elif isinstance(telt, ast.Num):
+				v = 'float64'
+			elif isinstance(telt, ast.Name):
+				v = 'decltype(%s)' % self.visit(telt)
+			else:
+				v = self.visit(telt)
+
+			if v.startswith('[]'):
+				t  = v.split(']')[-1]
+				if self._memory[-1]=='STACK':
+					v = 'std::vector<%s>' %t
+				else:
+					v = 'std::vector<%s>*' %t
+
+			tupletype.append(v)
+
+
+		targs = []
+		for ti,te in enumerate(elts):
+			tt = tupletype[ti]
+			tv = self.visit(te)
+			if tv.startswith('[') and tv.endswith(']'):
+				assert tt.startswith('std::vector')
+				if tt.endswith('*'):
+					tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+				else:
+					tv = '%s{%s}' %(tt, tv[1:-1])
+			elif tv.startswith('std::vector'):  ## never happens?
+				raise RuntimeError(tv)
+
+			if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
+				tupletype[ti] = 'std::shared_ptr<%s>' %tt
+				tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+
+			targs.append(tv)
+
+		return tupletype, targs
+
 	def visit_Return(self, node):
 		if isinstance(node.value, ast.Tuple):
 			## initializer list ##

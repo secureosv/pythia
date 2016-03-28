@@ -11,13 +11,17 @@ with typedef:
 with constant: IDX = 0
 
 def test_typedefs():
-	hta = HeapTArray()
+	x = HeapTArray()
 	a = [1.1,2.2,3.3]
 	b = [0.1,0.2]
-	hta.push_back(
+	x.push_back(
 		(a, b, 0.99)
 	)
-	print hta
+	print x
+	assert len(x)==1
+
+	x.push_back( ([0.1, 0.2], [0.9, 0.8], 0.1) )
+	assert len(x)==2
 
 with stack:
 	with typedef:

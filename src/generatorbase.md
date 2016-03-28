@@ -43,11 +43,13 @@ class GeneratorBase( CLikeLanguage ):
 			if len(self._stack) >= 2 and isinstance(self._stack[-2], ast.Call):
 				if isinstance(self._stack[-2].func, ast.Name) and self._stack[-2].func.id=='__array__':  ## special case
 					return '{%s}' %','.join(map(self.visit, node.elts))
-				elif self._memory[-1]=='STACK':
-					return 'std::make_tuple(%s)' %','.join(map(self.visit, node.elts))
 				else:
-					declargs = ['decltype(%s)'%self.visit(da) for da in node.elts]
-					return 'std::make_shared<std::tuple<%s>>(std::make_tuple(%s))' %(','.join(declargs), ','.join(map(self.visit, node.elts)))
+					tupletype, tupleinit = self.make_tuple(node.elts)
+					if self._memory[-1]=='STACK':
+						return 'std::make_tuple(%s)' %','.join(tupleinit)
+					else:
+						#declargs = ['decltype(%s)'%self.visit(da) for da in node.elts]
+						return 'std::make_shared<std::tuple<%s>>(std::make_tuple(%s))' %(','.join(tupletype), ','.join(tupleinit))
 			else:
 				return '{%s}' %','.join(map(self.visit, node.elts))
 		else:
