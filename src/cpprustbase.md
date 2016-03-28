@@ -4484,12 +4484,16 @@ because they need some special handling in other places.
 									tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
 								else:
 									tv = '%s{%s}' %(tt, tv[1:-1])
-							elif tv.startswith('std::vector'):  ## never happens?
-								raise RuntimeError(tv)
+							#elif tv.startswith('std::vector'):  ## never happens?
+							#	raise RuntimeError(tv)
 
 							if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
 								tupletype[ti] = 'std::shared_ptr<%s>' %tt
-								tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+								if not tv.startswith('new '):
+									raise RuntimeError(self.format_error(tv))
+									tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+								else:
+									tv = 'std::shared_ptr<%s>(%s)' %(tt, tv)
 
 							targs.append(tv)
 

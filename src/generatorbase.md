@@ -36,11 +36,11 @@ class GeneratorBase( CLikeLanguage ):
 		return options['getter'] or options['setter']
 
 
-	def visit_Tuple(self, node):
+	def visit_Tuple(self, node, force_make_tuple=False):
 		if self._rust:
 			return 'vec!(%s)' % ', '.join(map(self.visit, node.elts))
 		elif self._cpp:
-			if len(self._stack) >= 2 and isinstance(self._stack[-2], ast.Call):
+			if len(self._stack) >= 2 and isinstance(self._stack[-2], ast.Call) or force_make_tuple:
 				if isinstance(self._stack[-2].func, ast.Name) and self._stack[-2].func.id=='__array__':  ## special case
 					return '{%s}' %','.join(map(self.visit, node.elts))
 				else:
@@ -59,7 +59,7 @@ class GeneratorBase( CLikeLanguage ):
 		a = []
 		for elt in node.elts:
 			b = self.visit(elt)
-			if b is None: raise SyntaxError(elt)
+			if b is None: raise SyntaxError( self.format_error(elt) )
 			a.append( b )
 		return '[%s]' % ', '.join(a)
 

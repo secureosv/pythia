@@ -71,22 +71,72 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 		for ti,te in enumerate(elts):
 			tt = tupletype[ti]
 			tv = self.visit(te)
-			if tv.startswith('[') and tv.endswith(']'):
+			if tv.startswith('[') and tv.endswith(']'):  ## old style
 				assert tt.startswith('std::vector')
 				if tt.endswith('*'):
 					tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
 				else:
 					tv = '%s{%s}' %(tt, tv[1:-1])
-			elif tv.startswith('std::vector'):  ## never happens?
-				raise RuntimeError(tv)
+			#elif tv.startswith('std::vector'):  ## never happens?
+			#	raise RuntimeError(tv)
 
 			if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
 				tupletype[ti] = 'std::shared_ptr<%s>' %tt
-				tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+				if not tv.startswith('new '):  ## TODO test when is this required
+					raise RuntimeError(self.format_error(tv))
+					tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
+				else:
+					tv = 'std::shared_ptr<%s>(%s)' %(tt, tv)
 
 			targs.append(tv)
 
 		return tupletype, targs
+
+	def visit_List(self, node):
+		vectype = None
+		vecinit = []
+		tupletype = None
+		for elt in node.elts:
+			if vectype is None:
+				if isinstance(elt, ast.Num):
+					vectype = 'float64'
+				elif isinstance(elt, ast.Str):
+					vectype = 'std::string'
+				elif isinstance(elt, ast.Name):
+					vectype = 'decltype(%s)' %elt.id
+				elif isinstance(elt, ast.Tuple):
+					if tupletype is None:
+						tupletype = [None] * len(elt.elts)
+					for i,sub in enumerate(elt.elts):
+						if tupletype[i] is None:
+							if isinstance(sub, ast.Num):
+								tupletype[i] = 'float64'
+							elif isinstance(sub, ast.Str):
+								tupletype[i] = 'std::string'
+							elif isinstance(sub, ast.Name):
+								tupletype[i] = 'decltype(%s)' %sub.id
+							else:
+								tupletype[i] = 'decltype(%s)' %self.visit(sub)
+
+			if isinstance(elt, ast.Tuple):
+				b = self.visit_Tuple(elt, force_make_tuple=True)
+				vecinit.append( b )
+
+			else:
+				b = self.visit(elt)
+				vecinit.append( b )
+		if tupletype:
+			assert None not in tupletype
+			if self._memory[-1]=='STACK':
+				vectype = 'std::tuple<%s>' %','.join(tupletype)
+			else:
+				vectype = 'std::shared_ptr<std::tuple<%s>>' %','.join(tupletype)
+
+		if self._memory[-1]=='STACK':
+			return 'std::vector<%s>{%s}' % (vectype,','.join(vecinit))
+		else:
+			return 'new std::vector<%s>{%s}' % (vectype,','.join(vecinit))
+
 
 	def visit_Return(self, node):
 		if isinstance(node.value, ast.Tuple):

@@ -23,6 +23,16 @@ def test_typedefs():
 	x.push_back( ([0.1, 0.2], [0.9, 0.8], 0.1) )
 	assert len(x)==2
 
+	c = ([0.1, 0.2], [0.9, 0.8], 0.1)
+	x.push_back( c )
+
+	assert len(x)==3
+
+	y = HeapTArray([
+		(a, b, 0.99),
+		(b, a, 0.5)
+	])
+
 with stack:
 	with typedef:
 		StackTArray = []tuple( []f64, []f64, f64 )
