@@ -45,13 +45,19 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				tsubvec = None
 				for st in telt.elts:
 					if isinstance(st, ast.Num):
-						tsubvec = 'float64'
+						if str(st.n).isdigit():
+							tsubvec = 'int'
+						else:
+							tsubvec = 'float64'
 						break
 				assert tsubvec is not None
 				v = 'std::vector<%s>' %tsubvec
 
 			elif isinstance(telt, ast.Num):
-				v = 'float64'
+				if str(telt.n).isdigit():
+					v = 'int'
+				else:
+					v = 'float64'
 			elif isinstance(telt, ast.Name):
 				v = 'decltype(%s)' % self.visit(telt)
 			else:
@@ -82,11 +88,11 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 
 			if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
 				tupletype[ti] = 'std::shared_ptr<%s>' %tt
-				if not tv.startswith('new '):  ## TODO test when is this required
-					raise RuntimeError(self.format_error(tv))
-					tv = 'std::shared_ptr<%s>(new %s)' %(tt, tv)
-				else:
-					tv = 'std::shared_ptr<%s>(%s)' %(tt, tv)
+				#if not tv.startswith('new ') and tt.endswith('*'):  ## TODO test when is this required
+				#	raise RuntimeError(self.format_error(tt))
+				#	tv = 'std::shared_ptr<%s>(new %s)' %(tt[:-1], tv)
+				#else:
+				tv = 'std::shared_ptr<%s>(%s)' %(tt, tv)
 
 			targs.append(tv)
 
@@ -99,7 +105,10 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 		for elt in node.elts:
 			if vectype is None:
 				if isinstance(elt, ast.Num):
-					vectype = 'float64'
+					if str(elt.n).isdigit():
+						vectype = 'int'
+					else:
+						vectype = 'float64'
 				elif isinstance(elt, ast.Str):
 					vectype = 'std::string'
 				elif isinstance(elt, ast.Name):
@@ -110,7 +119,10 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 					for i,sub in enumerate(elt.elts):
 						if tupletype[i] is None:
 							if isinstance(sub, ast.Num):
-								tupletype[i] = 'float64'
+								if str(sub.n).isdigit():
+									tupletype[i] = 'int'
+								else:
+									tupletype[i] = 'float64'
 							elif isinstance(sub, ast.Str):
 								tupletype[i] = 'std::string'
 							elif isinstance(sub, ast.Name):
