@@ -168,7 +168,8 @@ hooks into bad magic hack, 2nd pass rustc compile.
 							lines.append('for (auto &%s: (*%s)) { /*loop over heap vector*/' %(target, iter))
 					elif arrname in self._known_maps:
 						lines.append('for (auto &_pair_%s: (*%s)) {' %(target, iter))
-						lines.append('  auto %s = _pair_%s.second;')
+						#lines.append('  auto %s = _pair_%s.second;' %(target, target))
+						lines.append('  auto %s = _pair_%s.first;' %(target, target))
 					else:
 						if iter.startswith('PyObject_GetAttrString('):
 							lines.append('PyObject *__pyiterator = PyObject_GetIter(%s);' %iter)

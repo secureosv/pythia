@@ -51,6 +51,15 @@ def test_heap():
 	vecx = tuple.get( tuplemap['A'], 0 )
 	assert vecx[0]==1.0
 
+	print 'testing loop over map keys'
+	for key in m1:
+		print 'key:', key
+
+	print 'testing loop over map keys and values'
+	for (key,val) in m1:
+		print 'key:', key
+		print 'value:', val
+
 def main():
 	print mymap
 	assert mymap['key1'][0]==1
