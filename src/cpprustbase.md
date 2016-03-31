@@ -1071,13 +1071,32 @@ handles all special calls
 			return 'std::get<%s>(%s)' %(self.visit(node.args[1]), self.visit(node.args[0]))
 
 		elif self._cpp and fname == 'dict->keys':
+			if len(node.args) != 1:
+				raise SyntaxError(self.format_error('dict.keys(mymap) requires a single argument'))
+
 			arrname = self.visit(node.args[0])
 			vectype = 'std::vector<decltype(%s)::element_type::key_type>' %arrname
 			r = [
 				'[&%s](){' %arrname,
-				self.indent()+'auto __ = std::make_shared<%s>(%s());' %(vectype,vectype),
+				'auto __ = std::make_shared<%s>(%s());' %(vectype,vectype),
 				'for (const auto &_ : *%s) {' %arrname,
 				'__->push_back(_.first);',
+				'}',
+				'return __;}()'
+			]
+			return ''.join(r)
+
+		elif self._cpp and fname == 'dict->values':
+			if len(node.args) != 1:
+				raise SyntaxError(self.format_error('dict.values(mymap) requires a single argument'))
+
+			arrname = self.visit(node.args[0])
+			vectype = 'std::vector<decltype(%s)::element_type::mapped_type>' %arrname
+			r = [
+				'[&%s](){' %arrname,
+				'auto __ = std::make_shared<%s>(%s());' %(vectype,vectype),
+				'for (auto &_ : *%s) {' %arrname,
+				'__->push_back(_.second);',
 				'}',
 				'return __;}()'
 			]
