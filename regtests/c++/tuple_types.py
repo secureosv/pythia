@@ -11,6 +11,7 @@ with typedef:
 with constant: IDX = 0
 
 def test_typedefs():
+
 	x = HeapTArray()
 	a = [1.1,2.2,3.3]
 	b = [0.1,0.2]
@@ -32,6 +33,9 @@ def test_typedefs():
 		(a, b, 0.99),
 		(b, a, 0.5)
 	])
+
+	tt = HTupleOfTuples( (a, b, 0.99), (b, c, 0.11) )
+
 
 with stack:
 	with typedef:

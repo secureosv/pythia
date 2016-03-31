@@ -862,6 +862,7 @@ Also implements extra syntax like `switch` and `select`.
 					tname = self.visit(b.targets[0])
 					self._typedefs[tname] = tdef
 					if isinstance(tdef, tuple):
+						self._typedefs[tname] = tdef[0]
 						if tdef[0]=='std::vector<tuple>':
 							if self._memory[-1]=='STACK':
 								tdef = 'std::vector<std::tuple<%s>>' %','.join(tdef[1])
