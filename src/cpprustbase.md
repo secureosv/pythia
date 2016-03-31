@@ -1070,6 +1070,19 @@ handles all special calls
 		elif self._cpp and fname == 'tuple.get':
 			return 'std::get<%s>(%s)' %(self.visit(node.args[1]), self.visit(node.args[0]))
 
+		elif self._cpp and fname == 'dict->keys':
+			arrname = self.visit(node.args[0])
+			vectype = 'std::vector<decltype(%s)::element_type::key_type>' %arrname
+			r = [
+				'[&%s](){' %arrname,
+				self.indent()+'auto __ = std::make_shared<%s>(%s());' %(vectype,vectype),
+				'for (const auto &_ : *%s) {' %arrname,
+				'__->push_back(_.first);',
+				'}',
+				'return __;}()'
+			]
+			return ''.join(r)
+
 		elif fname=='future':
 			if not len(self._function_stack):
 				raise SyntaxError('future() call used at global level')

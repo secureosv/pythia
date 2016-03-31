@@ -60,6 +60,14 @@ def test_heap():
 		print 'key:', key
 		print 'value:', val
 
+	keys = dict.keys(m1)
+	assert len(keys)==2
+	for key in keys:
+		print key
+
+	assert 'K1' in keys
+	assert 'invalid-key' not in keys
+
 def main():
 	print mymap
 	assert mymap['key1'][0]==1
