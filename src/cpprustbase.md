@@ -33,6 +33,8 @@ class CppRustBase( GoGenerator ):
 		self._global_refs    = {}
 		self._typedefs       = {}
 		self._in_constant    = False
+		self._known_tuples   = {}
+		self._global_tuples  = {}
 		self.macros = {}
 
 
@@ -2304,6 +2306,8 @@ TODO clean up go stuff.
 			self._known_refs      = dict()
 			self._known_refs.update( self._global_refs )
 			self._known_pointers  = dict()
+			self._known_tuples    = dict()
+			self._known_tuples.update( self._global_tuples )
 
 		elif len(self._function_stack) > 1:
 			## do not clear self._known_* inside of closures ##

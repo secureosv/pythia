@@ -4,6 +4,43 @@ import os, sys, subprocess
 
 passed = {}
 
+has_osv = os.path.isdir(os.path.expanduser('~/osv'))
+
+def runbench_cython(path, name):
+	data = open(os.path.join(path, name), 'rb').read()
+	open('/tmp/cython_module.pyx', 'wb').write(data)
+
+	subprocess.check_call([
+		'cython',
+		'/tmp/cython_module.pyx'
+	])
+
+	script = [
+		'import pyximport, time',
+		'pyximport.install()',
+		'import cython_module',
+		'T = time.clock()',
+		'cython_module.run_benchmark()',
+		'print time.clock()-T'
+	]
+	open('/tmp/run-cython.py', 'wb').write('\n'.join(script))
+
+	proc = subprocess.Popen(
+		['python', 'run-cython.py',], stdout=subprocess.PIPE,
+		cwd='/tmp'
+	)
+	proc.wait()
+
+	data = proc.stdout.read()
+	for line in data.splitlines():
+		try:
+			T = float(line.strip())
+		except ValueError:
+			print line
+
+	return T
+
+
 def runbench_rs(path, name, strip=False):
 	url = os.path.join(path, name)
 	if os.path.isfile(url.replace('.py', '-rs.py')):
@@ -66,7 +103,7 @@ def runbench_py(path, name, interp='python3', cores=None):
 
 	return T
 
-def runbench(path, name, backend='javascript', pgo=False, cores=None):
+def runbench(path, name, backend='javascript', pgo=False, cores=None, osv=False):
 	srcpath = os.path.join(path, name)
 	if cores:
 		data = open(os.path.join(path, name), 'rb').read()
@@ -88,6 +125,8 @@ def runbench(path, name, backend='javascript', pgo=False, cores=None):
 	]
 	if pgo:
 		cmd.append('--gcc-pgo')
+	if osv:
+		cmd.append('--osv')
 
 	proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 	proc.wait()
@@ -110,13 +149,13 @@ def runbench(path, name, backend='javascript', pgo=False, cores=None):
 	return T
 
 BENCHES = [
-	'thread_shared_vector.py',
-	#'thread_collision.py',
+	'fannkuch.py',
+	#'thread_shared_vector.py',
 ]
 [
+	'thread_collision.py',
 	'pystone.py',
 	'recursive_fib.py',
-	'fannkuch.py',
 	'operator_overloading.py',
 	'add.py',
 	'float.py',
@@ -162,9 +201,20 @@ for name in BENCHES:
 	if os.path.isfile( os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm') ):
 		pypystm = os.path.expanduser('~/pypy-stm-2.5.1-linux64/bin/pypy-stm')
 
+
+	if '--cython' in sys.argv:
+		cyname = name.replace('.py','-cython.pyx')
+		if os.path.isfile('./bench/'+cyname):
+			times['cython'] = runbench_cython('./bench', cyname)
+		else:
+			print 'can not find cython version:', cyname
+
+
 	if not '--skip-python' in sys.argv:
 		times['python'] = runbench_py('./bench', name)
+
 	times['pypy'] = runbench_py('./bench', name, interp='pypy')
+
 
 	if name.startswith('thread_'):
 		if not '--skip-python' in sys.argv:
@@ -251,6 +301,10 @@ for name in BENCHES:
 
 	if 'rapyd' in times:
 		perf.append('RapydScript %s' % times['rapyd'])
+
+	if 'cython' in times:
+		perf.append('Cython %s' % times['cython'])
+
 	if 'c++' in times:
 		if 'thread' in name:
 			if 'c++(single)' in times:
