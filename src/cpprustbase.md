@@ -1068,14 +1068,25 @@ handles all special calls
 
 		elif self._cpp and fname in self._typedefs:
 			typedef = self._typedefs[fname]
-			if typedef.startswith('tuple('):
-				args = ','.join([self.visit(arg) for arg in node.args])
-				return 'std::make_tuple(%s)' %args
-			#elif typedef.startswith('std::vector<'):
-			#	raise RuntimeError(typedef)
-
 			args = ','.join([self.visit(arg) for arg in node.args])
-			return '%s(%s)' %(fname, args)
+			if typedef.startswith('tuple('):
+				if self._memory[-1]=='STACK':
+					return 'std::make_tuple(%s)' %args
+				else:
+					return '/*typedef: %s*/[&](){auto _ = std::make_tuple(%s); return std::make_shared<decltype(_)>(_);}()' %(typedef,args)
+			#elif typedef.startswith('std::shared_ptr<std::vector<') and args:
+			elif typedef.startswith('std::vector<') and args:
+				args = [self.visit(arg) for arg in node.args]
+				assert args[0].startswith('new std::vector<')
+				tvectype = args[0].split('{')[0][4:]
+				hacked_args = []
+				for arg in args:
+					if arg.startswith('new '):
+						arg = arg[4:]
+					hacked_args.append(arg)
+				return '/*typedef: %s*/std::make_shared<%s>(%s)' %(typedef, tvectype, ','.join(hacked_args))
+			else:
+				return '/*typedef:%s*/%s(%s)' %(typedef, fname, args)  ## requires `new` ?
 
 		elif self._cpp and fname =='tuple->get':
 			return 'std::get<%s>(*%s)' %(self.visit(node.args[1]), self.visit(node.args[0]))

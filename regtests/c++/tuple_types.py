@@ -6,6 +6,7 @@ with typedef:
 	HeapTupleType = tuple( []f64, []f64, f64 )
 	HeapArrayOfTuples = []HeapTupleType()
 	HTupleOfTuples    = tuple( HeapTupleType, HeapTupleType )
+	HTTArray = []HTupleOfTuples()
 
 ## IDX needs to be a constant so std::get<IDX> can be resolved at compile time.
 with constant: IDX = 0
@@ -35,7 +36,11 @@ def test_typedefs():
 	])
 
 	tt = HTupleOfTuples( (a, b, 0.99), (b, c, 0.11) )
-
+	htta = HTTArray([tt])
+	assert len(htta)==1
+	#htta = HTTArray()
+	htta.push_back( tt )
+	assert len(htta)==2
 
 with stack:
 	with typedef:
