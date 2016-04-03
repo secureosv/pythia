@@ -42,6 +42,15 @@ def test_typedefs():
 	htta.push_back( tt )
 	assert len(htta)==2
 
+	htta2 = HTTArray()
+	assert len(htta2)==0
+	#htta2.push_back( tt )  ## TODO fixme
+	#assert len(htta2)==1
+	#htta2.push_back(
+	#	( (a, b, 0.99), (b, c, 0.11) )
+	#)
+	htta2.push_back( tt )
+
 with stack:
 	with typedef:
 		StackTArray = []tuple( []f64, []f64, f64 )
