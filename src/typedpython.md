@@ -512,6 +512,9 @@ class typedpython:
 			inline_ptr = False
 			prevchar = None
 
+			if line.strip().startswith('cdef '):  ## cython syntax ##
+				line = line.replace('cdef ', 'cdef("""') + '""")'
+
 			for i,char in enumerate(line):
 
 				if isindef is False and len(a) and ''.join(a).strip().startswith('def '):
@@ -573,7 +576,7 @@ class typedpython:
 					inline_wrap = False
 					for u,_ in enumerate(a):
 						if _=='@':
-							a[u] = 'ref '
+							a[u] = 'ref '  ## old rust syntax
 					if char == ')':
 						a.append('"))')
 					else:

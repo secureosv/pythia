@@ -1046,8 +1046,9 @@ handles all special calls
 
 	def _visit_call_helper(self, node, force_name=None):
 		fname = force_name or self.visit(node.func)
-
-		if fname=='__array__':
+		if fname =='cdef':
+			return node.args[0].s
+		elif fname=='__array__':
 			if len(node.args)==4:
 				aname  = self.visit(node.args[0])
 				asize  = self.visit(node.args[1])

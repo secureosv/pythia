@@ -1,5 +1,6 @@
 '''
-let syntax example
+let syntax inspired by rust.
+cdef syntax borrowed from cython.
 '''
 
 macro( NUM=100 )  ## becomes `#define NUM 100`
@@ -19,6 +20,10 @@ gFoo = Foo()
 
 
 def main():
+	cdef int a=1
+	cdef int b=2
+	assert a+b==3
+
 	print gFoo
 
 	print 'len mycomp:', len(mycomp)
