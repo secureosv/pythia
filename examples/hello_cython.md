@@ -8,68 +8,21 @@ sys.path.append( os.path.curdir )  ## TODO this should not be required to import
 import mycython_module as cymod
 
 def run_test():
-	cymod.calc_mandelbrot(64, sys.stdout)
+	cymod.hi_cython()
 
 ```
 
 
 @mycython_module
 ```cython
-# The Computer Language Benchmarks Game
-# http://shootout.alioth.debian.org/
-#
-# contributed by Robert Bradshaw
 
-import sys
-FOO = 'bar'
-
-def calc_mandelbrot(int size, outfile=sys.stdout):
-
-	cdef int i, x, y
-	cdef double step = 2.0 / size
-	cdef double Cx, Cy, Zx, Zy, Tx, Ty
-
-	cdef line = ' ' * ((size+7) // 8)
-	cdef char *buf = line
-	cdef unsigned char byte_acc
-
-	write = outfile.write
-	write("P4\n%s %s\n" % (size, size))
-
-	for y in range(size):
-
-		byte_acc = 0
-
-		for x in range(size):
-
-			i = 50
-			Zx = Cx = step*x - 1.5
-			Zy = Cy = step*y - 1.0
-
-			Tx = Zx * Zx
-			Ty = Zy * Zy
-			while True:
-				# Z = Z^2 + C
-				Zx, Zy = Tx - Ty + Cx, Zx * Zy + Zx * Zy + Cy
-				Tx = Zx * Zx
-				Ty = Zy * Zy
-				i -= 1
-				if (i == 0) | (Tx + Ty > 4.0):
-					break
-
-			byte_acc = (byte_acc << 1) | (i == 0)
-			if x & 7 == 7:
-				buf[x >> 3] = byte_acc
-
-		if size & 7 != 0:
-			# line ending on non-byte boundary
-			byte_acc <<= 8 - (size & 7)
-			buf[size >> 3] = byte_acc
-		write(line)
-
-
-#if __name__ == '__main__':
-#	calc_mandelbrot(int(sys.argv[1]), sys.stdout)
+def hi_cython():
+	a = 'hello'
+	b = 'world'
+	print a + b
+	cdef int x=10
+	cdef int y=20
+	print x + y
 
 ```
 
@@ -83,6 +36,14 @@ Build Options
 import cpython
 
 def main():
+	a = 'hello'
+	b = 'world'
+	print a + b
+	x=10
+	y=20
+	print x + y
+
+
 	print 'init CPython...'
 	state = cpython.initalize()
 	with gil:
