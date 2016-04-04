@@ -429,6 +429,7 @@ def new_module():
 		'markdown': '',
 		'coffee'  : [],
 		'python'  : [],
+		'cython'  : [],
 		'rusthon' : [],
 		'rust'    : [],
 		'elm'     : [],
@@ -693,6 +694,29 @@ def build( modules, module_path, datadirs=None ):
 						'gyp':mod['code'],
 						'src': None
 					}
+
+	if modules['cython']:
+		PY_VERSION = '-2'  ## `-3` generates code in python3 mode
+		for mod in modules['cython']:
+			tmpcy = '/tmp/__cymodule.pyx'
+			tmpout = '/tmp/cython_output.cpp'
+			open(tmpcy, 'wb').write(mod['code'])
+			subprocess.check_call(['cython', tmpcy, '--cplus', '--output-file', tmpout])
+			cydata = open(tmpout,'rb').read()
+			if 'tag' in mod and mod['tag']: output['datafiles'][mod['tag']] = cydata
+
+			modules['c++'].append({
+				'tag'  : mod.get('tag', '__cymodule'),
+				'code' : cydata, 
+				'index': -1, 
+				'links': ['python2.7'],
+				'include-dirs':['/usr/include/python2.7'],
+				#'links': mod.get('links', None), 
+				#'include-dirs': mod.get('include-dirs'), 
+				#'defines'     : mod.get('defines'),
+				'compile-mode': 'dynamiclib'
+			})
+
 
 
 	if modules['javascript']:
@@ -1675,7 +1699,7 @@ def build( modules, module_path, datadirs=None ):
 						for libname in link:
 							cmd.append('-l'+libname)
 
-				print('========== g++ : compile main ==========')
+				print('========== g++ : compile mode=%s c++14=%s' %(compile_mode, HAS_CPP14))
 				print(' '.join(cmd))
 				try:
 					subprocess.check_call( cmd )
