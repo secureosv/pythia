@@ -698,24 +698,45 @@ def build( modules, module_path, datadirs=None ):
 	if modules['cython']:
 		PY_VERSION = '-2'  ## `-3` generates code in python3 mode
 		for mod in modules['cython']:
-			tmpcy = '/tmp/__cymodule.pyx'
-			tmpout = '/tmp/cython_output.cpp'
+			tmpcy = '/tmp/%s.pyx' %mod['tag']
+			tmpout = '/tmp/%s.cpp' %mod['tag']
+			#tmpout = '/tmp/cython_output.c'
 			open(tmpcy, 'wb').write(mod['code'])
-			subprocess.check_call(['cython', tmpcy, '--cplus', '--output-file', tmpout])
+			subprocess.check_call([
+				'cython', 
+				tmpcy, 
+				PY_VERSION,
+				'--cplus', 
+				'--output-file', 
+				tmpout
+			])
 			cydata = open(tmpout,'rb').read()
 			if 'tag' in mod and mod['tag']: output['datafiles'][mod['tag']] = cydata
 
-			modules['c++'].append({
-				'tag'  : mod.get('tag', '__cymodule'),
-				'code' : cydata, 
-				'index': -1, 
-				'links': ['python2.7'],
-				'include-dirs':['/usr/include/python2.7'],
-				#'links': mod.get('links', None), 
-				#'include-dirs': mod.get('include-dirs'), 
-				#'defines'     : mod.get('defines'),
-				'compile-mode': 'dynamiclib'
-			})
+			if True:
+				modules['c++'].append({
+					'tag'  : mod['tag'],
+					'code' : cydata, 
+					'index': -1, 
+					'links': ['python2.7'],
+					'include-dirs':['/usr/include/python2.7'],
+					#'links': mod.get('links', None), 
+					#'include-dirs': mod.get('include-dirs'), 
+					#'defines'     : mod.get('defines'),
+					'compile-mode': 'dynamiclib'
+				})
+			else:
+				modules['c'].append({
+					'tag'  : mod.get('tag', '__cymodule'),
+					'code' : cydata, 
+					'index': -1, 
+					'links': ['python2.7'],
+					'include-dirs':['/usr/include/python2.7'],
+					#'links': mod.get('links', None), 
+					#'include-dirs': mod.get('include-dirs'), 
+					#'defines'     : mod.get('defines'),
+					'compile-mode': 'dynamiclib'
+				})
 
 
 
@@ -1342,10 +1363,12 @@ def build( modules, module_path, datadirs=None ):
 
 
 	if modules['c']:
+		libname = 'default-clib%s' %len(output['c'])  ## TODO user named
 		dynamiclib = False
 		source   = []
 		cinclude = []
 		cbuild   = []
+		clinks   = []
 		mods_sorted_by_index = sorted(modules['c'], key=lambda mod: mod.get('index'))
 		for mod in mods_sorted_by_index:
 			if 'dynamic' in mod and mod['dynamic']:
@@ -1358,6 +1381,16 @@ def build( modules, module_path, datadirs=None ):
 						if fname.endswith('.c'):
 							cbuild.append(os.path.join(bdir,fname))
 
+			## new style
+			if 'compile-mode' in mod and mod['compile-mode']=='dynamiclib':
+				dynamiclib = True
+			if 'include-dirs' in mod:
+				cinclude.extend(mod['include-dirs'])
+			if 'links' in mod:
+				clinks.extend( mod['links'] )
+			if 'tag' in mod and mod['tag']:
+				libname = mod['tag']
+
 			if 'code' in mod and mod['code']:
 				source.append( mod['code'] )
 			else:
@@ -1369,7 +1402,6 @@ def build( modules, module_path, datadirs=None ):
 			cpak = {'source':data}
 			output['c'].append(cpak)
 
-			libname = 'default-clib%s' %len(output['c'])  ## TODO user named
 			link.append(libname)
 			dynamic_path = tempfile.gettempdir() + '/lib'+libname+'.so'
 			static_path = tempfile.gettempdir() + '/lib'+libname+'.a'
@@ -1382,6 +1414,10 @@ def build( modules, module_path, datadirs=None ):
 			cmd = ['gcc']
 			for idir in cinclude:
 				cmd.append('-I'+idir)
+
+			for ilink in clinks:
+				cmd.append('-L'+ilink)
+
 			cmd.extend(['-c', tmpfile])
 
 
@@ -1406,6 +1442,8 @@ def build( modules, module_path, datadirs=None ):
 					'-pthread', '-o', dynamic_path,
 					object_path
 				]
+				print '=========== gcc : compile shared library ==========='
+				print ' '.join(cmd)
 				subprocess.check_call(cmd)
 				cpak['dynamiclib'] = dynamic_path
 				cpak['name']       = 'lib%s.so' %libname

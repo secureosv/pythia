@@ -3,7 +3,8 @@ Cython Hello World
 
 @embed
 ```python
-import sys
+import os, sys
+sys.path.append( os.path.curdir )  ## TODO this should not be required to import the cython module
 import mycython_module as cymod
 
 def run_test():
@@ -20,6 +21,7 @@ def run_test():
 # contributed by Robert Bradshaw
 
 import sys
+FOO = 'bar'
 
 def calc_mandelbrot(int size, outfile=sys.stdout):
 
