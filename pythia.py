@@ -1479,14 +1479,25 @@ def build( modules, module_path, datadirs=None ):
 
 		mods_sorted_by_index = sorted(modules['c++'], key=lambda mod: mod.get('index'))
 		## save headers to temp build dir, and to output tar
+		skip = []
 		for mod in mods_sorted_by_index:
-			if 'tag' in mod and mod['tag'] and ( mod['tag'].endswith('.hpp') or mod['tag'].endswith('.hpp') ):
-				## allows plain header files to be included in build directory ##
-				open( os.path.join(builddir, mod['tag']), 'wb' ).write( mod['code'] )
-				output['c++'].append( mod )
+			if 'tag' in mod and mod['tag']:
+				if mod['tag'].endswith('.hpp') or mod['tag'].endswith('.hpp'):
+					## allows plain header files to be included in build directory ##
+					open( os.path.join(builddir, mod['tag']), 'wb' ).write( mod['code'] )
+					output['c++'].append( mod )
+				elif mod['tag'].startswith('embed:'):
+					parentmod = mod['tag'].split(':')[-1]
+					for pmod in mods_sorted_by_index:
+						if pmod.get('tag',None)==parentmod:
+							pmod['code'] = mod['code'] + '\n' + pmod['code']
+							skip.append(mod['tag'])
+							break
 
 
 		for mod in mods_sorted_by_index:
+			if mod.get('tag',None) in skip:
+				continue
 			links = []
 			idirs = []
 			source = []

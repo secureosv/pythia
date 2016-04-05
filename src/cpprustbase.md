@@ -1855,33 +1855,38 @@ handles all special calls
 					if isinstance(self._stack[-2], ast.ListComp):
 						return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
 
-					elif self._assign_node:
-						argname = '%s_%s' %(fname, int(id(node)))
-						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
-						if not self._assign_pre:
-							self._assign_pre.append(pre)
-						elif pre not in self._assign_pre:
-							self._assign_pre.append(pre)
-						return argname
-					elif isinstance(self._stack[-2], ast.Call):
-						print 'WARNING: object created without assignment to a variable'
-						print fname
-						print args
-						return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
-					elif isinstance(self._stack[-2], ast.Expr):
-						argname = '%s_%s' %(fname, int(id(node)))
-						pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
-						return pre
-					elif isinstance(self._stack[-2], ast.Return):
-						pass
-					else:
-						raise SyntaxError(self.format_error('heap mode requires objects are assigned to variables on initialization: %s' %self._stack[-2]))
+					#elif self._assign_node:
+					#	argname = '%s_%s' %(fname, int(id(node)))
+					#	pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
+					#	if not self._assign_pre:
+					#		self._assign_pre.append(pre)
+					#	elif pre not in self._assign_pre:
+					#		self._assign_pre.append(pre)
+					#	return argname
+					#elif isinstance(self._stack[-2], ast.Call):
+					#	print 'WARNING: object created without assignment to a variable'
+					#	print fname
+					#	print args
+					#	return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+					#elif isinstance(self._stack[-2], ast.Expr):
+					#	argname = '%s_%s' %(fname, int(id(node)))
+					#	pre = 'auto %s = %s(new %s()); %s->__init__(%s);' %(argname,prefix,fname, argname,args)
+					#	return pre
+					#elif isinstance(self._stack[-2], ast.Return):
+					#	pass
+					#else:
+					#	raise SyntaxError(self.format_error('heap mode requires objects are assigned to variables on initialization: %s' %self._stack[-2]))
 
-					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+					#return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+
+					## wrap in lambda ##
+					return '[&](){auto _ = %s(new %s()); _->__init__(%s); return _;}()' %(prefix,fname,args)
 
 
 				else:
-					return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+					#return '%s((new %s())->__init__(%s))' %(prefix,fname,args)
+					return '[&](){auto _ = %s(new %s()); _->__init__(%s); return _;}()' %(prefix,fname,args)
+
 			else:
 				return '%s(new %s())' %(prefix,fname)
 		else:
@@ -4402,20 +4407,22 @@ because they need some special handling in other places.
 			elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name):
 
 				## creation of a new class instance and assignment to a local variable
-				if node.value.func.id in self._classes or (node.value.func.id=='new' and isinstance(node.value.args[0],ast.Call) and isinstance(node.value.args[0].func, ast.Name) and not node.value.args[0].func.id.startswith('_') ):
-					if node.value.func.id=='new':
-						classname = node.value.args[0].func.id
-						if not self._cpp:
-							value = self.visit(node.value.args[0])
-					else:
-						classname = node.value.func.id
-
+				if node.value.func.id=='new' and isinstance(node.value.args[0],ast.Call) and isinstance(node.value.args[0].func, ast.Name) and not node.value.args[0].func.id.startswith('_'):
+					classname = node.value.args[0].func.id
+					value = self.visit(node.value.args[0])
 					self._known_instances[ target ] = classname
 
 					if self._cpp:
-						value = self.visit(node.value)
-						if value is None:
-							raise RuntimeError(node.value.func.id)
+						if classname in self._classes:
+							if self._memory[-1]=='HEAP':
+								return 'auto %s = %s; // heap-object' %(target, value)
+							else:
+								return 'auto %s = %s; // stack-object' %(target, value)
+						else:
+							if self._memory[-1]=='HEAP':
+								return 'auto %s = new %s; // heap-xobject' %(target, value)
+							else:
+								return 'auto %s = %s; // stack-xobject' %(target, value)
 
 						if self._unique_ptr:
 							## TODO fix everywhere, check visit_binop
@@ -4438,9 +4445,17 @@ because they need some special handling in other places.
 								print 'post-value=', value
 							elif '->__init__(' in value:
 								vh,vt = value.split('->__init__')
-								value = '%s); %s->__init__%s' %(vh, target, vt[:-1])
+								if is_new:
+									value = '%s); %s->__init__%s' %(vh, target, vt[:-1])
+								else:
+									value = '%s); %s->__init__%s' %(vh, target, vt[:-1])
 
-						return 'auto %s = %s; // new object' %(target, value)
+							return 'auto %s = %s; // heap-object' %(target, value)
+
+						elif is_new:
+							return 'auto %s = new %s; // new-object' %(target, value)
+						else:
+							return 'auto %s = %s; // stack-object' %(target, value)
 
 					else:  ## rust
 						self._construct_rust_structs_directly = False

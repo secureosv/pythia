@@ -399,26 +399,26 @@ in each object that __init__ returns (also fixes the _ref_hacks)
 			atype, avalue = a
 			if atype.endswith('*'): atype = atype[:-1]
 			else: pass  ## this should never happen
-			return '(new %s %s)' %(atype, avalue)
+			return '(/*array-or-map*/ new %s %s)' %(atype, avalue)
 
-		## Rusthon class ##
+		## Pythia User Class ##
 		elif isinstance(node.args[0], ast.Call) and isinstance(node.args[0].func, ast.Name) and node.args[0].func.id in self._classes:
 			classname = node.args[0].func.id
 			args = [self.visit(arg) for arg in node.args[0].args ]
 			if self._classes[classname]._requires_init:
-				#return '(new %s)->__init__(%s)' %(classname, ','.join(args))
 				if not isinstance(self._stack[-2], ast.Assign):
 					raise RuntimeError('TODO new(A(new(B))')
-				return '(new %s)->__init__(%s)' %(classname, ','.join(args))
+				return '(/*initialize-class*/ new %s)->__init__(%s)' %(classname, ','.join(args))
 
 			elif args:  ## a rusthon class that subclasses from an external c++ class ##
-				return '(new %s(%s))' %(classname, ','.join(args))
+				return '(/*external-parent-class*/ new %s(%s))' %(classname, ','.join(args))
 			else:
-				return '(new %s)' %classname
+				return '(/*create-class*/ new %s)' %classname
 
 		## external c++ class ##
 		else:
-			return '(new %s)' %self.visit(node.args[0])
+			classname = self.visit(node.args[0])
+			return '(/*external-class*/ new %s)' %classname
 
 ```
 
