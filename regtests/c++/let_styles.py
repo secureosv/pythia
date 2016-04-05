@@ -22,7 +22,10 @@ gFoo = Foo()
 def main():
 	cdef int a=1
 	cdef int b=2
+	cdef int *myptr
 	assert a+b==3
+	a = 10
+	assert a+b==12
 
 	print gFoo
 

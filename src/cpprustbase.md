@@ -1047,7 +1047,19 @@ handles all special calls
 	def _visit_call_helper(self, node, force_name=None):
 		fname = force_name or self.visit(node.func)
 		if fname =='cdef':
-			return node.args[0].s
+			s = node.args[0].s
+			varname = s.split('=')[0].split()[-1]
+			if varname.startswith('*'):
+				varname = varname.split('*')[-1]
+			elif varname.startswith('&'):
+				varname = varname.split('&')[-1]
+
+			self._known_vars.add(varname)
+			if varname in self._vars:
+				self._vars.remove(varname)
+
+			return s
+
 		elif fname=='__array__':
 			if len(node.args)==4:
 				aname  = self.visit(node.args[0])
