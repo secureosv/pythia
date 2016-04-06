@@ -1,0 +1,11 @@
+site_name: Pythia
+site_url: http://secureosv.news
+repo_url: https://github.com/secureosv/pythia
+docs_dir: doc
+
+pages:
+- Home: syntax.md
+- MemoryModel: memory.md
+
+
+theme: readthedocs
