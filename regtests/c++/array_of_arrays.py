@@ -6,8 +6,8 @@ def main():
 	## variable size vector of vectors,
 	## None is allowed as a sub-vector because each sub-vector is wrapped by std::shared_ptr
 	arr = [][]int(
-		(1,2,3),
-		(4,5,6,7,8),
+		[1,2,3],
+		[4,5,6,7,8],
 		None,
 		#(x*x for x in range(4)),  ## TODO fix listcomps
 		(x for x in range(20)),

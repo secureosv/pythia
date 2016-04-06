@@ -4134,7 +4134,13 @@ because they need some special handling in other places.
 								r.append(self.indent()+'%s %s = {%s};' %(vectype, target, ','.join(args)))
 
 							else:
-								r.append(self.indent()+'%s _ref_%s = {%s};' %(vectype, target, ','.join(args)))
+								#r.append(self.indent()+'%s _ref_%s = {%s};' %(vectype, target, ','.join(args)))
+								heapargs = []
+								for arg in args:
+									if arg.startswith('new std::vector'):
+										vtype = arg[ len('new ') : ].split('{')[0]
+										arg = 'std::shared_ptr<%s>(%s)' %(vtype, arg)
+									heapargs.append( self.indent() + '\t' + arg )
 
 								if not self._shared_pointers:
 									r.append(
@@ -4147,7 +4153,7 @@ because they need some special handling in other places.
 									)
 								else:
 									r.append(
-										self.indent()+'std::shared_ptr<%s> %s = std::make_shared<%s>(_ref_%s);' %(vectype, target, vectype, target)
+										self.indent()+'auto %s = std::make_shared<%s>(%s{%s});' %(target, vectype, vectype, ',\n'.join(heapargs))
 									)
 
 							return (self.indent()+'\n').join(r)
