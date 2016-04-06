@@ -4,8 +4,9 @@ repo_url: https://github.com/secureosv/pythia
 docs_dir: doc
 
 pages:
-- Home: syntax.md
+- Home: index.md
+- Syntax: syntax.md
 - MemoryModel: memory.md
-
+- Seastar: seastar.md
 
 theme: readthedocs
