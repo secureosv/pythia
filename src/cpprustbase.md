@@ -4065,6 +4065,9 @@ because they need some special handling in other places.
 						T = self.visit(node.value.left.right.args[0])
 						if T=='string': T = 'std::string'
 						self._known_arrays[ target ] = T
+						if not self.is_prim_type(T):
+							T = 'std::shared_ptr<%s>' %T
+
 						subvectype = 'std::vector<%s>' %T
 						if self._memory[-1]=='STACK':
 							vectype = 'std::vector<%s>' %subvectype
@@ -4144,10 +4147,10 @@ because they need some special handling in other places.
 
 								if not self._shared_pointers:
 									r.append(
-										self.indent()+'%s* %s = &_ref_%s;' %(vectype, target, target)
+										self.indent()+'%s* %s = {%s};' %(vectype, target, ','.join(args))
 									)
 
-								elif self._unique_ptr:
+								elif self._unique_ptr:  ## TODO test and fixme
 									r.append(
 										self.indent()+'std::unique_ptr<%s> %s = _make_unique<%s>(_ref_%s);' %(vectype, target, vectype, target)
 									)

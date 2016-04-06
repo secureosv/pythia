@@ -15,8 +15,8 @@ def main():
 	a3 = A(3)
 
 	arr = [][]A(
-		(a1,a2,a3, A(4)),
-		(a1,None),
+		[a1,a2,a3, A(4)],
+		[a1,None],
 		None,
 	)
 	print('length of array: ', len(arr))
