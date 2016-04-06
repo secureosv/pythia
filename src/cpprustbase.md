@@ -1088,6 +1088,21 @@ handles all special calls
 				else:
 					return '/*typedef: %s*/[&](){auto _ = std::make_tuple(%s); return std::make_shared<decltype(_)>(_);}()' %(typedef,args)
 			#elif typedef.startswith('std::shared_ptr<std::vector<') and args:
+			elif typedef.startswith('std::vector<') and not args:
+				if typedef=='std::vector<tuple>':
+					return '/*typedef-tuple-array:%s*/%s(%s)' %(typedef, fname, args)  ## requires `new` ?
+				else:
+					subtype = typedef.split('<')[-1].split('>')[0]
+					if subtype in self._typedefs:
+						subsubtype = self._typedefs[subtype]
+						if subsubtype.startswith('tuple('):
+							for tsub in subsubtype[len('tuple('):-1].split(','):
+								if tsub in self._typedefs:
+									tsubtype = self._typedefs[tsub]
+									if tsubtype.startswith('tuple('):
+										raise SyntaxError(self.format_error('TRANSLATION-ERROR: an array of nested tuple of tuples, must be constructed with at least one item.'))
+					return '/*typedef-array:%s*/%s(%s)' %(typedef, fname, args)  ## requires `new` ?
+
 			elif typedef.startswith('std::vector<') and args:
 				args = [self.visit(arg) for arg in node.args]
 				assert args[0].startswith('new std::vector<')
