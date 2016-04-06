@@ -327,9 +327,9 @@ i2[1] = i4[1];
 	if (!(( i2[0] == i4[0] ))) {throw std::runtime_error("assertion failed: ( i2[0] == i4[0] )"); }
 	if (!(( i2[1] == i4[1] ))) {throw std::runtime_error("assertion failed: ( i2[1] == i4[1] )"); }
 	( test_pointer_decay(i2) == 2 );
-	auto a = Bar().__init__(i2); // new object
+	auto a = Bar().__init__(i2);			/* new variable*/
 	int arr[2] = {6,7};
-	auto b = Bar().__init__(arr); // new object
+	auto b = Bar().__init__(arr);			/* new variable*/
 	if (!(( a.x[0] == i2[0] ))) {throw std::runtime_error("assertion failed: ( a.x[0] == i2[0] )"); }
 	if (!(( a.x[1] == i2[1] ))) {throw std::runtime_error("assertion failed: ( a.x[1] == i2[1] )"); }
 	for (int __i=0; __i<2; __i++) {
@@ -443,7 +443,32 @@ input:
 array slice syntax
 '''
 
-def somefunc():
+def some_vec():
+	a = []int(1,2,3,4)
+	return a
+
+def test_unknown_vectypes():
+	print 'testing unknown vec types'
+	v1 = some_vec()
+	v2 = v1[ 1: ]
+	assert v2[0]==2
+	assert v2[1]==3
+	assert v2[2]==4
+	assert len(v2)==3
+
+	v3 = v1[ :2 ]
+	assert v3[0]==1
+	assert v3[1]==2
+	assert len(v3)==2
+
+	v4 = v1[:]
+	assert len(v4)==len(v1)
+	assert v4[0]==v1[0]
+
+	print 'OK'
+
+
+def test_known_vectypes():
 	for step in range(2):
 		w = range(10)
 		assert len(w)==10
@@ -534,10 +559,8 @@ def somefunc():
 
 def main():
 	print('calling somefunc')
-	somefunc()
-
-	## never reached because there is a segfault at the end
-	## of somefunc when the slices go out of scope, they are free'ed twice.
+	test_known_vectypes()
+	test_unknown_vectypes()
 	print('OK')
 
 #main()
@@ -546,7 +569,35 @@ output:
 ------
 ```c++
 
-auto somefunc() {
+auto some_vec() {
+
+	
+	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3,4})) ); /* 1D Array */
+	return a;
+	/* arrays:
+		a : int
+*/
+}
+auto test_unknown_vectypes() {
+
+	
+	std::cout << std::string("testing unknown vec types") << std::endl;
+	auto v1 = some_vec();			/* new variable*/
+	auto v2 = std::make_shared<std::vector<decltype(v1->begin())::value_type>>( std::vector<decltype(v1->begin())::value_type>(v1->begin()+1,v1->end()) );
+	if (!(( (*v2)[0] == 2 ))) {throw std::runtime_error("assertion failed: ( (*v2)[0] == 2 )"); }
+	if (!(( (*v2)[1] == 3 ))) {throw std::runtime_error("assertion failed: ( (*v2)[1] == 3 )"); }
+	if (!(( (*v2)[2] == 4 ))) {throw std::runtime_error("assertion failed: ( (*v2)[2] == 4 )"); }
+	if (!(( v2->size() == 3 ))) {throw std::runtime_error("assertion failed: ( v2->size() == 3 )"); }
+	auto v3 = std::make_shared<std::vector<decltype(v1->begin())::value_type>>( std::vector<decltype(v1->begin())::value_type>(v1->begin(),v1->begin()+2) );
+	if (!(( (*v3)[0] == 1 ))) {throw std::runtime_error("assertion failed: ( (*v3)[0] == 1 )"); }
+	if (!(( (*v3)[1] == 2 ))) {throw std::runtime_error("assertion failed: ( (*v3)[1] == 2 )"); }
+	if (!(( v3->size() == 2 ))) {throw std::runtime_error("assertion failed: ( v3->size() == 2 )"); }
+	auto v4 = std::make_shared<std::vector<decltype(v1->begin())::value_type>>( std::vector<decltype(v1->begin())::value_type>(v1->begin(),v1->end()) );
+	if (!(( v4->size() == v1->size() ))) {throw std::runtime_error("assertion failed: ( v4->size() == v1->size() )"); }
+	if (!(( (*v4)[0] == (*v1)[0] ))) {throw std::runtime_error("assertion failed: ( (*v4)[0] == (*v1)[0] )"); }
+	std::cout << std::string("OK") << std::endl;
+}
+auto test_known_vectypes() {
 
 	
 	for (int step=0; step<2; step++) {
@@ -688,7 +739,8 @@ int main() {
 
 	
 	std::cout << std::string("calling somefunc") << std::endl;
-	somefunc();
+	test_known_vectypes();
+	test_unknown_vectypes();
 	std::cout << std::string("OK") << std::endl;
 	return 0;
 }
@@ -752,6 +804,7 @@ class B:  public A {
 //	members from class: A  ['x']
 	B* __init__(int x);
 	int foo();
+	int method();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
@@ -763,12 +816,18 @@ class C:  public A {
 //	members from class: A  ['x']
 	C* __init__(int x);
 	int bar();
+	int method();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
 	C(bool init) {__class__ = std::string("C"); __initialized__ = init; __classid__=1;}
 	std::string getclassname() {return this->__class__;}
 };
+	int C::method() {
+
+		
+		return this->x;
+	}
 	int C::bar() {
 
 		
@@ -779,6 +838,11 @@ class C:  public A {
 		
 		this->x = x;
 		return this;
+	}
+	int B::method() {
+
+		
+		return this->x;
 	}
 	int B::foo() {
 
@@ -805,9 +869,9 @@ class C:  public A {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())); a->__init__(0); // new object
-	auto b = std::shared_ptr<B>((new B())); b->__init__(1); // new object
-	auto c = std::shared_ptr<C>((new C())); c->__init__(2); // new object
+	auto a = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(0); return _;}();			/* new variable*/
+	auto b = [&](){auto _ = std::shared_ptr<B>(new B()); _->__init__(1); return _;}();			/* new variable*/
+	auto c = [&](){auto _ = std::shared_ptr<C>(new C()); _->__init__(2); return _;}();			/* new variable*/
 	std::cout << a->getclassname() << std::endl;
 	std::cout << b->getclassname() << std::endl;
 	std::cout << c->getclassname() << std::endl;
@@ -950,8 +1014,8 @@ std::cout << b->size();std::cout << std::endl;
 	std::cout << (*c)[0] << std::endl;
 	std::cout << (*c)[1] << std::endl;
 	std::cout << (*c)[2] << std::endl;
-	auto x = std::shared_ptr<A>(new A()); // new object
-	auto y = std::shared_ptr<A>(new A()); // new object
+	auto x = std::shared_ptr<A>(new A());			/* new variable*/
+	auto y = std::shared_ptr<A>(new A());			/* new variable*/
 	std::vector<std::shared_ptr<A>> _ref_d = {x,y};_ref_d.resize(4);std::shared_ptr<std::vector<std::shared_ptr<A>>> d = std::make_shared<std::vector<std::shared_ptr<A>>>(_ref_d);
 	std::cout << (*d)[0] << std::endl;
 	std::cout << (*d)[1] << std::endl;
@@ -1175,7 +1239,7 @@ class A: public std::enable_shared_from_this<A> {
 int main() {
 
 	
-	auto x = std::shared_ptr<A>((new A())); x->__init__(1, 2); // new object
+	auto x = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(1, 2); return _;}();			/* new variable*/
 	x->foo();
 	A::foo();
 	std::cout << x->bar(100) << std::endl;
@@ -1190,7 +1254,8 @@ input:
 ------
 ```python
 '''
-let syntax example
+let syntax inspired by rust.
+cdef syntax borrowed from cython.
 '''
 
 macro( NUM=100 )  ## becomes `#define NUM 100`
@@ -1210,6 +1275,13 @@ gFoo = Foo()
 
 
 def main():
+	cdef int a=1
+	cdef int b=2
+	cdef int *myptr
+	assert a+b==3
+	a = 10
+	assert a+b==12
+
 	print gFoo
 
 	print 'len mycomp:', len(mycomp)
@@ -1260,7 +1332,7 @@ auto Foos = std::make_shared<std::vector<std::shared_ptr<Foo>>>();
 auto TwentyFoos = std::make_shared<std::vector<std::shared_ptr<Foo>>>(20);
 auto mycomp = std::make_shared<std::vector<int>>();
 auto twentyints = std::make_shared<std::vector<int>>(20);
-auto gFoo = std::shared_ptr<Foo>((new Foo())->__init__());
+auto gFoo = [&](){auto _ = std::shared_ptr<Foo>(new Foo()); _->__init__(); return _;}();
 	Foo* Foo::__init__() {
 
 		
@@ -1273,6 +1345,12 @@ auto gFoo = std::shared_ptr<Foo>((new Foo())->__init__());
 int main() {
 
 	
+	int a=1;
+	int b=2;
+	int *myptr;
+	if (!(( ( (a + b) ) == 3 ))) {throw std::runtime_error("assertion failed: ( ( (a + b) ) == 3 )"); }
+	a = 10;
+	if (!(( ( (a + b) ) == 12 ))) {throw std::runtime_error("assertion failed: ( ( (a + b) ) == 12 )"); }
 	std::cout << gFoo << std::endl;
 	std::cout << std::string("len mycomp:");
 std::cout << mycomp->size();std::cout << std::endl;
@@ -1285,7 +1363,7 @@ std::cout << mycomp2->size();std::cout << std::endl;
 	std::cout << Foos << std::endl;
 	std::cout << Foos->size() << std::endl;
 	if (!(( Foos->size() == 0 ))) {throw std::runtime_error("assertion failed: ( Foos->size() == 0 )"); }
-	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(); // new object
+	auto f = [&](){auto _ = std::shared_ptr<Foo>(new Foo()); _->__init__(); return _;}();			/* new variable*/
 	if (!(( f->data->size() == NUM ))) {throw std::runtime_error("assertion failed: ( f->data->size() == NUM )"); }
 	(*f->data)[0] = 12;
 	std::cout << (*f->data)[0] << std::endl;
@@ -1373,7 +1451,7 @@ output:
 int main() {
 
 	
-	auto i = 10;  /* auto-fallback <_ast.Num object at 0x7fafea028fd0> */
+	auto i = 10;  /* auto-fallback <_ast.Num object at 0x7fc34f7e2350> */
 	while (( i > 0 )) {
 		i --;
 	}
@@ -1573,6 +1651,8 @@ class Sub:  public Foo {
 	int callsub(std::shared_ptr<Sub> other);
 	inline int callsub(std::shared_ptr<Foo> other){ return callsub(
 std::static_pointer_cast<Sub>(other));}
+	int bar();
+	int test();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	Sub() {__class__ = std::string("Sub"); __initialized__ = true; __classid__=1;}
@@ -1589,6 +1669,16 @@ int callsub(std::shared_ptr<Sub> s) {
 	
 	return s->sub();
 }
+	int Sub::test() {
+
+		
+		return callbar(this->shared_from_this());
+	}
+	int Sub::bar() {
+
+		
+		return this->x;
+	}
 	int Sub::callsub(std::shared_ptr<Sub> other) {
 
 		
@@ -1649,26 +1739,23 @@ int callsub(std::shared_ptr<Sub> s) {
 int main() {
 
 	
-	auto f = std::shared_ptr<Foo>((new Foo())); f->__init__(10); // new object
+	auto f = [&](){auto _ = std::shared_ptr<Foo>(new Foo()); _->__init__(10); return _;}();			/* new variable*/
 	if (!(( f->test() == 10 ))) {throw std::runtime_error("assertion failed: ( f->test() == 10 )"); }
-	auto s = std::shared_ptr<Sub>((new Sub())); s->__init__(100, f); // new object
+	auto s = [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(100, f); return _;}();			/* new variable*/
 	std::cout << std::string("should be 100:");
 std::cout << s->test();std::cout << std::endl;
 	if (!(( s->test() == 100 ))) {throw std::runtime_error("assertion failed: ( s->test() == 100 )"); }
 	if (!(( s->submethod() == 200 ))) {throw std::runtime_error("assertion failed: ( s->submethod() == 200 )"); }
 	if (!(( s->testsub() == 99 ))) {throw std::runtime_error("assertion failed: ( s->testsub() == 99 )"); }
 	if (!(( s->test_pass_self() == 99 ))) {throw std::runtime_error("assertion failed: ( s->test_pass_self() == 99 )"); }
-	auto Sub_140574905317648 = std::shared_ptr<Sub>(new Sub()); Sub_140574905317648->__init__(1);
-auto Sub_140574905317456 = std::shared_ptr<Sub>(new Sub()); Sub_140574905317456->__init__(100, Sub_140574905317648);
-auto ss = std::shared_ptr<Sub>((new Sub())); ss->__init__(10, Sub_140574905317456); // new object
+	auto ss = [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(10, [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(100, [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(1); return _;}()); return _;}()); return _;}();			/* new variable*/
 	std::cout << ss << std::endl;
 	if (!(( ss->x == 10 ))) {throw std::runtime_error("assertion failed: ( ss->x == 10 )"); }
 	if (!(( ss->test_pass_self() == 9 ))) {throw std::runtime_error("assertion failed: ( ss->test_pass_self() == 9 )"); }
-	auto Sub_140574905318736 = std::shared_ptr<Sub>(new Sub()); Sub_140574905318736->__init__(10, std::shared_ptr<Sub>((new Sub())->__init__(11)));
-	auto Sub_140574905344144 = std::shared_ptr<Sub>(new Sub()); Sub_140574905344144->__init__(10);
-auto sss = std::shared_ptr<Sub>((new Sub())); sss->__init__(Sub_140574905344144->sub()); // new object
+	[&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(10, [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(11); return _;}()); return _;}();
+	auto sss = [&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__([&](){auto _ = std::shared_ptr<Sub>(new Sub()); _->__init__(10); return _;}()->sub()); return _;}();			/* new variable*/
 	auto subs = std::make_shared<std::vector<std::shared_ptr<Sub>>>(10);
-	auto ptr = (*subs)[0];  /* auto-fallback <_ast.Subscript object at 0x7fda254c2310> */
+	auto ptr = (*subs)[0];  /* auto-fallback <_ast.Subscript object at 0x7f86f8fd7650> */
 	if (!(( ptr == nullptr ))) {throw std::runtime_error("assertion failed: ( ptr == nullptr )"); }
 		auto ps = std::static_pointer_cast<Sub>(ptr);
 	if (!(( ps == nullptr ))) {throw std::runtime_error("assertion failed: ( ps == nullptr )"); }
@@ -1693,40 +1780,53 @@ def main():
 	## variable size vector of vectors,
 	## None is allowed as a sub-vector because each sub-vector is wrapped by std::shared_ptr
 	arr = [][]int(
-		(1,2,3),
-		(4,5,6,7,8),
+		[1,2,3],
+		[4,5,6,7,8],
 		None,
 		#(x*x for x in range(4)),  ## TODO fix listcomps
 		(x for x in range(20)),
 	)
-	print( len(arr))
-	print( len(arr[0]) )
-	print( len(arr[1]) )
-	if arr[2] is None:
-		print('nullptr works ok!')
-	else:
-		print('never reached')
 
-	print('sub 0 items:')
+	a,b,c = arr[0]
+	assert a==1
+	assert b==2
+	assert c==3
+
+	for vec in arr:
+		print vec
+		if vec is not None:
+			x,y,z = vec
+			print x,y,z
+
+	assert len(arr)==4
+	assert len(arr[0])==3
+	assert len(arr[1])==5
+	assert len(arr[3])==20
+	assert arr[2] is None
+
+	v = 1
 	for i in arr[0]:
-		print( i )
+		assert i==v
+		v+=1
 
-	print('sub 1 items:')
 	sub = arr[1]
+	v = sub[0]
 	for i in sub:
-		print(i)
+		assert i == v
+		v+=1
 
-	print('sub 3 items:')
+	v = 0
 	for i in arr[3]:
-		print(i)
+		assert i==v
+		v+=1
 
-	print('sub 3 items changed:')
 	arr[3][0] = 1000
 	arr[3][1] = 1001
-	arr[3][2] = 1002
-	arr[3][3] = 1003
-	for i in arr[3]:
-		print(i)
+
+	assert arr[3][0] == 1000
+	assert arr[3][1] == 1001
+
+	print 'OK'
 ```
 output:
 ------
@@ -1736,46 +1836,60 @@ int main() {
 
 	
 	/* arr = vector of vectors to: int */	
-	std::vector<int> _r__sub0_arr = {1,2,3};	
-	std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
-	std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
-	std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
 std::vector<int> _comp__subcomp_arr; /*comprehension*/
 	for (int x=0; x<20; x++) {
 		_comp__subcomp_arr.push_back(x);
 	}
 	auto _subcomp_arr = std::make_shared<std::vector<int>>(_comp__subcomp_arr);	
-	std::vector<std::shared_ptr<std::vector<int>>> _ref_arr = {_sub0_arr,_sub1_arr,nullptr,_subcomp_arr};	
-	std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(_ref_arr);
-	std::cout << arr->size() << std::endl;
-	std::cout << (*arr)[0]->size() << std::endl;
-	std::cout << (*arr)[1]->size() << std::endl;
-	if (( (*arr)[2] == nullptr )) {
-		std::cout << std::string("nullptr works ok!") << std::endl;
-	} else {
-		std::cout << std::string("never reached") << std::endl;
+	auto arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(std::vector<std::shared_ptr<std::vector<int>>>{		std::shared_ptr<std::vector<int>>(new std::vector<int>{1,2,3}),
+		std::shared_ptr<std::vector<int>>(new std::vector<int>{4,5,6,7,8}),
+		nullptr,
+		_subcomp_arr});
+	
+	auto __r_0 = (*arr)[0];  /* auto-fallback <_ast.Subscript object at 0x7fcfe936dd50> */
+	auto a = (*__r_0)[0];  /* auto-fallback <_ast.Subscript object at 0x7fcfe936ded0> */
+	auto b = (*__r_0)[1];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92fe090> */
+	auto c = (*__r_0)[2];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92fe210> */
+	if (!(( a == 1 ))) {throw std::runtime_error("assertion failed: ( a == 1 )"); }
+	if (!(( b == 2 ))) {throw std::runtime_error("assertion failed: ( b == 2 )"); }
+	if (!(( c == 3 ))) {throw std::runtime_error("assertion failed: ( c == 3 )"); }
+	for (auto &vec: (*arr)) { /*loop over heap vector*/
+		std::cout << vec << std::endl;
+		if (( vec != nullptr )) {
+			auto x = (*vec)[0];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92fe8d0> */
+			auto y = (*vec)[1];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92fea50> */
+			auto z = (*vec)[2];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92febd0> */
+			std::cout << x;
+std::cout << y;
+std::cout << z;std::cout << std::endl;
+		}
 	}
-	std::cout << std::string("sub 0 items:") << std::endl;
+	if (!(( arr->size() == 4 ))) {throw std::runtime_error("assertion failed: ( arr->size() == 4 )"); }
+	if (!(( (*arr)[0]->size() == 3 ))) {throw std::runtime_error("assertion failed: ( (*arr)[0]->size() == 3 )"); }
+	if (!(( (*arr)[1]->size() == 5 ))) {throw std::runtime_error("assertion failed: ( (*arr)[1]->size() == 5 )"); }
+	if (!(( (*arr)[3]->size() == 20 ))) {throw std::runtime_error("assertion failed: ( (*arr)[3]->size() == 20 )"); }
+	if (!(( (*arr)[2] == nullptr ))) {throw std::runtime_error("assertion failed: ( (*arr)[2] == nullptr )"); }
+	auto v = 1;  /* auto-fallback <_ast.Num object at 0x7fcfe92ff8d0> */
 	for (auto &i: *(*arr)[0]) { /*loop over unknown type*/
-		std::cout << i << std::endl;
+		if (!(( i == v ))) {throw std::runtime_error("assertion failed: ( i == v )"); }
+		v ++;
 	}
-	std::cout << std::string("sub 1 items:") << std::endl;
-	auto sub = (*arr)[1];  /* auto-fallback <_ast.Subscript object at 0x7feb8b87d210> */
+	auto sub = (*arr)[1];  /* auto-fallback <_ast.Subscript object at 0x7fcfe92ffcd0> */
+	v = (*sub)[0];
 	for (auto &i: *sub) { /*loop over unknown type*/
-		std::cout << i << std::endl;
+		if (!(( i == v ))) {throw std::runtime_error("assertion failed: ( i == v )"); }
+		v ++;
 	}
-	std::cout << std::string("sub 3 items:") << std::endl;
+	v = 0;
 	for (auto &i: *(*arr)[3]) { /*loop over unknown type*/
-		std::cout << i << std::endl;
+		if (!(( i == v ))) {throw std::runtime_error("assertion failed: ( i == v )"); }
+		v ++;
 	}
-	std::cout << std::string("sub 3 items changed:") << std::endl;
 	(*(*arr)[3])[0] = 1000;
 	(*(*arr)[3])[1] = 1001;
-	(*(*arr)[3])[2] = 1002;
-	(*(*arr)[3])[3] = 1003;
-	for (auto &i: *(*arr)[3]) { /*loop over unknown type*/
-		std::cout << i << std::endl;
-	}
+	if (!(( (*(*arr)[3])[0] == 1000 ))) {throw std::runtime_error("assertion failed: ( (*(*arr)[3])[0] == 1000 )"); }
+	if (!(( (*(*arr)[3])[1] == 1001 ))) {throw std::runtime_error("assertion failed: ( (*(*arr)[3])[1] == 1001 )"); }
+	std::cout << std::string("OK") << std::endl;
 	return 0;
 	/* arrays:
 		arr : int
@@ -1829,8 +1943,7 @@ class A: public std::enable_shared_from_this<A> {
 A* create_A() {
 
 	
-	auto A_140496345426640 = (new A()); A_140496345426640->__init__(1, 2);
-auto a = (new A)->__init__(1,2);  /* new object */
+	auto a = (new A)->__init__(1,2);  /* new object */
 	return a;
 }
 	A* A::__init__(int x, int y) {
@@ -1874,7 +1987,7 @@ output:
 int main() {
 
 	
-	auto sixteen = std::pow(2, 4);  /* auto-fallback <_ast.Call object at 0x7f769cf50050> */
+	auto sixteen = std::pow(2, 4);  /* auto-fallback <_ast.Call object at 0x7fbf67055390> */
 	std::cout << sixteen << std::endl;
 	if (!(( sixteen == 16 ))) {throw std::runtime_error("assertion failed: ( sixteen == 16 )"); }
 	auto c = std::complex<double>(1,2);			/* new variable*/
@@ -1924,7 +2037,7 @@ auto sender_wrapper(int a, cpp::channel<int>  send) {
 
 	
 	std::cout << std::string("sending") << std::endl;
-	auto result = 100;  /* auto-fallback <_ast.Num object at 0x7f004078a250> */
+	auto result = 100;  /* auto-fallback <_ast.Num object at 0x7fc4ff040590> */
 	send.send(result);
 }
 int recv_wrapper(int a, cpp::channel<int> recver) {
@@ -2041,7 +2154,7 @@ auto somefunc() {
 std::cout << a->size();std::cout << std::endl;
 	std::cout << std::string("slice assign front") << std::endl;
 	auto lena = a->size();			/* new variable*/
-	auto two = 2;  /* auto-fallback <_ast.Num object at 0x7fe79a276050> */
+	auto two = 2;  /* auto-fallback <_ast.Num object at 0x7fe2afacf390> */
 	if ((two + 1) >= a->size()) { a->erase(a->begin(), a->end());
 } else { a->erase(a->begin(), a->begin()+(two + 1)); }
 a->insert(a->begin(), b->begin(), b->end());
@@ -2270,7 +2383,7 @@ class Child: public std::enable_shared_from_this<Child> {
 	std::shared_ptr<Child> Parent::create_child(int x, std::shared_ptr<Parent> parent) {
 
 		
-		auto child = std::shared_ptr<Child>((new Child())); child->__init__(x, parent); // new object
+		auto child = [&](){auto _ = std::shared_ptr<Child>(new Child()); _->__init__(x, parent); return _;}();			/* new variable*/
 		this->children->push_back(child);
 		return child;
 	}
@@ -2288,7 +2401,7 @@ int main() {
 
 	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())); p->__init__(1000, children); // new object
+	auto p = [&](){auto _ = std::shared_ptr<Parent>(new Parent()); _->__init__(1000, children); return _;}();			/* new variable*/
 	std::cout << std::string("parent:");
 std::cout << p;std::cout << std::endl;
 	auto c1 = p->create_child(1, p);			/* p   */
@@ -2334,12 +2447,51 @@ def returns_float():
 	return 1.1
 
 class Foo:
+	def __init__(self, bar:int):
+		self.bar = bar
 	def get_int(self):
 		return 3
 	def get_float(self):
 		return 4.4
 	def do_nothing(self):
 		pass
+	def get_self(self):
+		return self
+
+
+with stack:
+	class FooStack:
+		def __init__(self, bar:int):
+			self.bar = bar
+		def get_self(self):
+			return self
+		def test_indirect(self):
+			return self.test_abstract()
+
+		#@abstractmethod
+		def test_abstract(self):
+			return self
+
+
+	class FooStackA( FooStack ):
+		def __init__(self, bar:int, value:string):
+			self.bar = bar
+			self.value = value
+		## subclasses automatically generate this
+		#def get_self(self):
+		#	return self
+		## subclasses automatically generate this
+		#def test_indirect(self):
+		#	return self.test_abstract()
+		## subclasses automatically generate this
+		#def test_abstract(self):
+		#	return self
+
+	class FooStackB( FooStack ):
+		def __init__(self, bar:int, value:int):
+			self.bar = bar
+			self.value = value
+
 
 def main():
 	print returns_int( False )
@@ -2347,10 +2499,58 @@ def main():
 	assert returns_int( True )==1
 	assert returns_float() == 1.1
 
-	f = Foo()
+	f = Foo(400)
 	assert f.get_int()==3
 	assert f.get_float()==4.4
 	f.do_nothing()
+	assert f.bar==400
+	assert f.get_self().bar==400
+
+	with stack:
+		sf = FooStack(100)
+		assert sf.bar==100
+		assert sf.get_self().bar==100
+
+		subf = FooStackA(10, 'hello')
+		print subf.bar
+		print subf.value
+		assert subf.bar == 10
+		assert subf.value == 'hello'
+		o = subf.get_self()
+		assert o.bar == 10
+		assert o.value == 'hello'
+
+		print o.bar
+		print o.value
+
+		## explicit casting to FooStackSub is not required if subclass contains its own versions
+		## of methods from its parent classes, these are auto generated durring translation.
+		x = o.test_indirect()
+		assert x.bar == 10
+		assert x.value == 'hello'
+
+
+		sub = FooStackB(10, 4)
+		assert sub.bar == 10
+		assert sub.value == 4
+		oo = sub.get_self()
+		assert oo.bar == 10
+		assert oo.value == 4
+
+		print oo.bar
+		print oo.value
+
+		## explicit casting to FooStackSub is not required if subclass contains its own versions
+		## of methods from its parent classes, these are auto generated durring translation.
+		xx = oo.test_indirect()
+		assert xx.bar == 10
+		assert xx.value == 4
+
+		#assert isinstance(xx, FooStackB)  ## TODO: fixme
+		if isinstance(xx, FooStackB):
+			print 'xx is FooStackB'
+		else:
+			raise RuntimeError('test failed')
 
 	print('OK')
 
@@ -2388,15 +2588,146 @@ class Foo: public std::enable_shared_from_this<Foo> {
 	std::string __class__;
 	bool __initialized__;
 	int  __classid__;
+	int  bar;
+	Foo* __init__(int bar);
 	auto get_int();
 	auto get_float();
 	auto do_nothing();
+	auto get_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
-	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=0;}
-	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=0;}
+	Foo() {__class__ = std::string("Foo"); __initialized__ = true; __classid__=2;}
+	Foo(bool init) {__class__ = std::string("Foo"); __initialized__ = init; __classid__=2;}
 	std::string getclassname() {return this->__class__;}
 };
+class FooStack: public std::enable_shared_from_this<FooStack> {
+  public:
+	std::string __class__;
+	bool __initialized__;
+	int  __classid__;
+	int  bar;
+	FooStack __init__(int bar);
+	auto get_self();
+	auto test_indirect();
+	auto test_abstract();
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	FooStack() {__class__ = std::string("FooStack"); __initialized__ = true; __classid__=0;}
+	FooStack(bool init) {__class__ = std::string("FooStack"); __initialized__ = init; __classid__=0;}
+	std::string getclassname() {return __class__;}
+};
+class FooStackA:  public FooStack {
+  public:
+//	members from class: FooStack  ['bar']
+	std::string  value;
+	FooStackA __init__(int bar);
+	FooStackA __init__(int bar, std::string value);
+	auto get_self();
+	auto test_indirect();
+	auto test_abstract();
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	FooStackA() {__class__ = std::string("FooStackA"); __initialized__ = true; __classid__=1;}
+	FooStackA(bool init) {__class__ = std::string("FooStackA"); __initialized__ = init; __classid__=1;}
+	std::string getclassname() {return __class__;}
+};
+class FooStackB:  public FooStack {
+  public:
+//	members from class: FooStack  ['bar']
+	int  value;
+	FooStackB __init__(int bar);
+	FooStackB __init__(int bar, int value);
+	auto get_self();
+	auto test_indirect();
+	auto test_abstract();
+	bool operator != (std::nullptr_t rhs) {return __initialized__;}
+	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
+	FooStackB() {__class__ = std::string("FooStackB"); __initialized__ = true; __classid__=3;}
+	FooStackB(bool init) {__class__ = std::string("FooStackB"); __initialized__ = init; __classid__=3;}
+	std::string getclassname() {return __class__;}
+};
+	auto FooStackB::test_abstract() {
+
+		
+		return *this;;
+	}
+	auto FooStackB::test_indirect() {
+
+		
+		return (*this).test_abstract();
+	}
+	auto FooStackB::get_self() {
+
+		
+		return *this;;
+	}
+	FooStackB FooStackB::__init__(int bar, int value) {
+
+		
+		(*this).bar = bar;
+		(*this).value = value;
+		return *this;
+	}
+	FooStackB FooStackB::__init__(int bar) {
+
+		
+		(*this).bar = bar;
+		return *this;
+	}
+	auto FooStackA::test_abstract() {
+
+		
+		return *this;;
+	}
+	auto FooStackA::test_indirect() {
+
+		
+		return (*this).test_abstract();
+	}
+	auto FooStackA::get_self() {
+
+		
+		return *this;;
+	}
+	FooStackA FooStackA::__init__(int bar, std::string value) {
+
+		
+		(*this).bar = bar;
+		(*this).value = value;
+		return *this;
+	}
+	FooStackA FooStackA::__init__(int bar) {
+
+		
+		(*this).bar = bar;
+		return *this;
+	}
+	auto FooStack::test_abstract() {
+
+		
+		return *this;;
+	}
+	auto FooStack::test_indirect() {
+
+		
+		return (*this).test_abstract();
+	}
+	auto FooStack::get_self() {
+
+		
+		return *this;;
+	}
+	FooStack FooStack::__init__(int bar) {
+
+		
+		(*this).bar = bar;
+		return *this;
+	}
+	auto Foo::get_self() {
+
+		
+		return std::static_pointer_cast<Foo>(shared_from_this());
+	}
 	auto Foo::do_nothing() {
 
 		
@@ -2412,6 +2743,12 @@ class Foo: public std::enable_shared_from_this<Foo> {
 		
 		return 3;
 	}
+	Foo* Foo::__init__(int bar) {
+
+		
+		this->bar = bar;
+		return this;
+	}
 int main() {
 
 	
@@ -2419,10 +2756,45 @@ int main() {
 	if (!(( returns_int(false) == 2 ))) {throw std::runtime_error("assertion failed: ( returns_int(false) == 2 )"); }
 	if (!(( returns_int(true) == 1 ))) {throw std::runtime_error("assertion failed: ( returns_int(true) == 1 )"); }
 	if (!(( returns_float() == 1.1 ))) {throw std::runtime_error("assertion failed: ( returns_float() == 1.1 )"); }
-	auto f = std::shared_ptr<Foo>(new Foo()); // new object
+	auto f = [&](){auto _ = std::shared_ptr<Foo>(new Foo()); _->__init__(400); return _;}();			/* new variable*/
 	if (!(( f->get_int() == 3 ))) {throw std::runtime_error("assertion failed: ( f->get_int() == 3 )"); }
 	if (!(( f->get_float() == 4.4 ))) {throw std::runtime_error("assertion failed: ( f->get_float() == 4.4 )"); }
 	f->do_nothing();
+	if (!(( f->bar == 400 ))) {throw std::runtime_error("assertion failed: ( f->bar == 400 )"); }
+	if (!(( f->get_self()->bar == 400 ))) {throw std::runtime_error("assertion failed: ( f->get_self()->bar == 400 )"); }
+		auto sf = FooStack().__init__(100);			/* new variable*/
+	if (!(( sf.bar == 100 ))) {throw std::runtime_error("assertion failed: ( sf.bar == 100 )"); }
+	if (!(( sf.get_self().bar == 100 ))) {throw std::runtime_error("assertion failed: ( sf.get_self().bar == 100 )"); }
+	auto subf = FooStackA().__init__(10, std::string("hello"));			/* new variable*/
+	std::cout << subf.bar << std::endl;
+	std::cout << subf.value << std::endl;
+	if (!(( subf.bar == 10 ))) {throw std::runtime_error("assertion failed: ( subf.bar == 10 )"); }
+	if (!(( subf.value == std::string("hello") ))) {throw std::runtime_error("assertion failed: ( subf.value == std::string(\"hello\") )"); }
+	auto o = subf.get_self();			/* subf   */
+	if (!(( o.bar == 10 ))) {throw std::runtime_error("assertion failed: ( o.bar == 10 )"); }
+	if (!(( o.value == std::string("hello") ))) {throw std::runtime_error("assertion failed: ( o.value == std::string(\"hello\") )"); }
+	std::cout << o.bar << std::endl;
+	std::cout << o.value << std::endl;
+	auto x = o.test_indirect();			/* o   */
+	if (!(( x.bar == 10 ))) {throw std::runtime_error("assertion failed: ( x.bar == 10 )"); }
+	if (!(( x.value == std::string("hello") ))) {throw std::runtime_error("assertion failed: ( x.value == std::string(\"hello\") )"); }
+	auto sub = FooStackB().__init__(10, 4);			/* new variable*/
+	if (!(( sub.bar == 10 ))) {throw std::runtime_error("assertion failed: ( sub.bar == 10 )"); }
+	if (!(( sub.value == 4 ))) {throw std::runtime_error("assertion failed: ( sub.value == 4 )"); }
+	auto oo = sub.get_self();			/* sub   */
+	if (!(( oo.bar == 10 ))) {throw std::runtime_error("assertion failed: ( oo.bar == 10 )"); }
+	if (!(( oo.value == 4 ))) {throw std::runtime_error("assertion failed: ( oo.value == 4 )"); }
+	std::cout << oo.bar << std::endl;
+	std::cout << oo.value << std::endl;
+	auto xx = oo.test_indirect();			/* oo   */
+	if (!(( xx.bar == 10 ))) {throw std::runtime_error("assertion failed: ( xx.bar == 10 )"); }
+	if (!(( xx.value == 4 ))) {throw std::runtime_error("assertion failed: ( xx.value == 4 )"); }
+	if ((xx.__class__==std::string("FooStackB"))) {
+		auto _cast_xx = static_cast<FooStackB>(xx);
+		std::cout << std::string("xx is FooStackB") << std::endl;
+	} else {
+		throw RuntimeError(std::string("test failed"));
+	}
 	std::cout << std::string("OK") << std::endl;
 	return 0;
 }
@@ -2607,7 +2979,7 @@ auto stack_test() {
 	Bar bars[4] = {Bar(false),Bar(false),Bar(false),Bar(false)};
 	bars[0] = Bar().__init__(std::string("hello"));
 	bars[1] = Bar().__init__(std::string("world"));
-	auto sub = Sub().__init__(bars); // new object
+	auto sub = Sub().__init__(bars);			/* new variable*/
 	std::cout << bars[0].value << std::endl;
 	std::cout << sub.arr2[0].value << std::endl;
 	test_foos_fixedarr(Foos);
@@ -2626,7 +2998,7 @@ auto stack_test() {
 		if (!(( i == 0 ))) {throw std::runtime_error("assertion failed: ( i == 0 )"); }
 	}
 	std::cout << std::string("local array iter ok") << std::endl;
-	auto j = 0;  /* auto-fallback <_ast.Num object at 0x7fa2a94ec210> */
+	auto j = 0;  /* auto-fallback <_ast.Num object at 0x7f7447e6a550> */
 	for (auto &i: grange) { /*loop over stack vector*/
 		std::cout << i << std::endl;
 		if (!(( i == j ))) {throw std::runtime_error("assertion failed: ( i == j )"); }
@@ -2699,7 +3071,7 @@ auto stack_test() {
 int main() {
 
 	
-	auto j = 0;  /* auto-fallback <_ast.Num object at 0x7fa2a94f66d0> */
+	auto j = 0;  /* auto-fallback <_ast.Num object at 0x7f7447e73a10> */
 	for (auto &i: grange) { /*loop over stack vector*/
 		std::cout << i << std::endl;
 		if (!(( i == j ))) {throw std::runtime_error("assertion failed: ( i == j )"); }
@@ -2840,11 +3212,11 @@ auto somefunc() {
 	if (!(( (std::find(a->begin(), a->end(), 5) != a->end()) ))) {throw std::runtime_error("assertion failed: ( (std::find(a->begin(), a->end(), 5) != a->end()) )"); }
 	if (!(! (( (std::find(a->begin(), a->end(), 100) != a->end()) )))) {throw std::runtime_error("assertion failed: ! (( (std::find(a->begin(), a->end(), 100) != a->end()) ))"); }
 	if (!(( a->at(4) == 5 ))) {throw std::runtime_error("assertion failed: ( a->at(4) == 5 )"); }
-	auto a1 = (*a)[0];  /* auto-fallback <_ast.Subscript object at 0x7f2170e0a9d0> */
-	auto a2 = (*a)[1];  /* auto-fallback <_ast.Subscript object at 0x7f2170e0ab50> */
-	auto a3 = (*a)[2];  /* auto-fallback <_ast.Subscript object at 0x7f2170e0acd0> */
-	auto a4 = (*a)[3];  /* auto-fallback <_ast.Subscript object at 0x7f2170e0ae50> */
-	auto a5 = (*a)[4];  /* auto-fallback <_ast.Subscript object at 0x7f2170e0afd0> */
+	auto a1 = (*a)[0];  /* auto-fallback <_ast.Subscript object at 0x7fc59b677d10> */
+	auto a2 = (*a)[1];  /* auto-fallback <_ast.Subscript object at 0x7fc59b677e90> */
+	auto a3 = (*a)[2];  /* auto-fallback <_ast.Subscript object at 0x7fc59b61d050> */
+	auto a4 = (*a)[3];  /* auto-fallback <_ast.Subscript object at 0x7fc59b61d1d0> */
+	auto a5 = (*a)[4];  /* auto-fallback <_ast.Subscript object at 0x7fc59b61d350> */
 	if (!(( a1 == 1 ))) {throw std::runtime_error("assertion failed: ( a1 == 1 )"); }
 	if (!(( a2 == 2 ))) {throw std::runtime_error("assertion failed: ( a2 == 2 )"); }
 	if (!(( a3 == 3 ))) {throw std::runtime_error("assertion failed: ( a3 == 3 )"); }
@@ -2881,11 +3253,11 @@ auto stackfunc() {
 		int arr[5] = {1,2,3,4,5};
 	std::cout << std::string("sizeof arr:");
 std::cout << sizeof(arr);std::cout << std::endl;
-	auto a1 = arr[0];  /* auto-fallback <_ast.Subscript object at 0x7f2170d9b8d0> */
-	auto a2 = arr[1];  /* auto-fallback <_ast.Subscript object at 0x7f2170d9ba50> */
-	auto a3 = arr[2];  /* auto-fallback <_ast.Subscript object at 0x7f2170d9bbd0> */
-	auto a4 = arr[3];  /* auto-fallback <_ast.Subscript object at 0x7f2170d9bd50> */
-	auto a5 = arr[4];  /* auto-fallback <_ast.Subscript object at 0x7f2170d9bed0> */
+	auto a1 = arr[0];  /* auto-fallback <_ast.Subscript object at 0x7fc59b612c10> */
+	auto a2 = arr[1];  /* auto-fallback <_ast.Subscript object at 0x7fc59b612d90> */
+	auto a3 = arr[2];  /* auto-fallback <_ast.Subscript object at 0x7fc59b612f10> */
+	auto a4 = arr[3];  /* auto-fallback <_ast.Subscript object at 0x7fc59b6130d0> */
+	auto a5 = arr[4];  /* auto-fallback <_ast.Subscript object at 0x7fc59b613250> */
 	if (!(( a1 == 1 ))) {throw std::runtime_error("assertion failed: ( a1 == 1 )"); }
 	if (!(( a2 == 2 ))) {throw std::runtime_error("assertion failed: ( a2 == 2 )"); }
 	if (!(( a3 == 3 ))) {throw std::runtime_error("assertion failed: ( a3 == 3 )"); }
@@ -2912,7 +3284,7 @@ std::cout << sizeof(arr);std::cout << std::endl;
 	if (!(( reversed[3] == 2 ))) {throw std::runtime_error("assertion failed: ( reversed[3] == 2 )"); }
 	if (!(( reversed[4] == 1 ))) {throw std::runtime_error("assertion failed: ( reversed[4] == 1 )"); }
 	std::cout << std::string("slice front and reverse") << std::endl;
-	auto k = 2;  /* auto-fallback <_ast.Num object at 0x7f2170d96fd0> */
+	auto k = 2;  /* auto-fallback <_ast.Num object at 0x7fc59b638350> */
 	/* <fixed size slice> k : None : -1 */
 	int s[5-k];
 	int __L = 0;
@@ -3053,6 +3425,7 @@ class B:  public A {
 	B* __init__(int x);
 	int method1();
 	auto method2(int y);
+	std::string getname();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
@@ -3065,6 +3438,7 @@ class C:  public A {
 	C* __init__(int x);
 	int method1();
 	auto say_hi();
+	std::string getname();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
@@ -3076,6 +3450,11 @@ int my_generic(std::shared_ptr<A> g) {
 	
 	return g->method1();
 }
+	std::string C::getname() {
+
+		
+		return this->__class__;
+	}
 	auto C::say_hi() {
 
 		
@@ -3091,6 +3470,11 @@ int my_generic(std::shared_ptr<A> g) {
 		
 		this->x = x;
 		return this;
+	}
+	std::string B::getname() {
+
+		
+		return this->__class__;
 	}
 	auto B::method2(int y) {
 
@@ -3127,9 +3511,9 @@ int my_generic(std::shared_ptr<A> g) {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())); a->__init__(1); // new object
-	auto b = std::shared_ptr<B>((new B())); b->__init__(200); // new object
-	auto c = std::shared_ptr<C>((new C())); c->__init__(3000); // new object
+	auto a = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(1); return _;}();			/* new variable*/
+	auto b = [&](){auto _ = std::shared_ptr<B>(new B()); _->__init__(200); return _;}();			/* new variable*/
+	auto c = [&](){auto _ = std::shared_ptr<C>(new C()); _->__init__(3000); return _;}();			/* new variable*/
 	std::cout << a->__class__ << std::endl;
 	std::cout << b->__class__ << std::endl;
 	std::cout << c->__class__ << std::endl;
@@ -3158,6 +3542,49 @@ int main() {
 	/* arrays:
 		arr : A
 */
+}
+```
+* [block_scope.py](c++/block_scope.py)
+
+input:
+------
+```python
+'''
+variable block scope
+http://stackoverflow.com/questions/6167923/block-scope-in-python
+'''
+
+def main():
+	for x in range(3):
+		print x
+		y = x
+
+	## below is valid in python, but not in pythia.
+	#assert x==2
+	#assert y==x
+
+	## note because `y` above is block scoped inside the for loop,
+	## the type of `y` can be changed here.
+	y = 'hi'
+	print y
+
+	print 'OK'
+```
+output:
+------
+```c++
+
+int main() {
+
+	
+	for (int x=0; x<3; x++) {
+		std::cout << x << std::endl;
+		auto y = x;  /* auto-fallback <_ast.Name object at 0x7fd6cbe1f550> */
+	}
+	auto y = std::string("hi");  /* auto-fallback <_ast.Str object at 0x7fd6cbe1f610> */
+	std::cout << y << std::endl;
+	std::cout << std::string("OK") << std::endl;
+	return 0;
 }
 ```
 * [subscript.py](c++/subscript.py)
@@ -3195,10 +3622,10 @@ int main() {
 
 	
 	std::shared_ptr<std::vector<int>> a( (new std::vector<int>({1,2,3})) ); /* 1D Array */
-	auto index = 0;  /* auto-fallback <_ast.Num object at 0x7f9c89f60310> */
+	auto index = 0;  /* auto-fallback <_ast.Num object at 0x7fcf1bdf7650> */
 	(*a)[index] = 100;
 	std::cout << (*a)[index] << std::endl;
-	auto s = std::string("hello world");  /* auto-fallback <_ast.Str object at 0x7f9c89f60690> */
+	auto s = std::string("hello world");  /* auto-fallback <_ast.Str object at 0x7fcf1bdf79d0> */
 	std::cout << s << std::endl;
 	std::cout << s.substr(0,1) << std::endl;
 	std::cout << s.substr(1,1) << std::endl;
@@ -3371,7 +3798,9 @@ class B:  public A {
 	B* __init__(int x, std::shared_ptr<A> other);
 	int foo();
 	int foo(float x, float y);
+	int method();
 	std::shared_ptr<B> get_self();
+	auto set_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	B() {__class__ = std::string("B"); __initialized__ = true; __classid__=2;}
@@ -3383,7 +3812,9 @@ class C:  public A {
 //	members from class: A  ['x', 'other']
 	C* __init__(int x, std::shared_ptr<A> other);
 	int bar();
+	int method();
 	std::shared_ptr<C> get_self();
+	auto set_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	C() {__class__ = std::string("C"); __initialized__ = true; __classid__=1;}
@@ -3395,7 +3826,10 @@ class D:  public C {
 //	members from class: A  ['x', 'other']
 	D* __init__(int x, std::shared_ptr<A> other);
 	int hey();
+	int bar();
+	int method();
 	std::shared_ptr<D> get_self();
+	auto set_self();
 	bool operator != (std::nullptr_t rhs) {return __initialized__;}
 	bool operator == (std::nullptr_t rhs) {return !__initialized__;}
 	D() {__class__ = std::string("D"); __initialized__ = true; __classid__=3;}
@@ -3407,27 +3841,42 @@ std::shared_ptr<A> some_subclass(int x, std::shared_ptr<A> o) {
 	
 		switch (x) {
 		case 0: {
-	auto a = std::shared_ptr<A>((new A())); a->__init__(1, o); // new object
+	auto a = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(1, o); return _;}();			/* new variable*/
 	return a;
 	} break;
 		case 1: {
-	auto b = std::shared_ptr<B>((new B())); b->__init__(2, o); // new object
+	auto b = [&](){auto _ = std::shared_ptr<B>(new B()); _->__init__(2, o); return _;}();			/* new variable*/
 	return b;
 	} break;
 		case 2: {
-	auto c = std::shared_ptr<C>((new C())); c->__init__(3, o); // new object
+	auto c = [&](){auto _ = std::shared_ptr<C>(new C()); _->__init__(3, o); return _;}();			/* new variable*/
 	return c;
 	} break;
 		case 3: {
-	auto d = std::shared_ptr<D>((new D())); d->__init__(4, o); // new object
+	auto d = [&](){auto _ = std::shared_ptr<D>(new D()); _->__init__(4, o); return _;}();			/* new variable*/
 	return d;
 	} break;
 	}
 }
+	auto D::set_self() {
+
+		
+		this->other->other = this->get_self();
+	}
 	std::shared_ptr<D> D::get_self() {
 
 		
 		return std::static_pointer_cast<D>(shared_from_this());
+	}
+	int D::method() {
+
+		
+		return this->x;
+	}
+	int D::bar() {
+
+		
+		return (this->x + 200);
 	}
 	int D::hey() {
 
@@ -3441,10 +3890,20 @@ std::shared_ptr<A> some_subclass(int x, std::shared_ptr<A> o) {
 		this->other = other;
 		return this;
 	}
+	auto C::set_self() {
+
+		
+		this->other->other = this->get_self();
+	}
 	std::shared_ptr<C> C::get_self() {
 
 		
 		return std::static_pointer_cast<C>(shared_from_this());
+	}
+	int C::method() {
+
+		
+		return this->x;
 	}
 	int C::bar() {
 
@@ -3458,10 +3917,20 @@ std::shared_ptr<A> some_subclass(int x, std::shared_ptr<A> o) {
 		this->other = other;
 		return this;
 	}
+	auto B::set_self() {
+
+		
+		this->other->other = this->get_self();
+	}
 	std::shared_ptr<B> B::get_self() {
 
 		
 		return std::static_pointer_cast<B>(shared_from_this());
+	}
+	int B::method() {
+
+		
+		return this->x;
 	}
 	int B::foo(float x, float y) {
 
@@ -3626,7 +4095,7 @@ class A: public std::enable_shared_from_this<A> {
 int main() {
 
 	
-	auto a = std::shared_ptr<A>((new A())); a->__init__(1); // new object
+	auto a = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(1); return _;}();			/* new variable*/
 	std::cout << a << std::endl;
 	a.reset();
 	std::cout << std::string("done") << std::endl;
@@ -3691,7 +4160,7 @@ class A: public std::enable_shared_from_this<A> {
 auto test() {
 
 	
-	auto a = A().__init__(); // new object
+	auto a = A().__init__();			/* new variable*/
 	std::cout << a.is_initialized() << std::endl;
 	if (!(a.is_initialized())) {throw std::runtime_error("assertion failed: a.is_initialized()"); }
 	if (( a != nullptr )) {
@@ -3705,7 +4174,7 @@ auto test() {
 		std::cout << std::string("b is acting like a nullptr") << std::endl;
 	}
 	if (!(( b.is_initialized() == false ))) {throw std::runtime_error("assertion failed: ( b.is_initialized() == false )"); }
-	auto c = A().__init__(); // new object
+	auto c = A().__init__();			/* new variable*/
 	a = c;
 }
 	bool A::is_initialized() {
@@ -3735,21 +4204,78 @@ input:
 std::tuple<Type1, Type2, etc...>
 '''
 with typedef:
-	HeapTArray = []tuple( []float, []float, float )
+	HeapTArray = []tuple( []f64, []f64, f64 )
+	HeapTupleType = tuple( []f64, []f64, f64 )
+	HeapArrayOfTuples = []HeapTupleType()
+	HTupleOfTuples    = tuple( HeapTupleType, HeapTupleType )
+	HTTArray = []HTupleOfTuples()
 
 ## IDX needs to be a constant so std::get<IDX> can be resolved at compile time.
 with constant: IDX = 0
 
+def test_typedefs():
+
+	x = HeapTArray()
+	a = [1.1,2.2,3.3]
+	b = [0.1,0.2]
+	x.push_back(
+		(a, b, 0.99)
+	)
+	print x
+	assert len(x)==1
+
+	x.push_back( ([0.1, 0.2], [0.9, 0.8], 0.1) )
+	assert len(x)==2
+
+	c = ([0.1, 0.2], [0.9, 0.8], 0.1)
+	x.push_back( c )
+
+	assert len(x)==3
+
+	y = HeapTArray([
+		(a, b, 0.99),
+		(b, a, 0.5)
+	])
+
+	tt = HTupleOfTuples( (a, b, 0.99), (b, c, 0.11) )
+	htta = HTTArray([tt])
+	assert len(htta)==1
+	#htta = HTTArray()
+	htta.push_back( tt )
+	assert len(htta)==2
+
+	## TODO fixme, bug with typedef's and nested tuples?
+	#htta2 = HTTArray()
+	#assert len(htta2)==0
+	#htta2.push_back( tt )
+	#assert len(htta2)==1
+	#htta2.push_back(
+	#	( (a, b, 0.99), (b, c, 0.11) )
+	#)
+	#htta2.push_back( tt )
+
 with stack:
 	with typedef:
-		StackTArray = []tuple( []float, []float, float )
+		StackTArray = []tuple( []f64, []f64, f64 )
 
 	def test_stack_array( arr: StackTArray ):
 		print 'len of arr:', len(arr)
 
+	def test_array_of_nested_tuples_stack(n:int):
+		with typedef: T = tuple(f64,f64)
+		r = []tuple( T, T )
+		for i in range(n):
+			a = (1.1, 1.2)
+			b = (2.2, 2.3)
+			r.append( (a,b) )
+			#c = (a,b)
+			#r.append( c )
+		return r
+
+
 	def test_stack():
 		print 'stack test'
-		tuplearray = []tuple( []float, []float, float )
+		tuplearray = []tuple( []f64, []f64, f64 )
 		a = ( [1.1,2.2,3.3], [4.4,5.5], 100.0 )
 		b = ( [6.1,7.2,8.3], [9.4,0.5], 1.0 )
 		tuplearray.append( a )
@@ -3766,23 +4292,48 @@ with stack:
 				v3 = item[{ IDX }]
 				assert v3[0]==vec3[0]
 
+				v4 = tuple.get(item, 0)
+				assert v4[0]==v3[0]
+
+		tu = test_array_of_nested_tuples_stack(6)
+		assert len(tu)
+
 
 def test_heap_array( arr: HeapTArray ):
 	print 'len of arr:', len(arr)
 
-def test_returns_array_of_tuples(n) -> []tuple(float, float):
-	r = []tuple( float, float )
+def test_returns_array_of_tuples(n) -> []tuple(f64, f64):
+	r = []tuple( f64, f64 )
 	for i in range(n):
 		t = (1.1, 1.2)
 		r.append(t)
 	return r
 
+## note: g++4.9 can not guess a complex return type, when the parameter `n` is untyped, 
+## so `n:int` is required so the return type can automatically be deduced by g++.
+def test_array_of_nested_tuples(n:int):
+	with typedef: T = tuple(f64,f64)
+	r = []tuple( T, T )
+
+	for i in range(n):
+		a = (1.1, 1.2)
+		b = (2.2, 2.3)
+		r.append( (a,b) )
+		#c = (a,b)
+		#r.append( c )
+	return r
+
+
+
 def test_heap():
 	print 'heap test'
+	nested = test_array_of_nested_tuples(4)
+	assert len(nested)==4
+
 	tarr = test_returns_array_of_tuples(3)
 	assert len(tarr)==3
 
-	tuplearray = []tuple( []float, []float, float )
+	tuplearray = []tuple( []f64, []f64, f64 )
 	a = ( [1.1,2.2,3.3], [4.4,5.5], 100.0 )
 	b = ( [6.1,7.2,8.3], [9.4,0.5], 1.0 )
 	tuplearray.append( a )
@@ -3807,8 +4358,8 @@ def test_heap():
 		v3 = item[{ 0 }]
 		assert v3[0]==vec3[0]
 
-		#for s in item:
-		#	print s
+		v4 = tuple.get(item, 0)
+		assert v4[0]==v3[0]
 
 def main():
 	test_stack()
@@ -3818,22 +4369,66 @@ output:
 ------
 ```c++
 
-typedef std::shared_ptr< std::vector<std::shared_ptr<std::tuple<std::shared_ptr<std::vector<float>>,std::shared_ptr<std::vector<float>>,float>>> > HeapTArray;
+typedef std::shared_ptr< std::vector<std::shared_ptr<std::tuple<std::shared_ptr<std::vector<f64>>,std::shared_ptr<std::vector<f64>>,f64>>> > HeapTArray;
+typedef std::shared_ptr<std::tuple<std::shared_ptr<std::vector<f64>>,std::shared_ptr<std::vector<f64>>,f64>> HeapTupleType;
+typedef std::shared_ptr<std::vector<HeapTupleType>> HeapArrayOfTuples;
+typedef std::shared_ptr<std::tuple<HeapTupleType,HeapTupleType>> HTupleOfTuples;
+typedef std::shared_ptr<std::vector<HTupleOfTuples>> HTTArray;
 const int IDX = 0;
-typedef std::vector<std::tuple<std::vector<float>,std::vector<float>,float>> StackTArray;
+auto test_typedefs() {
+
+	
+	auto x = /*typedef-tuple-array:std::vector<tuple>*/HeapTArray();			/* new variable*/
+	std::shared_ptr<std::vector<float64>> a( (new std::vector<float64>({1.1,2.2,3.3})) ); /* 1D Array */
+	std::shared_ptr<std::vector<float64>> b( (new std::vector<float64>({0.1,0.2})) ); /* 1D Array */
+	x->push_back(std::make_shared<std::tuple<decltype(a),decltype(b),float64>>(std::make_tuple(a,b,0.99)));
+	std::cout << x << std::endl;
+	if (!(( x->size() == 1 ))) {throw std::runtime_error("assertion failed: ( x->size() == 1 )"); }
+	x->push_back(std::make_shared<std::tuple<std::shared_ptr<std::vector<float64>>,std::shared_ptr<std::vector<float64>>,float64>>(std::make_tuple(std::shared_ptr<std::vector<float64>>(new std::vector<float64>{0.1,0.2}),std::shared_ptr<std::vector<float64>>(new std::vector<float64>{0.9,0.8}),0.1)));
+	if (!(( x->size() == 2 ))) {throw std::runtime_error("assertion failed: ( x->size() == 2 )"); }
+	auto c = std::make_shared<std::tuple<std::shared_ptr<std::vector<float64>>,std::shared_ptr<std::vector<float64>>,float64>>(std::make_tuple(std::shared_ptr<std::vector<float64>>(new std::vector<float64>{0.1,0.2}),std::shared_ptr<std::vector<float64>>(new std::vector<float64>{0.9,0.8}),0.1)); /*new-tuple*/
+	x->push_back(c);
+	if (!(( x->size() == 3 ))) {throw std::runtime_error("assertion failed: ( x->size() == 3 )"); }
+	auto y = /*typedef: std::vector<tuple>*/std::make_shared<std::vector<std::shared_ptr<std::tuple<decltype(a),decltype(b),float64>>>>(std::vector<std::shared_ptr<std::tuple<decltype(a),decltype(b),float64>>>{std::make_shared<std::tuple<decltype(a),decltype(b),float64>>(std::make_tuple(a,b,0.99)),std::make_shared<std::tuple<decltype(b),decltype(a),float64>>(std::make_tuple(b,a,0.5))});			/* new variable*/
+	auto tt = /*typedef: tuple(HeapTupleType, HeapTupleType)*/[&](){auto _ = std::make_tuple(std::make_shared<std::tuple<decltype(a),decltype(b),float64>>(std::make_tuple(a,b,0.99)),std::make_shared<std::tuple<decltype(b),decltype(c),float64>>(std::make_tuple(b,c,0.11))); return std::make_shared<decltype(_)>(_);}();			/* new variable*/
+	auto htta = /*typedef: std::vector<HTupleOfTuples>*/std::make_shared<std::vector<decltype(tt)>>(std::vector<decltype(tt)>{tt});			/* new variable*/
+	if (!(( htta->size() == 1 ))) {throw std::runtime_error("assertion failed: ( htta->size() == 1 )"); }
+	htta->push_back(tt);
+	if (!(( htta->size() == 2 ))) {throw std::runtime_error("assertion failed: ( htta->size() == 2 )"); }
+	/* arrays:
+		a : float64
+		b : float64
+*/
+}
+typedef std::vector<std::tuple<std::vector<f64>,std::vector<f64>,f64>> StackTArray;
 auto test_stack_array(StackTArray arr) {
 
 	
 	std::cout << std::string("len of arr:");
 std::cout << arr.size();std::cout << std::endl;
 }
+auto test_array_of_nested_tuples_stack(int n) {
+
+	
+	typedef std::tuple<f64,f64> T;
+	auto r = std::vector<std::tuple<T,T>>();
+	for (int i=0; i<n; i++) {
+		auto a = std::make_tuple(1.1,1.2); /*new-tuple*/
+		auto b = std::make_tuple(2.2,2.3); /*new-tuple*/
+		r.push_back(std::make_tuple(a,b));
+	}
+	return r;
+	/* arrays:
+		r : tuple
+*/
+}
 auto test_stack() {
 
 	
 	std::cout << std::string("stack test") << std::endl;
-	auto tuplearray = std::vector<std::tuple<std::vector<float>,std::vector<float>,float>>();
-	auto a = std::make_tuple(std::vector<float>{1.1, 2.2, 3.3},std::vector<float>{4.4, 5.5},100.0); /*new-tuple*/
-	auto b = std::make_tuple(std::vector<float>{6.1, 7.2, 8.3},std::vector<float>{9.4, 0.5},1.0); /*new-tuple*/
+	auto tuplearray = std::vector<std::tuple<std::vector<f64>,std::vector<f64>,f64>>();
+	auto a = std::make_tuple(std::vector<float64>{1.1,2.2,3.3},std::vector<float64>{4.4,5.5},100.0); /*new-tuple*/
+	auto b = std::make_tuple(std::vector<float64>{6.1,7.2,8.3},std::vector<float64>{9.4,0.5},1.0); /*new-tuple*/
 	tuplearray.push_back(a);
 	tuplearray.push_back(b);
 	test_stack_array(tuplearray);
@@ -3844,9 +4439,13 @@ auto test_stack() {
 		std::cout << vec3[0];
 std::cout << vec3[1];
 std::cout << vec3[2];std::cout << std::endl;
-		auto v3 = std::get<IDX>(item);  /* auto-fallback <_ast.Subscript object at 0x7fa444f0ab10> */
+		auto v3 = std::get<IDX>(item);  /* auto-fallback <_ast.Subscript object at 0x7f2f0141d950> */
 		if (!(( v3[0] == vec3[0] ))) {throw std::runtime_error("assertion failed: ( v3[0] == vec3[0] )"); }
+		auto v4 = std::get<0>(item);			/* tuple   */
+		if (!(( v4[0] == v3[0] ))) {throw std::runtime_error("assertion failed: ( v4[0] == v3[0] )"); }
 	}
+	auto tu = test_array_of_nested_tuples_stack(6);			/* new variable*/
+	if (!(tu.size())) {throw std::runtime_error("assertion failed: tu.size()"); }
 	/* arrays:
 		tuplearray : tuple
 */
@@ -3857,13 +4456,28 @@ auto test_heap_array(HeapTArray arr) {
 	std::cout << std::string("len of arr:");
 std::cout << arr->size();std::cout << std::endl;
 }
-std::shared_ptr<std::vector<std::shared_ptr<std::tuple<float, float>>>> test_returns_array_of_tuples(auto n) {
+std::shared_ptr<std::vector<std::shared_ptr<std::tuple<f64, f64>>>> test_returns_array_of_tuples(auto n) {
 
 	
-	auto r = std::make_shared<std::vector< std::shared_ptr<std::tuple<float,float>> >>(std::vector< std::shared_ptr<std::tuple<float,float>> >());
+	auto r = std::make_shared<std::vector< std::shared_ptr<std::tuple<f64,f64>> >>(std::vector< std::shared_ptr<std::tuple<f64,f64>> >());
 	for (int i=0; i<n; i++) {
-		auto t = std::make_shared<std::tuple<float,float>>(std::make_tuple(1.1,1.2)); /*new-tuple*/
+		auto t = std::make_shared<std::tuple<float64,float64>>(std::make_tuple(1.1,1.2)); /*new-tuple*/
 		r->push_back(t);
+	}
+	return r;
+	/* arrays:
+		r : tuple
+*/
+}
+auto test_array_of_nested_tuples(int n) {
+
+	
+	typedef std::shared_ptr<std::tuple<f64,f64>> T;
+	auto r = std::make_shared<std::vector< std::shared_ptr<std::tuple<T,T>> >>(std::vector< std::shared_ptr<std::tuple<T,T>> >());
+	for (int i=0; i<n; i++) {
+		auto a = std::make_shared<std::tuple<float64,float64>>(std::make_tuple(1.1,1.2)); /*new-tuple*/
+		auto b = std::make_shared<std::tuple<float64,float64>>(std::make_tuple(2.2,2.3)); /*new-tuple*/
+		r->push_back(std::make_shared<std::tuple<decltype(a),decltype(b)>>(std::make_tuple(a,b)));
 	}
 	return r;
 	/* arrays:
@@ -3874,16 +4488,18 @@ auto test_heap() {
 
 	
 	std::cout << std::string("heap test") << std::endl;
+	auto nested = test_array_of_nested_tuples(4);			/* new variable*/
+	if (!(( nested->size() == 4 ))) {throw std::runtime_error("assertion failed: ( nested->size() == 4 )"); }
 	auto tarr = test_returns_array_of_tuples(3);			/* new variable*/
 	if (!(( tarr->size() == 3 ))) {throw std::runtime_error("assertion failed: ( tarr->size() == 3 )"); }
-	auto tuplearray = std::make_shared<std::vector< std::shared_ptr<std::tuple<std::shared_ptr<std::vector<float>>,std::shared_ptr<std::vector<float>>,float>> >>(std::vector< std::shared_ptr<std::tuple<std::shared_ptr<std::vector<float>>,std::shared_ptr<std::vector<float>>,float>> >());
-	auto a = std::make_shared<std::tuple<std::shared_ptr<std::vector<float>>,std::shared_ptr<std::vector<float>>,float>>(std::make_tuple(std::shared_ptr<std::vector<float>>(new std::vector<float>{1.1, 2.2, 3.3}),std::shared_ptr<std::vector<float>>(new std::vector<float>{4.4, 5.5}),100.0)); /*new-tuple*/
-	auto b = std::make_shared<std::tuple<std::shared_ptr<std::vector<float>>,std::shared_ptr<std::vector<float>>,float>>(std::make_tuple(std::shared_ptr<std::vector<float>>(new std::vector<float>{6.1, 7.2, 8.3}),std::shared_ptr<std::vector<float>>(new std::vector<float>{9.4, 0.5}),1.0)); /*new-tuple*/
+	auto tuplearray = std::make_shared<std::vector< std::shared_ptr<std::tuple<std::shared_ptr<std::vector<f64>>,std::shared_ptr<std::vector<f64>>,f64>> >>(std::vector< std::shared_ptr<std::tuple<std::shared_ptr<std::vector<f64>>,std::shared_ptr<std::vector<f64>>,f64>> >());
+	auto a = std::make_shared<std::tuple<std::shared_ptr<std::vector<float64>>,std::shared_ptr<std::vector<float64>>,float64>>(std::make_tuple(std::shared_ptr<std::vector<float64>>(new std::vector<float64>{1.1,2.2,3.3}),std::shared_ptr<std::vector<float64>>(new std::vector<float64>{4.4,5.5}),100.0)); /*new-tuple*/
+	auto b = std::make_shared<std::tuple<std::shared_ptr<std::vector<float64>>,std::shared_ptr<std::vector<float64>>,float64>>(std::make_tuple(std::shared_ptr<std::vector<float64>>(new std::vector<float64>{6.1,7.2,8.3}),std::shared_ptr<std::vector<float64>>(new std::vector<float64>{9.4,0.5}),1.0)); /*new-tuple*/
 	tuplearray->push_back(a);
 	tuplearray->push_back(b);
 	test_heap_array(tuplearray);
 	std::cout << (*std::get<0>(*a))[1] << std::endl;
-		const auto index = 2;  /* auto-fallback <_ast.Num object at 0x7fa444f354d0> */
+		const auto index = 2;  /* auto-fallback <_ast.Num object at 0x7f2eff2fab50> */
 	std::cout << std::get<index>(*b) << std::endl;
 	for (auto &item: (*tuplearray)) { /*loop over heap vector*/
 		auto vec3 = std::get<0>(*item);			/* new variable*/
@@ -3892,8 +4508,10 @@ auto test_heap() {
 		std::cout << (*vec3)[0];
 std::cout << (*vec3)[1];
 std::cout << (*vec3)[2];std::cout << std::endl;
-		auto v3 = std::get<0>(*item);  /* auto-fallback <_ast.Subscript object at 0x7fa444f3d190> */
+		auto v3 = std::get<0>(*item);  /* auto-fallback <_ast.Subscript object at 0x7f2eff2fe810> */
 		if (!(( (*v3)[0] == (*vec3)[0] ))) {throw std::runtime_error("assertion failed: ( (*v3)[0] == (*vec3)[0] )"); }
+		auto v4 = std::get<0>(*item);			/* tuple   */
+		if (!(( (*v4)[0] == (*v3)[0] ))) {throw std::runtime_error("assertion failed: ( (*v4)[0] == (*v3)[0] )"); }
 	}
 	/* arrays:
 		tuplearray : tuple
@@ -3927,6 +4545,11 @@ tuplemap = {
 }
 
 with stack:
+	tuplemap_stack = {
+		'A': ([1.0, 2.0, 3.0], [4.0, 5.0, 6.0], FOO),
+		'B': ([7.0, 8.0, 9.0], [0.0, 0.0, 0.0], FOO*2.2)
+	}
+
 	def test_stack():
 		print 'stack test...'
 		m1 = {
@@ -3937,6 +4560,9 @@ with stack:
 		assert m1['K1'][1]==1
 		assert m1['K2'][0]==2
 		assert m1['K2'][1]==3
+
+		vecx = tuple.get( tuplemap_stack['A'], 0 )
+		assert vecx[0]==1.0
 
 
 def test_heap():
@@ -3950,9 +4576,32 @@ def test_heap():
 	assert m1['K2'][0]==2
 	assert m1['K2'][1]==3
 
-	with get as 'std::get<%s>(%s)':
+	with get as 'std::get<%s>(*%s)':
 		vec = get(0, tuplemap['A'])
 		assert vec[0]==1.0
+
+	vecx = tuple.get( tuplemap['A'], 0 )
+	assert vecx[0]==1.0
+
+	print 'testing loop over map keys'
+	for key in m1:
+		print 'key:', key
+
+	print 'testing loop over map keys and values'
+	for (key,val) in m1:
+		print 'key:', key
+		print 'value:', val
+
+	keys = dict.keys(m1)
+	assert len(keys)==2
+	for key in keys:
+		print key
+
+	assert 'K1' in keys
+	assert 'invalid-key' not in keys
+
+	values = dict.values(m1)
+	assert len(values)==2
 
 
 def main():
@@ -3968,34 +4617,62 @@ output:
 ------
 ```c++
 
-auto mymap = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("key1"), new std::vector<int>{1, 2, 3}}
-,{std::string("key2"), new std::vector<int>{4, 5, 6, 7}}});
+auto mymap = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("key1"), new std::vector<int>{1,2,3}}
+,{std::string("key2"), new std::vector<int>{4,5,6,7}}});
 int FOO = 1.1;
-auto tuplemap = std::shared_ptr<std::map<std::string,std::tuple<std::vector<double>*,std::vector<double>*,double>>>(new std::map<std::string,std::tuple<std::vector<double>*,std::vector<double>*,double>>{{std::string("A"), std::make_tuple((new std::vector<double>{1.0, 2.0, 3.0}),(new std::vector<double>{4.0, 5.0, 6.0}),FOO)}
-,{std::string("B"), std::make_tuple((new std::vector<double>{7.0, 8.0, 9.0}),(new std::vector<double>{0.0, 0.0, 0.0}),(FOO * 2.2))}});
+auto tuplemap = std::shared_ptr<std::map<std::string,std::shared_ptr<std::tuple<std::vector<double>*,std::vector<double>*,double>>>>(new std::map<std::string,std::shared_ptr<std::tuple<std::vector<double>*,std::vector<double>*,double>>>{{std::string("A"), std::make_shared<std::tuple<std::vector<double>*,std::vector<double>*,double>>(std::make_tuple(new std::vector<float64>{1.0,2.0,3.0},new std::vector<float64>{4.0,5.0,6.0},FOO))}
+,{std::string("B"), std::make_shared<std::tuple<std::vector<double>*,std::vector<double>*,double>>(std::make_tuple(new std::vector<float64>{7.0,8.0,9.0},new std::vector<float64>{0.0,0.0,0.0},(FOO * 2.2)))}});
+auto tuplemap_stack = std::map<std::string, std::tuple<std::vector<double>,std::vector<double>,double>>{{std::string("A"), std::make_tuple(std::vector<float64>{1.0,2.0,3.0},std::vector<float64>{4.0,5.0,6.0},FOO)}
+,{std::string("B"), std::make_tuple(std::vector<float64>{7.0,8.0,9.0},std::vector<float64>{0.0,0.0,0.0},(FOO * 2.2))}};
 auto test_stack() {
 
 	
 	std::cout << std::string("stack test...") << std::endl;
-	auto m1 = std::map<std::string,std::vector<int>>{{std::string("K1"),std::vector<int>{0, 1}}
-,{std::string("K2"),std::vector<int>{2, 3}}};
+	auto m1 = std::map<std::string,std::vector<int>>{{std::string("K1"),std::vector<int>{0,1}}
+,{std::string("K2"),std::vector<int>{2,3}}};
 	if (!(( m1[std::string("K1")][0] == 0 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K1\")][0] == 0 )"); }
 	if (!(( m1[std::string("K1")][1] == 1 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K1\")][1] == 1 )"); }
 	if (!(( m1[std::string("K2")][0] == 2 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K2\")][0] == 2 )"); }
 	if (!(( m1[std::string("K2")][1] == 3 ))) {throw std::runtime_error("assertion failed: ( m1[std::string(\"K2\")][1] == 3 )"); }
+	auto vecx = std::get<0>(tuplemap_stack[std::string("A")]);			/* tuple   */
+	if (!(( vecx[0] == 1.0 ))) {throw std::runtime_error("assertion failed: ( vecx[0] == 1.0 )"); }
 }
 auto test_heap() {
 
 	
 	std::cout << std::string("heap test...") << std::endl;
-	auto m1 = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("K1"),new std::vector<int>{0, 1}}
-,{std::string("K2"),new std::vector<int>{2, 3}}});
+	auto m1 = std::shared_ptr<std::map<std::string,std::vector<int>*>>(new std::map<std::string,std::vector<int>*>{{std::string("K1"),new std::vector<int>{0,1}}
+,{std::string("K2"),new std::vector<int>{2,3}}});
 	if (!(( (*(*m1)[std::string("K1")])[0] == 0 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K1\")])[0] == 0 )"); }
 	if (!(( (*(*m1)[std::string("K1")])[1] == 1 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K1\")])[1] == 1 )"); }
 	if (!(( (*(*m1)[std::string("K2")])[0] == 2 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K2\")])[0] == 2 )"); }
 	if (!(( (*(*m1)[std::string("K2")])[1] == 3 ))) {throw std::runtime_error("assertion failed: ( (*(*m1)[std::string(\"K2\")])[1] == 3 )"); }
-	auto vec = std::get<0>((*tuplemap)[std::string("A")]);			/* new variable*/
+	auto vec = std::get<0>(*(*tuplemap)[std::string("A")]);			/* new variable*/
 	if (!(( (*vec)[0] == 1.0 ))) {throw std::runtime_error("assertion failed: ( (*vec)[0] == 1.0 )"); }
+	auto vecx = std::get<0>(*(*tuplemap)[std::string("A")]);			/* tuple   */
+	if (!(( (*vecx)[0] == 1.0 ))) {throw std::runtime_error("assertion failed: ( (*vecx)[0] == 1.0 )"); }
+	std::cout << std::string("testing loop over map keys") << std::endl;
+	for (auto &_pair_key: (*m1)) {
+  auto key = _pair_key.first;
+		std::cout << std::string("key:");
+std::cout << key;std::cout << std::endl;
+	}
+	std::cout << std::string("testing loop over map keys and values") << std::endl;
+	for (auto &_pair_key : *m1) {  auto key = _pair_key.first;  auto val = _pair_key.second;
+		std::cout << std::string("key:");
+std::cout << key;std::cout << std::endl;
+		std::cout << std::string("value:");
+std::cout << val;std::cout << std::endl;
+	}
+	auto keys = [&m1](){auto __ = std::make_shared<std::vector<decltype(m1)::element_type::key_type>>(std::vector<decltype(m1)::element_type::key_type>());for (const auto &_ : *m1) {__->push_back(_.first);}return __;}();			/* dict   */
+	if (!(( keys->size() == 2 ))) {throw std::runtime_error("assertion failed: ( keys->size() == 2 )"); }
+	for (auto &key: *keys) { /*loop over unknown type*/
+		std::cout << key << std::endl;
+	}
+	if (!(( (std::find(keys->begin(), keys->end(), std::string("K1")) != keys->end()) ))) {throw std::runtime_error("assertion failed: ( (std::find(keys->begin(), keys->end(), std::string(\"K1\")) != keys->end()) )"); }
+	if (!(! (( (std::find(keys->begin(), keys->end(), std::string("invalid-key")) != keys->end()) )))) {throw std::runtime_error("assertion failed: ! (( (std::find(keys->begin(), keys->end(), std::string(\"invalid-key\")) != keys->end()) ))"); }
+	auto values = [&m1](){auto __ = std::make_shared<std::vector<decltype(m1)::element_type::mapped_type>>(std::vector<decltype(m1)::element_type::mapped_type>());for (auto &_ : *m1) {__->push_back(_.second);}return __;}();			/* dict   */
+	if (!(( values->size() == 2 ))) {throw std::runtime_error("assertion failed: ( values->size() == 2 )"); }
 }
 int main() {
 
@@ -4031,8 +4708,8 @@ def main():
 	a3 = A(3)
 
 	arr = [][]A(
-		(a1,a2,a3, A(4)),
-		(a1,None),
+		[a1,a2,a3, A(4)],
+		[a1,None],
 		None,
 	)
 	print('length of array: ', len(arr))
@@ -4075,17 +4752,13 @@ class A: public std::enable_shared_from_this<A> {
 int main() {
 
 	
-	auto a1 = std::shared_ptr<A>((new A())); a1->__init__(1); // new object
-	auto a2 = std::shared_ptr<A>((new A())); a2->__init__(2); // new object
-	auto a3 = std::shared_ptr<A>((new A())); a3->__init__(3); // new object
-	auto A_139973670646032 = std::shared_ptr<A>(new A()); A_139973670646032->__init__(4);
-/* arr = vector of vectors to: A */	
-	std::vector<  std::shared_ptr<A>  > _r__sub0_arr = {a1,a2,a3,std::shared_ptr<A>((new A())->__init__(4))};	
-	std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub0_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub0_arr);	
-	std::vector<  std::shared_ptr<A>  > _r__sub1_arr = {a1,nullptr};	
-	std::shared_ptr<std::vector<  std::shared_ptr<A>  >> _sub1_arr = std::make_shared<std::vector<  std::shared_ptr<A>  >>(_r__sub1_arr);	
-	std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> > _ref_arr = {_sub0_arr,_sub1_arr,nullptr};	
-	std::shared_ptr<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >> arr = std::make_shared<std::vector< std::shared_ptr<std::vector<  std::shared_ptr<A>  >> >>(_ref_arr);
+	auto a1 = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(1); return _;}();			/* new variable*/
+	auto a2 = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(2); return _;}();			/* new variable*/
+	auto a3 = [&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(3); return _;}();			/* new variable*/
+	/* arr = vector of vectors to: std::shared_ptr<A> */	
+	auto arr = std::make_shared<std::vector<std::shared_ptr<std::vector<std::shared_ptr<A>>>>>(std::vector<std::shared_ptr<std::vector<std::shared_ptr<A>>>>{		std::shared_ptr<std::vector<decltype(a1)>>(new std::vector<decltype(a1)>{a1,a2,a3,[&](){auto _ = std::shared_ptr<A>(new A()); _->__init__(4); return _;}()}),
+		std::shared_ptr<std::vector<decltype(a1)>>(new std::vector<decltype(a1)>{a1,nullptr}),
+		nullptr});
 	std::cout << std::string("length of array: ");
 std::cout << arr->size();std::cout << std::endl;
 	std::cout << std::string("len subarray 0:  ");
@@ -4181,7 +4854,7 @@ class Child: public std::enable_shared_from_this<Child> {
 std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 
 	
-	auto c = std::shared_ptr<Child>((new Child())); c->__init__(p); // new object
+	auto c = [&](){auto _ = std::shared_ptr<Child>(new Child()); _->__init__(p); return _;}();			/* new variable*/
 	p->children->push_back(c);
 	return c;
 }
@@ -4193,7 +4866,7 @@ std::shared_ptr<Child> make_child(std::shared_ptr<Parent> p) {
 	int Child::foo() {
 
 		
-		auto par = this->parent.lock();  /* auto-fallback <_ast.Attribute object at 0x7f54a8b9ed90> */
+		auto par = this->parent.lock();  /* auto-fallback <_ast.Attribute object at 0x7f87bd101110> */
 		if (( par != nullptr )) {
 			return 1;
 		} else {
@@ -4219,7 +4892,7 @@ int main() {
 
 	
 	std::shared_ptr<std::vector<std::shared_ptr<Child>>> children( ( new std::vector<std::shared_ptr<Child>>({}) ) ); /* 1D Array */
-	auto p = std::shared_ptr<Parent>((new Parent())); p->__init__(children); // new object
+	auto p = [&](){auto _ = std::shared_ptr<Parent>(new Parent()); _->__init__(children); return _;}();			/* new variable*/
 	auto c1 = make_child(p);			/* new variable*/
 	auto c2 = make_child(p);			/* new variable*/
 	std::cout << c1->foo() << std::endl;
@@ -4270,8 +4943,8 @@ std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> make_array() {
 	std::shared_ptr<std::vector<int>> _sub0_arr = std::make_shared<std::vector<int>>(_r__sub0_arr);	
 	std::vector<int> _r__sub1_arr = {4,5,6,7,8};	
 	std::shared_ptr<std::vector<int>> _sub1_arr = std::make_shared<std::vector<int>>(_r__sub1_arr);	
-	std::vector<std::shared_ptr<std::vector<int>>> _ref_arr = {_sub0_arr,_sub1_arr};	
-	std::shared_ptr<std::vector<std::shared_ptr<std::vector<int>>>> arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(_ref_arr);
+	auto arr = std::make_shared<std::vector<std::shared_ptr<std::vector<int>>>>(std::vector<std::shared_ptr<std::vector<int>>>{		_sub0_arr,
+		_sub1_arr});
 	return arr;
 	/* arrays:
 		arr : int
@@ -4368,7 +5041,7 @@ output:
 auto myfunc() {
 
 	
-	auto a = false;  /* auto-fallback <_ast.Name object at 0x7f927d6c5250> */
+	auto a = false;  /* auto-fallback <_ast.Name object at 0x7fc25eb2a590> */
 	try {
 		throw RuntimeError(std::string("oops"));
 	}
@@ -4380,7 +5053,7 @@ auto myfunc() {
 		}
 	}
 	if (!(( a == true ))) {throw std::runtime_error("assertion failed: ( a == true )"); }
-	auto c = false;  /* auto-fallback <_ast.Name object at 0x7f927d6c5710> */
+	auto c = false;  /* auto-fallback <_ast.Name object at 0x7fc25eb2aa50> */
 	try {
 		throw IOError(std::string("my ioerror"));
 	}
@@ -4394,7 +5067,7 @@ auto myfunc() {
 		}
 	}
 	if (!(( c == true ))) {throw std::runtime_error("assertion failed: ( c == true )"); }
-	auto b = false;  /* auto-fallback <_ast.Name object at 0x7f927d6c5d10> */
+	auto b = false;  /* auto-fallback <_ast.Name object at 0x7fc25eac0090> */
 	bool __finally_done_1 = false;
 	try {
 		std::cout << std::string("trying something that will fail...") << std::endl;
@@ -4472,13 +5145,13 @@ output:
 int main() {
 
 	
-	auto a = std::string("x");  /* auto-fallback <_ast.Str object at 0x7fe69dcf6050> */
+	auto a = std::string("x");  /* auto-fallback <_ast.Str object at 0x7ffa99baf390> */
 	if (( a == std::string("x") )) {
 		std::cout << std::string("a ok") << std::endl;
 	} else {
 		std::cout << std::string("not a ok") << std::endl;
 	}
-	auto b = std::string("y");  /* auto-fallback <_ast.Str object at 0x7fe69dcf6310> */
+	auto b = std::string("y");  /* auto-fallback <_ast.Str object at 0x7ffa99baf650> */
 	if (( b == std::string("x") )) {
 		std::cout << std::string("b ok") << std::endl;
 	} else {
