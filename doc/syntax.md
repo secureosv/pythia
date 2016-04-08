@@ -1,46 +1,35 @@
-Classes
-=========
-https://github.com/rusthon/Rusthon/blob/master/regtests/rust/simple_subclass.py
-https://github.com/rusthon/Rusthon/blob/master/regtests/rust/multiple_inheritance.py
+Pythia's C++ translator requires static programs.
+The static type syntax is inspired by, and borrows from: Cython, C++, Rust and Golang.
+
+Pythia is similar to [RPython](http://rpython.readthedocs.org/en/latest/rpython.html#definition), a restricted and non-dynamic subset of Python.
 
 
-Go Style Syntax
-===============
-  . works with backends: go, rust, c++
-
-typed arrays
+static typed vectors
 ---------
+[list and array doc](lists.md)
+
 ```go
 a = []int(1,2,3)
 b = []int(x for x in range(3))
-push_something( a )
 ```
-function array typed parameters
-------------------------------
-the `append` method is translated to work with each backend.
-```python
-def push_something( arr:[]int ):
-	arr.append( 4 )
-```
-https://github.com/rusthon/Rusthon/blob/master/regtests/rust/list_comp.py
 
-typed maps
+static typed maps
 ---------
 ```go
 a = map[string]int{'a':1, 'b':2}
-
 ```
+
 map iteration
 -------------
 The key value pairs can be looped over with a for loop.
 ```python
-	def main():
-		a = map[string]int{'x':100, 'y':200}
-		b = ''
-		c = 0
-		for key,value in a:
-			b += key
-			c += value
+def main():
+	a = map[string]int{'x':100, 'y':200}
+	b = ''
+	c = 0
+	for key,value in a:
+		b += key
+		c += value
 ```
 
 
@@ -78,11 +67,10 @@ def recv_wrapper(recver: chan Receiver<int> ):
 	result = <- recver
 ```
 
-Javascript Style Syntax
-=======================
 
-switch
--------
+switch syntax
+-------------
+
 ```javascript
 switch a == b:
 	case True:
@@ -93,6 +81,9 @@ switch a == b:
 		break
 
 ```
+
+JavaScript Extra Syntax
+=======================
 
 var
 ----
@@ -108,7 +99,7 @@ new
 	a = new SomeObject()
 ```
 
-$
+Jquery
 ----
 . `$` can be used to call a function like jquery
 ```python
@@ -126,11 +117,6 @@ def setup_my_jquery_class( $ ):
 	$.fn.someclass = myclass_init
 ```
 
-. function expressions
-```python
-F = def(x):
-	return x
-```
 
 
 exception expressions

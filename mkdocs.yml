@@ -9,6 +9,8 @@ pages:
 - CommandLine: getting_started.md
 - ExtendedMarkdown: markdown_format.md
 - Syntax: syntax.md
+- Lists: lists.md
 - MemoryModel: memory.md
 - Seastar: seastar.md
+- JavaScript: js_backend.md
 theme: readthedocs

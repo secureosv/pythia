@@ -1,20 +1,13 @@
-Overview
---------
-https://github.com/rusthon/Rusthon/wiki/JavaScript-Backend
+Pythia Javascript Backend
+-------------------------
 
+[old wiki page](https://github.com/rusthon/Rusthon/wiki/JavaScript-Backend)
 
 PythonJS Runtime
 ----------------
 If you include in your script the line `from runtime import *`,
-it will trigger pythonjs.js to be included with your transpiled output.
-You can also manually include it from here instead:
-https://github.com/rusthon/Rusthon/blob/master/pythonjs/pythonjs.js
-
-To regenerate pythonjs.js run these commands:
-```bash
-cd Rusthon
-./rusthon.py --runtime
-```
+the translator will include the helper functions and builtins
+that emulate a subset of Python's features, builtins and data types.
 
 Operator Overloading
 -------------------
@@ -209,7 +202,6 @@ Inline JavaScript
 
 Use `inline(str)` to inline javascript code
 
-####JS Example
 ```javascript
 	inline("var arr = new Array()")
 	inline("var ob = new Object()")
