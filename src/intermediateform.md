@@ -3479,6 +3479,18 @@ class PythonToPythonJS(NodeVisitorBase):
 				if a: writer.write(a)
 			writer.pull()
 
+		elif isinstance( node.context_expr, ast.Call ) and isinstance(node.context_expr.func, ast.Name) and node.context_expr.func.id == 'macro':
+			if isinstance(node.context_expr.args[0], ast.Str):
+				writer.write('with %s:' %self.visit(node.context_expr))
+			else:  ## force macro as string
+				writer.write('with macro("%s"):' %self.visit(node.context_expr.args[0]))
+
+			writer.push()
+			for b in node.body:
+				a = self.visit(b)
+				if a: writer.write(a)
+			writer.pull()
+
 
 		elif isinstance(node.context_expr, ast.Name) or isinstance(node.context_expr, ast.Tuple):  ## assume that backend can support this
 			#if isinstance(node.optional_vars, ast.Subscript) and isinstance(node.optional_vars.slice, ast.Index):

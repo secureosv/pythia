@@ -20,6 +20,8 @@ sudo cp -Rv build/include /usr/local/include/dpdk
 
 Reserve huge pages memory.
 -------------------------
+note: requires linux kernel is compiled with Huge Page support.
+
 @setup-hugepages.sh
 ```
 mkdir -p /mnt/huge
@@ -46,7 +48,6 @@ import rte_lcore.h
 import rte_debug.h
 
 def lcore_hello(arg:void*) ->int:
-	#unsigned lcore_id;
 	lcore_id = rte_lcore_id()
 	print "hello from core:", lcore_id
 	return 0
@@ -59,10 +60,11 @@ def main( argc:int, argv:char**) -> int:
 		print "Cannot init EAL"
 		std::exit(1)
 
-	#/* call lcore_hello() on every slave lcore */
-	inline("RTE_LCORE_FOREACH_SLAVE(lcore_id) { rte_eal_remote_launch(lcore_hello, NULL, lcore_id);}")
+	# call lcore_hello() on every slave lcore
+	with macro(RTE_LCORE_FOREACH_SLAVE(lcore_id)):
+		rte_eal_remote_launch(lcore_hello, NULL, lcore_id)
 
-	#/* call it on master lcore too */
+	# call it on master lcore too
 	lcore_hello(None)
 
 	rte_eal_mp_wait_lcore()

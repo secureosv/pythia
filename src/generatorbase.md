@@ -809,6 +809,15 @@ Also implements extra syntax like `switch` and `select`.
 				self._in_timeout = False
 				return '\n'.join(r)
 
+			elif node.context_expr.func.id == 'macro':
+				assert len(node.context_expr.args)==1
+				cppmacro = node.context_expr.args[0].s
+				r = [cppmacro + '{']
+				for b in node.body:
+					a = self.visit(b)
+					if a: r.append(self.indent()+a)
+				r.append(self.indent()+'}')
+				return '\n'.join(r)
 
 			else:
 				raise SyntaxError( 'invalid use of with: %s' %node.context_expr)
