@@ -1,4 +1,4 @@
-DPDK Example
+Data Plane DevKit Example
 -------------
 * http://dpdk.org/doc
 * http://dpdk.org/doc/quick-start
@@ -18,10 +18,23 @@ sudo mkdir /usr/local/include/dpdk
 sudo cp -Rv build/include /usr/local/include/dpdk
 ```
 
-Main Script
+Reserve huge pages memory.
+-------------------------
+@setup-hugepages.sh
+```
+mkdir -p /mnt/huge
+mount -t hugetlbfs nodev /mnt/huge
+echo 64 > /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
+```
+
+DPDK Hello World
 -------------
-* @link:dpdk
+
+* @link:rte_eal
+* @link:rte_mempool
+* @link:rte_ring
 * @include:/usr/local/include/dpdk
+* @define:RTE_MAX_LCORE=2
 ```pythia
 #backend:c++
 import rte_memory.h
@@ -43,7 +56,8 @@ def main( argc:int, argv:char**) -> int:
 	let lcore_id : unsigned
 	ret = rte_eal_init(argc, argv)
 	if ret < 0:
-		rte_panic( "Cannot init EAL\n".cstr() );
+		print "Cannot init EAL"
+		std::exit(1)
 
 	#/* call lcore_hello() on every slave lcore */
 	inline("RTE_LCORE_FOREACH_SLAVE(lcore_id) { rte_eal_remote_launch(lcore_hello, NULL, lcore_id);}")
