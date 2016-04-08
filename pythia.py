@@ -581,10 +581,10 @@ def is_restricted_bash( line ):
 		'./configure', 
 		'make', 'cmake', 
 		'scons', 'bazel', 
-		'cd', 'mkdir', 'cp', #'pwd', 'ls',
+		'cd', 'mkdir', 'cp', 'pwd', 'ls',
 		'npm', 'grunt', 'gyp', 'nw-gyp',
 		'apt-get', 'add-apt-repository', 'yum',
-		'pip', 'docker', 'rhc',
+		'pip', 'docker', 'rhc', 'sed'
 	]
 	cmd = line.split()[0]
 	if cmd == 'sudo': cmd = line.split()[1]
@@ -621,30 +621,59 @@ def build( modules, module_path, datadirs=None ):
 			if 'tag' in mod and mod['tag']:
 				tag = mod['tag']
 				if tag.startswith('http://') or tag.startswith('https://'):
-					if not tag.endswith('.git'):
-						raise SyntaxError('only git repos links are allowed: '+tag)
+					projectdir = None
+					is_tar = False
+					if tag.endswith('.tar.gz'):
+						is_tar = True
+					elif not tag.endswith('.git'):
+						raise SyntaxError('only tar files and git repos links are allowed: '+tag)
+
 					if not os.path.isdir(GITCACHE):
-						print 'making new rusthon cache folder: ' + GITCACHE
+						print 'making new pythia build cache folder: ' + GITCACHE
 						os.mkdir(GITCACHE)
 
-					gitname = tag.split('/')[-1][:-4]
-					projectdir = os.path.join(GITCACHE, gitname)
+					if is_tar:
+						rebuild = True
+						tarname = tag.split('/')[-1]
+						if tarname not in os.listdir(GITCACHE):
+							cmd = ['wget', '-c', tag]
+							try:
+								subprocess.check_call(cmd, cwd=GITCACHE)
+							except:
+								print 'DOWNLOAD ERROR'
+								rebuild = False
+						tarpath = os.path.join(GITCACHE, tag.split('/')[-1])
+						## TODO, directly open tar file and find its folders
+						cmd = ['tar', 'vxf', tarpath]
+						projectdir = tarpath.split('.tar.gz')[0]
+						if not os.path.isdir(projectdir):
+							try:
+								subprocess.check_call(cmd, cwd=GITCACHE)
+							except:
+								print 'ERROR EXTRACTING TAR FILE'
+								rebuild = False
 
-					rebuild = True
-					if gitname not in os.listdir(GITCACHE):
-						cmd = ['git', 'clone', tag]
-						try:
-							subprocess.check_call(cmd, cwd=GITCACHE)
-						except:
-							rebuild = False
-					elif '--git-sync' in sys.argv:
-						cmd = ['git', 'pull']
-						try:
-							subprocess.check_call(cmd, cwd=projectdir)
-						except:
-							rebuild = False
+						assert os.path.isdir(projectdir)
+
 					else:
-						rebuild = False
+						gitname = tag.split('/')[-1][:-4]
+						projectdir = os.path.join(GITCACHE, gitname)
+
+						rebuild = True
+						if gitname not in os.listdir(GITCACHE):
+							cmd = ['git', 'clone', tag]
+							try:
+								subprocess.check_call(cmd, cwd=GITCACHE)
+							except:
+								rebuild = False
+						elif '--git-sync' in sys.argv:
+							cmd = ['git', 'pull']
+							try:
+								subprocess.check_call(cmd, cwd=projectdir)
+							except:
+								rebuild = False
+						else:
+							rebuild = False
 
 					if rebuild or '--force-rebuild-deps' in sys.argv:
 						print 'rebuilding git repo: ' + tag
@@ -670,8 +699,12 @@ def build( modules, module_path, datadirs=None ):
 							elif not is_restricted_bash(line):
 								raise SyntaxError('bash build script syntax is restricted:\n'+line)
 							else:
-								print '>>'+line
-								subprocess.check_call( line.split(), cwd=projectdir, env=env )
+								if "'" in line:
+									print ':insecure-bash>>'+line
+									subprocess.check_call( line, cwd=projectdir, env=env, shell=True )
+								else:
+									print ':restricted-bash>>'+line
+									subprocess.check_call( line.split(), cwd=projectdir, env=env )
 
 				else:
 					output['datafiles'][tag] = mod['code']
