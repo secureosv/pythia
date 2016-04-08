@@ -5,6 +5,7 @@ docs_dir: doc
 
 pages:
 - Home: index.md
+- QuickStart: quick_start.md
 - CommandLine: getting_started.md
 - ExtendedMarkdown: markdown_format.md
 - Syntax: syntax.md
