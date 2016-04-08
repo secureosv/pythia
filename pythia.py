@@ -623,6 +623,8 @@ def build( modules, module_path, datadirs=None ):
 				if tag.startswith('http://') or tag.startswith('https://'):
 					projectdir = None
 					is_tar = False
+					rebuild = False
+
 					if tag.endswith('.tar.gz'):
 						is_tar = True
 					elif not tag.endswith('.git'):
@@ -631,11 +633,12 @@ def build( modules, module_path, datadirs=None ):
 					if not os.path.isdir(GITCACHE):
 						print 'making new pythia build cache folder: ' + GITCACHE
 						os.mkdir(GITCACHE)
+						rebuild = True
 
 					if is_tar:
-						rebuild = True
 						tarname = tag.split('/')[-1]
 						if tarname not in os.listdir(GITCACHE):
+							rebuild = True
 							cmd = ['wget', '-c', tag]
 							try:
 								subprocess.check_call(cmd, cwd=GITCACHE)
@@ -647,6 +650,7 @@ def build( modules, module_path, datadirs=None ):
 						cmd = ['tar', 'vxf', tarpath]
 						projectdir = tarpath.split('.tar.gz')[0]
 						if not os.path.isdir(projectdir):
+							rebuild = True
 							try:
 								subprocess.check_call(cmd, cwd=GITCACHE)
 							except:
@@ -682,6 +686,7 @@ def build( modules, module_path, datadirs=None ):
 						env = dict(os.environ)
 						for line in mod['code'].splitlines():
 							if not line.strip(): continue
+							elif line.startswith('#'): continue
 							elif line.startswith('export '):
 								print line
 								for varval in line.split():
@@ -704,7 +709,11 @@ def build( modules, module_path, datadirs=None ):
 									subprocess.check_call( line, cwd=projectdir, env=env, shell=True )
 								else:
 									print ':restricted-bash>>'+line
-									subprocess.check_call( line.split(), cwd=projectdir, env=env )
+									cmd = line.split()
+									if 'mkdir' in cmd and os.path.isdir(cmd[-1]):
+										print ':skipping-mkdir-path-already-exists>>'+cmd[-1]
+									else:
+										subprocess.check_call( line.split(), cwd=projectdir, env=env )
 
 				else:
 					output['datafiles'][tag] = mod['code']
