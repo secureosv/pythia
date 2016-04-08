@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>MemoryModel - Pythia</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "MemoryModel";
+    var mkdocs_page_input_path = "memory.md";
+    var mkdocs_page_url = "/memory/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Pythia</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick_start/">QuickStart</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting_started/">CommandLine</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../markdown_format/">ExtendedMarkdown</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../syntax/">Syntax</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../lists/">Lists</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">MemoryModel</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#create-an-object-on-the-stack">create an object on the stack</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#create-an-array-on-the-stack">create an array on the stack</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#cyclic-data-structures">cyclic data structures</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../seastar/">Seastar</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../js_backend/">JavaScript</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Pythia</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>MemoryModel</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>Pythia script translated into C++14 will allocate objects on the heap, 
+and use standard reference counted garbage collection by default.</p>
+<p>Each of these object types will be wrapped by <code>std::shared_ptr&lt;T&gt;</code>:
+<em> <code>myclass()</code> objects are initialized as <code>std::shared_ptr&lt;myclass&gt;</code>
+</em> <code>[]</code> lists become <code>std::shared_ptr&lt;std::vector&lt;T&gt;&gt;</code>
+* <code>{}</code> dicts become <code>std::shared_ptr&lt;std::map&lt;K,V&gt;&gt;</code></p>
+<p>Note in stack memory mode, objects are not wrapped by <code>std::shared_ptr&lt;T&gt;</code>,
+and memory is automatically freed when it falls out of scope.</p>
+<h2 id="create-an-object-on-the-stack">create an object on the stack</h2>
+<pre><code class="python">with stack:
+    a = MyClass()
+</code></pre>
+
+<h2 id="create-an-array-on-the-stack">create an array on the stack</h2>
+<pre><code class="python">with stack:
+    a = [1,2,3]
+</code></pre>
+
+<h2 id="cyclic-data-structures">cyclic data structures</h2>
+<p>Wrapping objects with <code>std::shared_ptr</code> requires using <code>std::weak_ptr</code> to break cyclic references.
+The translator will detect simple cases where a child class has a reference to a class that contains 
+a list of itself, when this is found the parent will be wrapped with <code>std::weak_ptr</code> instead of <code>std::shared_ptr</code></p>
+<p>The child can then access its parent with some additional logic,
+getting a reference to the parent must be done by wrapping it with
+<code>p = weakref.unwrap( self.myparent )</code>
+and then checking if <code>p</code> is None.
+<code>if p is None: print "parent has been freed"</code>
+then if the parent is not None, it can be used normally, because <code>weakref.unwrap()</code> will convert the <code>std::weak_ref</code> to a <code>std::shared_ptr</code>.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../seastar/" class="btn btn-neutral float-right" title="Seastar">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../lists/" class="btn btn-neutral" title="Lists"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../lists/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../seastar/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

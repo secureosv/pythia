@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>JavaScript - Pythia</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "JavaScript";
+    var mkdocs_page_input_path = "js_backend.md";
+    var mkdocs_page_url = "/js_backend/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Pythia</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick_start/">QuickStart</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting_started/">CommandLine</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../markdown_format/">ExtendedMarkdown</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../syntax/">Syntax</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../lists/">Lists</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../memory/">MemoryModel</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../seastar/">Seastar</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">JavaScript</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#pythia-javascript-backend">Pythia Javascript Backend</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#pythonjs-runtime">PythonJS Runtime</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#operator-overloading">Operator Overloading</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#examples">Examples</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#classes">Classes</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#javascript">javascript</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#method-overrides">Method Overrides</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#javascript_1">javascript</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#webworkers">WebWorkers</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#generator-functions">Generator Functions</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#javascript_2">javascript</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#inline-javascript">Inline JavaScript</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Pythia</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>JavaScript</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="pythia-javascript-backend">Pythia Javascript Backend</h2>
+<p><a href="https://github.com/rusthon/Rusthon/wiki/JavaScript-Backend">old wiki page</a></p>
+<h2 id="pythonjs-runtime">PythonJS Runtime</h2>
+<p>If you include in your script the line <code>from runtime import *</code>,
+the translator will include the helper functions and builtins
+that emulate a subset of Python's features, builtins and data types.</p>
+<h2 id="operator-overloading">Operator Overloading</h2>
+<p>To use operator overloading you need to be explicit when you are using it.
+You can also use <code>with oo:</code></p>
+<pre><code class="python">with operator_overloading:
+    a = [1,2]
+    a += [3,4]
+    b = a + [5.6]
+
+</code></pre>
+
+<h2 id="examples">Examples</h2>
+<ul>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/hello_javascript.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/javascript_syntax.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/hello_angular.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/hello_peerjs.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/hello_rapydscript.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/hello_threejs.md</li>
+<li>https://github.com/rusthon/Rusthon/blob/master/examples/javascript_webworkers.md</li>
+</ul>
+<h2 id="classes">Classes</h2>
+<pre><code class="python">    class A:
+        def __init__(self, x,y,z):
+            self.x = x
+            self.y = y
+            self.z = z
+
+        def foo(self, w):
+            return self.x + w
+
+</code></pre>
+
+<h2 id="javascript">javascript</h2>
+<pre><code class="javascript">    A = function(x, y, z) {
+      A.__init__(this, x,y,z);
+    }
+
+    A.prototype.__init__ = function(x, y, z) {
+      this.x=x;
+      this.y=y;
+      this.z=z;
+    }
+    A.__init__ = function () { return A.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
+
+    A.prototype.foo = function(w) {
+      return (this.x + w);
+    }
+    A.foo = function () { return A.prototype.foo.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
+</code></pre>
+
+<h2 id="method-overrides">Method Overrides</h2>
+<p>In the example above, you might be wondering why in the JavaScript translation, is the class A constructor calling <code>A.__init__(this, x,y,z)</code>, and why is the <code>__init__</code> method assigned <code>A.prototype</code> and then wrapped and assigned to <code>A.__init__</code>.  This is done so that subclasses are able to override their parent's methods, but still have a way of calling them, an example that subclasses A will make this more clear.</p>
+<pre><code class="python">    class B( A ):
+        def __init__(self, w):
+            A.__init__(self, 10, 20, 30)
+            self.w = w
+</code></pre>
+
+<h2 id="javascript_1">javascript</h2>
+<pre><code class="javascript">    B = function(w) {
+      B.__init__(this, w);
+    }
+
+    B.prototype.__init__ = function(w) {
+      A.__init__(this,10,20,30);
+      this.w=w;
+    }
+    B.__init__ = function () { return B.prototype.__init__.apply(arguments[0], Array.prototype.slice.call(arguments,1)) };
+
+    for (var n in A.prototype) {  if (!(n in B.prototype)) {    B.prototype[n] = A.prototype[n]  }};
+</code></pre>
+
+<p>The above output Javascript shows how the constructor for <code>B</code> calls <code>B.__init__</code> which then calls <code>B.prototype.__init__</code>.
+<code>B.prototype.__init__</code> calls <code>A.__init__</code> passing <code>this</code> as the first argument.  This emulates in JavaScript how unbound methods work in Python.  When using the Dart backend, the output is different but the concept is the same - static "class methods" are created that implement the method body, the instance methods are just short stubs that call the static "class methods".</p>
+<h2 id="webworkers">WebWorkers</h2>
+<p>Using webworkers directly, straight sucks.  PythonJS hides all that shit, so you can write clear code with a syntax inspired by Golang.  This syntax <code>A &lt;- B</code>, sends data to <code>A</code> which is an instance that was spawned into the webworker-pool.  This syntax <code>N = &lt;- A</code>, gets data from <code>A</code>, note that this appears to be blocking code, but it is actually not (the transpiler transforms it into async code)</p>
+<pre><code class="python">
+with webworker:
+    class MyClass:
+        def send(self, msg):
+            return msg
+
+
+w = spawn( MyClass() )
+w &lt;- 'hello'
+w &lt;- 'world'
+
+a = &lt;- w
+b = &lt;- w
+print a + b
+
+</code></pre>
+
+<h2 id="generator-functions">Generator Functions</h2>
+<p>Functions that use the <code>yield</code> keyword are generator functions.  They allow you to quickly write complex iterables.
+PythonJS supports simple generator functions that have a single for loop, and up to three <code>yield</code> statements.
+The first <code>yield</code> comes before the for loop, and the final <code>yield</code> comes after the for loop.
+The compiler will translate your generator function into a simple class with state-machine.  This implementation
+bypasses using the native JavaScript <code>yield</code> keyword, and ensures that your generator function can work in all web browsers.  </p>
+<p>Instances of the generator function will have a next method.  Using a for loop to iterate over a generator function will automatically call its next method.</p>
+<pre><code class="python">    def fib(n):
+        yield 'hello'
+        a, b = 0, 1
+        for x in range(n):
+            yield a
+            a,b = b, a+b
+        yield 'world'
+
+    def test():
+        for n in fib(20):
+            print n
+</code></pre>
+
+<h2 id="javascript_2">javascript</h2>
+<pre><code class="javascript">    fib = function(n) {
+      this.n = n;
+      this.__head_yield = &quot;hello&quot;;
+      this.__head_returned = 0;
+      var __r_0;
+      __r_0 = [0, 1];
+      this.a = __r_0[0];
+      this.b = __r_0[1];
+      this.__iter_start = 0;
+      this.__iter_index = 0;
+      this.__iter_end = this.n;
+      this.__done__ = 0;
+    }
+
+    fib.prototype.next = function() {
+      if (( this.__head_returned ) == 0) {
+        this.__head_returned = 1;
+        return this.__head_yield;
+      } else {
+        if (( this.__iter_index ) &lt; this.__iter_end) {
+          __yield_return__ = this.a;
+          var __r_1;
+          __r_1 = [this.b, (this.a + this.b)];
+          this.a = __r_1[0];
+          this.b = __r_1[1];
+          this.__iter_index += 1
+          return __yield_return__;
+        } else {
+          this.__done__ = 1;
+          __yield_return__ = &quot;world&quot;;
+          return __yield_return__;
+        }
+      }
+    }
+
+    test = function(args, kwargs) {
+      var __iterator__, n;
+      var n, __generator__;
+      __generator__ = new fib(20);
+      while(( __generator__.__done__ ) != 1) {
+        n = __generator__.next();
+        console.log(n);
+      }
+    }
+</code></pre>
+
+<h2 id="inline-javascript">Inline JavaScript</h2>
+<p>Use <code>inline(str)</code> to inline javascript code</p>
+<pre><code class="javascript">    inline(&quot;var arr = new Array()&quot;)
+    inline(&quot;var ob = new Object()&quot;)
+    inline(&quot;ob['key'] = 'value'&quot;)
+    if inline(&quot;Object.prototype.toString.call( arr ) === '[object Array]'&quot;):
+        inline(&quot;arr.push('hello world')&quot;)
+        inline(&quot;arr.push( ob )&quot;)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../seastar/" class="btn btn-neutral" title="Seastar"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../seastar/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+
+</body>
+</html>

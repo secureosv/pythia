@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>Lists - Pythia</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Lists";
+    var mkdocs_page_input_path = "lists.md";
+    var mkdocs_page_url = "/lists/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Pythia</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../quick_start/">QuickStart</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../getting_started/">CommandLine</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../markdown_format/">ExtendedMarkdown</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../syntax/">Syntax</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Lists</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#invalid-list">invalid list</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#integer-list">integer list</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#fixed-size-arrays">fixed size arrays</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#multi-dimensional-lists">multi dimensional lists</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#slicing-lists">slicing lists</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../memory/">MemoryModel</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../seastar/">Seastar</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../js_backend/">JavaScript</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Pythia</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Lists</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>When transpiled to C++14 lists <code>[]</code> are converted to a vector of a single element type.  In regular python you are allowed to create a list that contains different types, like: <code>[1, "foo", 2.2]</code>, this is not allowed in Pythia because the list must be translated into a C++11 vector type <code>std::vector&lt;T&gt;</code> (where <code>T</code> is the element type).  Lists and other container types are restricted in this way, and follows closely the <a href="http://rpython.readthedocs.org/en/latest/rpython.html#object-restrictions">RPython language spec</a>.</p>
+<h2 id="invalid-list">invalid list</h2>
+<p>lists of multiple types are not allowed</p>
+<pre><code class="python">a = [100, &quot;mystring&quot;, 99.9999]
+</code></pre>
+
+<h2 id="integer-list">integer list</h2>
+<p>if the type of a list can be inferred from its arguments, 
+then regular python syntax can be used to create it,
+otherwise the syntax <code>[]int(...)</code> must be used.</p>
+<pre><code class="python">a = [1,2,3]
+b = []int()
+c = []int(1,2,3)
+</code></pre>
+
+<h2 id="fixed-size-arrays">fixed size arrays</h2>
+<p>in stack mode a fixed size array is allocated as a low level C array,
+and new items can not be appended to it. </p>
+<pre><code class="python">with stack:
+    a = [2]int()
+    a[0] = 100
+    a[1] = 2500
+</code></pre>
+
+<h2 id="multi-dimensional-lists">multi dimensional lists</h2>
+<pre><code class="python">a = [][]int()
+a.append( [1,2,3] )
+a.append( [3,4,5] )
+assert a[0][0]==1
+assert a[1][2]==5
+</code></pre>
+
+<h2 id="slicing-lists">slicing lists</h2>
+<p>when slicing a list the slice must be assigned to a variable,
+passing a slice directly in a function call <code>f( a[1:2] )</code> is not allowed.</p>
+<pre><code class="python">myslice = mylist[ 10:2 ]
+f( myslice )
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../memory/" class="btn btn-neutral float-right" title="MemoryModel">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../syntax/" class="btn btn-neutral" title="Syntax"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../syntax/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../memory/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>
