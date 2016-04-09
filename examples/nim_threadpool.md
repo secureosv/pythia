@@ -3,8 +3,8 @@ Nim ThreadPool and Parallel
 
 
 ```nim
-
 import threadpool
+{.experimental.}
 
 type
 	IntSeq = seq[int]

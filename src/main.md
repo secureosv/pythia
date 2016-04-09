@@ -29,8 +29,6 @@ Markdown Imports
 * [@import intermediateform.md](intermediateform.md)
 * [@import generatorbase.md](generatorbase.md)
 * [@import jstranslator.md](jstranslator.md)
-* [@import verilogtranslator.md](verilogtranslator.md)
-* [@import darttranslator.md](darttranslator.md)
 * [@import gotranslator.md](gotranslator.md)
 * [@import cpprustbase.md](cpprustbase.md)
 * [@import rusttranslator.md](rusttranslator.md)
