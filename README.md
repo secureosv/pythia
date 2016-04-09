@@ -1,23 +1,61 @@
 Pythia
 ------
 Multi-language compiler frontend and Python based transpiler, integrated with OSv, and optimized for translation to: C++14 and JavaScript.
+Pythia can translate Python scripts (`.py` files), and multi-language/multi-data projects contained in Markdown (`.md` files).
 
-http://pythia.readthedocs.org/en/latest/
+[documentation](http://secureosv.github.io/pythia/)
 
-Old C++ Backend Docs
+
+C++ Example
+-----------
+The C++ translator can convert Python directly into C++14, most of the time line by line,
+without any magic.
+
+```python
+
+def foo( a ):
+	return a + 1
+
+def main():
+	x = foo(2)
+	assert x==3
+
+```
+
+The translator output is made more human readable by using `auto` to make the C++ compiler guess the type of `a` and return type of `foo`
+```c++
+auto foo(auto a) {
+	return (a + 1);
+}
+int main() {
+	auto x = foo(2);
+	if (!(( x == 3 ))) {throw std::runtime_error("assertion failed: ( x == 3 )"); }
+	return 0;
+}
+```
+
+Javascript Example
+------------------
+
+The same example above is translated into this Javascript.
+```javascript
+var foo =  function foo(a){
+	return (a + 1);
+}
+
+var main =  function main(){
+	var x;
+	x = foo(2);
+	if (!(x === 3)) {throw new Error("assertion failed"); }
+}
+```
+
+old wiki
 ---------------
-Pythia extends the Rusthon C++11 backend to support C++14, with specialized syntax for using the SeaStar 
-high performance asyc IO framework.  The C++14 backend makes static typing optional in many cases, this allows you to write python like scripts that are compiled to fast native code.
-
-
-* [typed backend extra syntax](https://github.com/rusthon/Rusthon/blob/master/doc/syntax.md)
 * [vectors](https://github.com/rusthon/Rusthon/wiki/Lists-and-Arrays)
 * [concurrency](https://github.com/rusthon/Rusthon/wiki/concurrency)
 * [cpython integration](https://github.com/rusthon/Rusthon/wiki/CPython-Integration)
 * [arrays and generics](https://github.com/rusthon/Rusthon/wiki/Array-Generics)
 * [java frontend](https://github.com/rusthon/Rusthon/wiki/Java-Frontend)
-* [memory and reference counting](https://github.com/rusthon/Rusthon/blob/master/doc/memory.md)
 * [weak references](https://github.com/rusthon/Rusthon/wiki/Weak-References)
 * [nim integration](https://github.com/rusthon/Rusthon/wiki/Nim-Integration)
-* [c++ regression test results](https://github.com/rusthon/Rusthon/blob/master/regtests/regtest-report-c%2B%2B.md)
-

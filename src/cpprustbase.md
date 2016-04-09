@@ -2593,8 +2593,10 @@ TODO clean up go stuff.
 							altargs.append('%s %s' %(arg_type, arg_name))
 							altbody.append(arg_name+',')
 
-					if arg_type=='auto':
-						self._known_instances[arg_name]='auto'
+					## TODO better way to guess if an untyped param is a pointer
+					#if arg_type=='auto':
+					#	self._known_instances[arg_name]='auto'
+
 					## rule above assumes anything marked with `auto` should not used __shared__ wrapper and directly use `a->b`
 					if arg_type in ('string', 'string*', 'string&', 'string&&'):
 						if self.usertypes and 'string' in self.usertypes:
