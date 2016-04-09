@@ -4200,9 +4200,11 @@ because they need some special handling in other places.
 						key_type = self.visit(node.value.left.args[0])
 						value_type = self.visit(node.value.left.args[1])
 						value_vec  = None
+						if not self.is_prim_type(value_type):
+							value_type = 'std::shared_ptr<%s>' %value_type
 
 						if isinstance(node.value.left.args[0], ast.Str):
-							raise RuntimeError('TODO dict key type: %s' %value_type)
+							raise RuntimeError('TODO dict key type from string: %s' %value_type)
 
 						if isinstance(node.value.left.args[1], ast.Str):
 							value_type = node.value.left.args[1].s
@@ -4212,17 +4214,20 @@ because they need some special handling in other places.
 							else:
 								value_type = 'std::vector<%s>*' %value_vec
 						elif isinstance(node.value.left.args[1], ast.Tuple):
-							raise RuntimeError('gottuple')
+							raise RuntimeError('TODO map and tuple')
 						elif value_type.startswith('{') and value_type.endswith('}'):
-							raise RuntimeError(value_type)
+							raise RuntimeError(self.format_error('invalid value_type: %s' %value_type))
 						elif '{' in value_type:
-							raise RuntimeError('xx')
+							raise RuntimeError('TODO { in value_type')
+
 						#####################
 						if key_type=='string':
 							if self.usertypes and 'string' in self.usertypes:
 								key_type = self.usertypes['string']['type']
 							else:
 								key_type = 'std::string'
+
+
 						if value_type=='string':
 							if self.usertypes and 'string' in self.usertypes:
 								value_type = self.usertypes['string']['type']

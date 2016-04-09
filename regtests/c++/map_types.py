@@ -12,6 +12,11 @@ tuplemap = {
 	'B': ([7.0, 8.0, 9.0], [0.0, 0.0, 0.0], FOO*2.2)
 }
 
+class MyClass:
+	#def mymethod(self):  TODO `auto` fails here as return type
+	def mymethod(self) ->int:
+		return 99
+
 with stack:
 	tuplemap_stack = {
 		'A': ([1.0, 2.0, 3.0], [4.0, 5.0, 6.0], FOO),
@@ -71,6 +76,18 @@ def test_heap():
 	values = dict.values(m1)
 	assert len(values)==2
 
+	## golang style maps ##
+	mymap = map[string]int{
+		'foo':10, 
+		'bar':100 
+	}
+	assert mymap['foo']==10
+	assert mymap['bar']==100
+
+	obmap = map[string]MyClass{ 'xx': MyClass() }
+	#obmap = map[string]MyClass{}
+	#obmap['xx'] = MyClass()
+	assert obmap['xx'].mymethod()==99
 
 def main():
 	print mymap
