@@ -1727,9 +1727,9 @@ TODO: update and test generate new js runtimes
 def generate_js_runtime( nodejs=False, nodejs_tornado=False, webworker_manager=False, debugger=False ):
 	## note: RUSTHON_LIB_ROOT gets defined in the entry of rusthon.py
 	r = [
-		open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/pythonpythonjs.py'), 'rb').read(),
+		open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/pythonpythonjs.py'), 'rb').read(),
 		python_to_pythonjs(
-			open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/builtins_core.py'), 'rb').read(),
+			open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/builtins_core.py'), 'rb').read(),
 			fast_javascript = True,
 			pure_javascript = False
 		)
@@ -1739,7 +1739,7 @@ def generate_js_runtime( nodejs=False, nodejs_tornado=False, webworker_manager=F
 	if debugger:
 		r.append(
 			python_to_pythonjs(
-				open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/builtins_debugger.py'), 'rb').read(),
+				open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/builtins_debugger.py'), 'rb').read(),
 				fast_javascript = True,
 				pure_javascript = False
 			)
@@ -1749,7 +1749,7 @@ def generate_js_runtime( nodejs=False, nodejs_tornado=False, webworker_manager=F
 	if nodejs:
 		r.append(
 			python_to_pythonjs(
-				open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/builtins_nodejs.py'), 'rb').read(),
+				open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/builtins_nodejs.py'), 'rb').read(),
 				fast_javascript = True,
 				pure_javascript = False
 			)
@@ -1758,7 +1758,7 @@ def generate_js_runtime( nodejs=False, nodejs_tornado=False, webworker_manager=F
 	if nodejs_tornado:
 		r.append(
 			python_to_pythonjs(
-				open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/nodejs_tornado.py'), 'rb').read(),
+				open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/nodejs_tornado.py'), 'rb').read(),
 				fast_javascript = True,
 				pure_javascript = False
 			)
@@ -1767,7 +1767,7 @@ def generate_js_runtime( nodejs=False, nodejs_tornado=False, webworker_manager=F
 	if webworker_manager:
 		r.append(
 			python_to_pythonjs(
-				open(os.path.join(RUSTHON_LIB_ROOT,'src/runtime/builtins_webworker.py'), 'rb').read(),
+				open(os.path.join(RUSTHON_LIB_ROOT,'src/pythia/runtime/builtins_webworker.py'), 'rb').read(),
 				fast_javascript = True,
 				pure_javascript = False
 			)

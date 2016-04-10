@@ -182,12 +182,18 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				v = 'make_ready_future<%s>(%s)' %(T,F)
 			else:
 				if isinstance(node.value, ast.Num):
-					if str(node.value.n).isdigit():
-						func.return_type = 'int'
-					else:
-						func.return_type = 'float64'
+					if str(node.value.n).isdigit(): func.return_type = 'int'
+					else: func.return_type = 'float64'
 				elif isinstance(node.value, ast.Str):
 					func.return_type = 'std::string'
+				elif isinstance(node.value, ast.BinOp):
+					if isinstance(node.value.right, ast.Num):
+						if str(node.value.right.n).isdigit(): func.return_type = 'int'
+						else: func.return_type = 'float64'
+					elif isinstance(node.value.right, ast.Str):
+						func.return_type = 'std::string'
+				else:
+					func.return_type = 'auto'
 
 				v = self.visit(node.value)
 			try:
@@ -279,7 +285,7 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			## instead of including, just directly inline cpp-channel source
 			#dirname = os.path.dirname(os.path.abspath(__file__))
 			header.append(
-				open( os.path.join(RUSTHON_LIB_ROOT, 'src/runtime/c++/cpp-channel.h') ).read()
+				open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/c++/cpp-channel.h') ).read()
 			)
 
 		if self._has_jvm:
