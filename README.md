@@ -3,7 +3,9 @@ Pythia
 Multi-language compiler frontend and Python based transpiler, integrated with OSv, and optimized for translation to: C++14 and JavaScript.
 Pythia can translate Python scripts (`.py` files), and multi-language/multi-data projects contained in Markdown (`.md` files).
 
-[documentation](http://secureosv.github.io/pythia/)
+[documentation](http://pythia.readthedocs.org/en/latest/)
+
+[examples](http://secureosv.github.io/pythia/)
 
 
 C++ Example
