@@ -1,16 +1,21 @@
-site_name: Pythia
-site_url: http://secureosv.news
+site_name: PythiaExamples
 repo_url: https://github.com/secureosv/pythia
-docs_dir: doc
+docs_dir: examples
+theme: readthedocs
 
 pages:
 - Home: index.md
-- QuickStart: quick_start.md
-- CommandLine: getting_started.md
-- ExtendedMarkdown: markdown_format.md
-- Syntax: syntax.md
-- Lists: lists.md
-- MemoryModel: memory.md
-- Seastar: seastar.md
-- JavaScript: js_backend.md
-theme: readthedocs
+- Angular: hello_angular.md
+- FullWebStack: fullstack_nosql_onsql.md
+- MultilangExample: example-project.md
+- MixingPython2: cpython_embed.md
+- MixingCython: cython_mandelbrot.md
+- Nimlang: nim_threadpool.md
+- Rapydscript: hello_rapydscript.md
+- ThreeJS: hello_threejs.md
+- Java: hello_java.md
+- NodeJs: nodejs_file.md
+- NodeJsTornado: nodejs_tornado.md
+- OSv: hello_osv.md
+- JavascriptGotchas: javascript_gotchas.md
+- JavascriptWebworkers: javascript_webworkers.md

@@ -1220,7 +1220,7 @@ def translate_to_go(script, insert_runtime=True):
 	if '--debug-inter' in sys.argv:
 		raise RuntimeError(script)
 	if insert_runtime:
-		runtime = open( os.path.join(RUSTHON_LIB_ROOT, 'src/runtime/go_builtins.py') ).read()
+		runtime = open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/go_builtins.py') ).read()
 		script = runtime + '\n' + script
 
 	try:
