@@ -8,7 +8,7 @@
   
   
   
-  <title>Seastar - Pythia</title>
+  <title>JavascriptGotchas - PythiaExamples</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -23,9 +23,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Seastar";
-    var mkdocs_page_input_path = "seastar.md";
-    var mkdocs_page_url = "/seastar/";
+    var mkdocs_page_name = "JavascriptGotchas";
+    var mkdocs_page_input_path = "javascript_gotchas.md";
+    var mkdocs_page_url = "/javascript_gotchas/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -43,7 +43,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pythia</a>
+        <a href=".." class="icon icon-home"> PythiaExamples</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,53 +63,95 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../quick_start/">QuickStart</a>
+        <a class="" href="../hello_angular/">Angular</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../getting_started/">CommandLine</a>
+        <a class="" href="../fullstack_nosql_onsql/">FullWebStack</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../markdown_format/">ExtendedMarkdown</a>
+        <a class="" href="../example-project/">MultilangExample</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../syntax/">Syntax</a>
+        <a class="" href="../cpython_embed/">MixingPython2</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../lists/">Lists</a>
+        <a class="" href="../cython_mandelbrot/">MixingCython</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../memory/">MemoryModel</a>
+        <a class="" href="../nim_threadpool/">Nimlang</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_rapydscript/">Rapydscript</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_threejs/">ThreeJS</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_java/">Java</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_file/">NodeJs</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_tornado/">NodeJsTornado</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_osv/">OSv</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 current">
-        <a class="current" href="./">Seastar</a>
+        <a class="current" href="./">JavascriptGotchas</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#seastar-example">Seastar Example</a></li>
+                <li class="toctree-l3"><a href="#javascript-backend-gotchas">JavaScript Backend - Gotchas</a></li>
                 
             
             </ul>
@@ -119,7 +161,7 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../js_backend/">JavaScript</a>
+        <a class="" href="../javascript_webworkers/">JavascriptWebworkers</a>
         
     </li>
 <li>
@@ -134,7 +176,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Pythia</a>
+        <a href="..">PythiaExamples</a>
       </nav>
 
       
@@ -146,7 +188,7 @@
     
       
     
-    <li>Seastar</li>
+    <li>JavascriptGotchas</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -160,38 +202,62 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="seastar-example">Seastar Example</h2>
-<p>Pythia includes syntax for calling and chaining lambda functions.
-The syntax below <code>and then():</code> chains a new lambda function to the previous one.
-The functions are defined under <code>with stack:</code> are set to use stack memory mode (CPU Cache).
-note: the default memory mode is c++11 smart pointers (reference counted garbage collection).</p>
-<pre><code class="python">
-with stack:
-    def delay(seconds) -&gt; future&lt;&gt;:
-        print 'sleeping', seconds
-        sleep(seconds)
-        return future
+                <h2 id="javascript-backend-gotchas">JavaScript Backend - Gotchas</h2>
+<p>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names</p>
+<p>@myapp.js</p>
+<pre><code class="rusthon">#backend:javascript
+from runtime import *
 
-    def f() -&gt; future&lt;&gt;:
-        delay(1) and then():
-            print 'sleep1'
-            and then():
-                print 'sleep1.1'
-                delay(1) and then():
-                    print 'nested 1.1:1'
-                    and then():
-                        print 'nested 1.1:2'
+def foo():
+    return 'FOO'
 
-            and then():
-                print 'sleep1.2'
-                and then():
-                    print 'sleep1.2.1'
+def test():
+    print 'testing javascript gotchas'
+    a = 'bar'
+    d = {
+        a : 2,
+        foo() : 1
+    }
+    print d
 
-        delay(2) and then():
-            print 'sleep2'
+    ## dict literals follow javascript initalization rules,
+    ## where `a` is treated as an unquoted string literal,
+    ## instead of the variable  
+    assert d[ a ] is undefined
+    assert d[ 'a' ] == 2
 
-        return delay(3) and then():
-            print 'all done'
+    ## this works because the transpiler is able to infer
+    ## in the construction of `d` that `foo()` is a function
+    ## call and not an unquoted string literal.
+    assert d[foo()] == 1
+
+    ## part of the new javascript standard ES6, allows for `Computed Property Names`,
+    ## by wrapping your key in `[]` the key value becomes an expression, and not an unquoted string literal.
+    ## Rusthon also supports this syntax, and transpiles it to javascript that will run in pre-ES6 browsers.
+    d = {
+        [a] : 1
+    }
+    assert d[a] == 1
+    print d
+
+    print 'testing list'
+
+    lst1 = [1,2,3]
+    lst2 = [1,2,3]
+    ## in regular python these would be equal,
+    ## but in javascript this is not the case.
+    assert lst1 != lst2
+    ## as a workaround you can use the method `equals`,
+    ## this uses JSON.stringify, to convert the lists to strings,
+    ## and tests if those strings are equal it returns true.
+    assert lst1.equals( lst2 )
+
+    lst2.append( 4 )
+    assert not lst1.equals( lst2 )
+
+    print 'test ok'
+
+test()
 
 </code></pre>
               
@@ -201,10 +267,10 @@ with stack:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../js_backend/" class="btn btn-neutral float-right" title="JavaScript">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../javascript_webworkers/" class="btn btn-neutral float-right" title="JavascriptWebworkers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../memory/" class="btn btn-neutral" title="MemoryModel"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../hello_osv/" class="btn btn-neutral" title="OSv"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -232,10 +298,10 @@ with stack:
           <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../memory/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../hello_osv/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../js_backend/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../javascript_webworkers/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

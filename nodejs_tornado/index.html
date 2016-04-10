@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>NodeJsTornado - PythiaExamples</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "NodeJsTornado";
+    var mkdocs_page_input_path = "nodejs_tornado.md";
+    var mkdocs_page_url = "/nodejs_tornado/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PythiaExamples</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_angular/">Angular</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../fullstack_nosql_onsql/">FullWebStack</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../example-project/">MultilangExample</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cpython_embed/">MixingPython2</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cython_mandelbrot/">MixingCython</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nim_threadpool/">Nimlang</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_rapydscript/">Rapydscript</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_threejs/">ThreeJS</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_java/">Java</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_file/">NodeJs</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">NodeJsTornado</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#nodejs-fake-tornado-module">NodeJS fake Tornado module</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#html">html</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_osv/">OSv</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_gotchas/">JavascriptGotchas</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_webworkers/">JavascriptWebworkers</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PythiaExamples</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>NodeJsTornado</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="nodejs-fake-tornado-module">NodeJS fake Tornado module</h2>
+<p>see <a href="../../src/runtime/nodejs_tornado.py">nodejs_tornado.py</a></p>
+<p>note: you need to install the nodejs module <code>ws</code>, run <code>sudo npm install -g ws</code>.</p>
+<p>To run this example run these commands in your shell, nodejs will be used to run it:</p>
+<pre><code class="bash">cd
+git clone https://github.com/rusthon/Rusthon.git
+cd Rusthon/
+./rusthon.py ./examples/nodejs_tornado.md --run=myapp.js
+</code></pre>
+
+<p>Then open a web browser and go to http://localhost:8000</p>
+<h2 id="html">html</h2>
+<p>@index.html</p>
+<pre><code class="html">&lt;html&gt;
+&lt;head&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;@myscript&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>@myscript</p>
+<pre><code class="rusthon">#backend:javascript
+from runtime import *
+
+ws = None
+
+def on_open_ws():
+    print 'websocket open'
+    ws.send('hello server')
+
+def on_close_ws():
+    print 'websocket close'
+
+def on_message_ws(event):
+    print 'on message', event
+    print event.data
+
+def connect_ws():
+    global ws
+    document.body.appendChild( document.createTextNode('testing websocket') )
+    addr = 'ws://' + location.host + '/websocket'
+    print 'websocket test connecting to:', addr
+    ws = new( WebSocket(addr) )
+    ws.binaryType = 'arraybuffer'
+    ws.onmessage = on_message_ws
+    ws.onopen = on_open_ws
+    ws.onclose = on_close_ws
+    print ws
+
+connect_ws()
+
+</code></pre>
+
+<p>@myapp.js</p>
+<pre><code class="rusthon">#backend:javascript
+from runtime import *
+from nodejs import *
+from nodejs.tornado import *
+
+PORT = 8000
+
+class MainHandler( tornado.web.RequestHandler ):
+
+    def get(self, path=None):
+        print('path', path)
+        if path == 'favicon.ico' or path.endswith('.map'):
+            self.write('')
+        else:
+            self.write( open('index.html').read() )
+
+
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        print( 'websocket open' )
+        print( self.request.connection )
+        self.write_message('hello client')
+
+    def on_message(self, msg):
+        print 'websocket - got %s bytes' %len(msg)
+        print msg
+
+    def on_close(self):
+        print('websocket closed')
+        if self.ws_connection:
+            self.close()
+
+## Tornado Handlers ##
+Handlers = [
+    ('/websocket', WebSocketHandler),
+    ('/', MainHandler),  ## order is important, this comes last.
+]
+
+## main ##
+def main():
+    print('&lt;starting tornado server&gt;')
+    app = new tornado.web.Application( Handlers )
+    app.listen( PORT )
+    tornado.ioloop.IOLoop.instance().start()
+
+## start main ##
+main()
+
+
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../hello_osv/" class="btn btn-neutral float-right" title="OSv">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../nodejs_file/" class="btn btn-neutral" title="NodeJs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../nodejs_file/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../hello_osv/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

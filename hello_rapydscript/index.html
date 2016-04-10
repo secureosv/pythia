@@ -8,7 +8,7 @@
   
   
   
-  <title>ExtendedMarkdown - Pythia</title>
+  <title>Rapydscript - PythiaExamples</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -23,9 +23,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "ExtendedMarkdown";
-    var mkdocs_page_input_path = "markdown_format.md";
-    var mkdocs_page_url = "/markdown_format/";
+    var mkdocs_page_name = "Rapydscript";
+    var mkdocs_page_input_path = "hello_rapydscript.md";
+    var mkdocs_page_url = "/hello_rapydscript/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -43,7 +43,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pythia</a>
+        <a href=".." class="icon icon-home"> PythiaExamples</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -63,28 +63,62 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../quick_start/">QuickStart</a>
+        <a class="" href="../hello_angular/">Angular</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../getting_started/">CommandLine</a>
+        <a class="" href="../fullstack_nosql_onsql/">FullWebStack</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../example-project/">MultilangExample</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cpython_embed/">MixingPython2</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cython_mandelbrot/">MixingCython</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nim_threadpool/">Nimlang</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 current">
-        <a class="current" href="./">ExtendedMarkdown</a>
+        <a class="current" href="./">Rapydscript</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#markdown-containers">Markdown Containers</a></li>
+                <li class="toctree-l3"><a href="#testing">testing</a></li>
                 
             
-                <li class="toctree-l3"><a href="#multi-backend-python-transpiler">Multi-backend Python Transpiler</a></li>
+                <li class="toctree-l3"><a href="#html">html</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#rapydscript">rapydscript</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#rusthon-javascript-backend">rusthon javascript backend</a></li>
                 
             
             </ul>
@@ -94,35 +128,49 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../syntax/">Syntax</a>
+        <a class="" href="../hello_threejs/">ThreeJS</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../lists/">Lists</a>
+        <a class="" href="../hello_java/">Java</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../memory/">MemoryModel</a>
+        <a class="" href="../nodejs_file/">NodeJs</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../seastar/">Seastar</a>
+        <a class="" href="../nodejs_tornado/">NodeJsTornado</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../js_backend/">JavaScript</a>
+        <a class="" href="../hello_osv/">OSv</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_gotchas/">JavascriptGotchas</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_webworkers/">JavascriptWebworkers</a>
         
     </li>
 <li>
@@ -137,7 +185,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Pythia</a>
+        <a href="..">PythiaExamples</a>
       </nav>
 
       
@@ -149,7 +197,7 @@
     
       
     
-    <li>ExtendedMarkdown</li>
+    <li>Rapydscript</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -163,23 +211,59 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="markdown-containers">Markdown Containers</h2>
-<p>The primary format <code>pythia</code> works with is <a href="https://guides.github.com/features/mastering-markdown/">markdown</a> containers files (<code>.md</code>).
-Markdown containers allow you to bundle code and data into a single file.  They store project and file directory stucture,
-code build options, and code documentation.</p>
-<p>Markdown files that contain fenced-code-blocks using <a href="https://help.github.com/categories/writing-on-github/">github style markdown</a>, can be compiled and run with <code>pythia</code>.
-Tripple backquotes <code>ʽʽʽ</code> are used to fence a block of code.  The start of a fence can contain a language name, like: <code>ʽʽʽc++</code>,
-this will trigger that fenced code block to be compiled with <code>g++</code>.</p>
-<p>Fenced code blocks can also contain a label that must be on the line just before it and start with <code>@</code> followed by a file name
-or the special label name <code>@embed</code>.</p>
-<h2 id="multi-backend-python-transpiler">Multi-backend Python Transpiler</h2>
-<p>Fenced code blocks that begin with <code>ʽʽʽpythia</code> will be transpiled to C++14 (by default), and compiled with <code>g++</code>.
-A single markdown file can contain multiple targets to transpile, each fenced block must have its own file name label,
-and define at the start of the script which backend to transpile with.</p>
-<p>Pythia's transpiler will check each script's first line for a special comment starting with <code>#backend:</code>, valid options are:
-<em> <code>#backend:c++</code>
-</em> <code>#backend:javascript</code>
-* <code>#backend:go</code></p>
+                <h2 id="testing">testing</h2>
+<p>To run this example run these commands in your shell:</p>
+<pre><code class="bash">cd
+git clone https://github.com/rusthon/Rusthon.git
+cd Rusthon/
+./rusthon.py ./examples/hello_rapydscript.md
+</code></pre>
+
+<h2 id="html">html</h2>
+<p>@index.html</p>
+<pre><code class="html">&lt;html&gt;
+&lt;head&gt;
+
+&lt;@my_rapydscript.js&gt;
+&lt;@my_rusthon_script.js&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+&lt;button onclick=&quot;javascript:hi_from_rapyd()&quot;&gt;clickme&lt;/button&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2 id="rapydscript">rapydscript</h2>
+<p>You need to install RapydScript for this to work.
+http://www.rapydscript.com/</p>
+<p>Test calling Rusthon translated JS from RapydScript.</p>
+<p>@my_rapydscript.js</p>
+<pre><code class="rapydscript">
+## note unicode is broken in rapydscript
+#𝑭𝑶𝑶𝒃𝒂𝒓 = 'UNICODE_OK'
+
+def hi_from_rapyd():
+    window.alert('hey rapydscript!')
+    a = [1,2,3]
+    hi_from_rusthon(a)
+
+</code></pre>
+
+<h2 id="rusthon-javascript-backend">rusthon javascript backend</h2>
+<p>@my_rusthon_script.js</p>
+<pre><code class="rusthon">#backend:javascript
+from runtime import *
+
+def hi_from_rusthon(v):
+    assert inline('𝑭𝑶𝑶𝒃𝒂𝒓') == 'UNICODE_OK'
+    assert len(v) == 3
+    assert v[0] == 1
+    for x in v:
+        print(x)
+
+</code></pre>
               
             </div>
           </div>
@@ -187,10 +271,10 @@ and define at the start of the script which backend to transpile with.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../syntax/" class="btn btn-neutral float-right" title="Syntax">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../hello_threejs/" class="btn btn-neutral float-right" title="ThreeJS">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../getting_started/" class="btn btn-neutral" title="CommandLine"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../nim_threadpool/" class="btn btn-neutral" title="Nimlang"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -218,10 +302,10 @@ and define at the start of the script which backend to transpile with.</p>
           <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../getting_started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../nim_threadpool/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../syntax/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../hello_threejs/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

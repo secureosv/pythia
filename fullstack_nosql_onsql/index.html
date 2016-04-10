@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>FullWebStack - PythiaExamples</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "FullWebStack";
+    var mkdocs_page_input_path = "fullstack_nosql_onsql.md";
+    var mkdocs_page_url = "/fullstack_nosql_onsql/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PythiaExamples</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_angular/">Angular</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">FullWebStack</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#fullstack-single-file-example">FullStack Single File Example</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#dataset">Dataset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#tornado-server">Tornado Server</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#client-side">Client Side</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#html">HTML</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../example-project/">MultilangExample</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cpython_embed/">MixingPython2</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cython_mandelbrot/">MixingCython</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nim_threadpool/">Nimlang</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_rapydscript/">Rapydscript</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_threejs/">ThreeJS</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_java/">Java</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_file/">NodeJs</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_tornado/">NodeJsTornado</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_osv/">OSv</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_gotchas/">JavascriptGotchas</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../javascript_webworkers/">JavascriptWebworkers</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PythiaExamples</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>FullWebStack</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="fullstack-single-file-example">FullStack Single File Example</h2>
+<p>Fullstack development includes: webserver, database, object relational mapping, javascript and html with css.
+This example includes all of these in a single file, in less than 300 lines of code.</p>
+<h2 id="dataset">Dataset</h2>
+<p>Dataset is a database abstraction layer that makes using SQL dead simple.</p>
+<p>https://dataset.readthedocs.org/en/latest/</p>
+<pre><code>git clone git://github.com/pudo/dataset.git
+cd dataset/
+sudo python setup.py install
+</code></pre>
+
+<h2 id="tornado-server">Tornado Server</h2>
+<p>the tornado webserver saves objects into the SQL database using Dataset.</p>
+<pre><code>./rusthon.py ./examples/hello_fullstack.md --run=myserver.py
+</code></pre>
+
+<p>@myserver.py</p>
+<pre><code class="python">#!/usr/bin/python
+import dataset
+import tornado
+import tornado.ioloop
+import tornado.web
+import tornado.websocket
+import os, sys, subprocess, datetime, json, time, mimetypes
+
+PORT = int(os.environ.get(&quot;PORT&quot;, 8000))
+
+## connect to database ##
+##db = dataset.connect('sqlite:///mydatabase.db')
+db = dataset.connect('sqlite:///:memory:')
+
+# dataset will get or create `mytable`
+table = db['mytable']
+
+
+class MainHandler( tornado.web.RequestHandler ):
+
+    def get(self, path=None):
+        print('path', path)
+        guess = path
+        if not path or path == '/': guess = 'index.html'
+        mime_type, encoding = mimetypes.guess_type(guess)
+        if mime_type: self.set_header(&quot;Content-Type&quot;, mime_type)
+
+        if path == 'favicon.ico' or path.endswith('.map'):
+            self.write('')
+        elif path and '.' in path:
+            self.write( open(path).read() )
+        else:
+            self.write( open('index.html').read() )
+
+
+Clients = []
+
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        print( 'websocket open' )
+        print( self.request.connection )
+        Clients.append( self )
+
+    def on_message(self, msg):
+        ob = json.loads( msg )
+        ## if a simple test string ##
+        if isinstance(ob, str):
+            print ob
+        elif isinstance(ob, list):
+            print 'doing database search'
+            results = []
+            for search in ob:
+                assert isinstance(search, dict)
+                ## `**search` unpacks to something like `name=&quot;foo&quot;`
+                r = table.find_one( **search )
+                if r: results.append(r)
+            if results:
+                print results
+                self.write_message(json.dumps(results))
+            else:
+                self.write_message(json.dumps(&quot;nothing found in databases&quot;))
+
+        elif isinstance(ob, dict):
+            print 'saving object into database'
+            print ob
+            if len( list(table.find(id=ob['id'])) ):
+                table.update( ob, ['id'] )
+            else:
+                table.insert( ob )
+            self.write_message( json.dumps('updated database:'+str(ob)) )
+
+            for other in Clients:
+                if other is self: continue
+                print 'updating other client with new data'
+                other.write_message( msg )
+
+    def on_close(self):
+        print('websocket closed')
+        if self in Clients:
+            Clients.remove( self )
+        if self.ws_connection:
+            self.close()
+
+
+
+## Tornado Handlers ##
+Handlers = [
+    (r'/websocket', WebSocketHandler),
+    (r'/(.*)', MainHandler),  ## order is important, this comes last.
+]
+
+print('&lt;starting tornado server&gt;')
+app = tornado.web.Application(
+    Handlers,
+    #cookie_secret = 'some random text',
+    #login_url = '/login',
+    #xsrf_cookies = False,
+)
+app.listen( PORT )
+tornado.ioloop.IOLoop.instance().start()
+
+</code></pre>
+
+<h2 id="client-side">Client Side</h2>
+<p>https://github.com/rusthon/Rusthon/wiki/JavaScript-DOM-Syntax</p>
+<p>@myapp</p>
+<pre><code class="rusthon">#backend:javascript
+from runtime import *
+
+ws = None
+
+def on_open_ws():
+    print 'websocket open'
+    ws.send(JSON.stringify('hello server'))
+
+def on_close_ws():
+    print 'websocket close'
+
+def on_message_ws(event):
+    print 'on message', event
+    msg = None
+    if instanceof(event.data, ArrayBuffer):
+        print 'got binary bytes', event.data.byteLength
+        arr = new(Uint8Array(event.data))
+        txt = String.fromCharCode.apply(None, arr)
+        msg = JSON.parse(txt)
+    else:
+        msg = JSON.parse(event.data)
+
+    pre = document-&gt;('#RESULTS')
+    if isinstance(msg, list):
+        for res in msg:
+            s = JSON.stringify(res)
+            pre-&gt;(s+'\n')
+    elif isinstance(msg, string):
+        pre-&gt;(msg+'\n')
+    else:
+        proxy = man.instances[ msg.id ]
+        #a = { msg['key'] : msg['value'] }  ## TODO support this syntax
+        a = {}
+        a[ msg['key'] ] = msg['value']
+        proxy.restore( a )
+
+
+def connect_ws():
+    global ws
+    addr = 'ws://' + location.host + '/websocket'
+    print 'websocket test connecting to:', addr
+    ws = new( WebSocket(addr) )
+    ws.binaryType = 'arraybuffer'
+    ws.onmessage = on_message_ws
+    ws.onopen = on_open_ws
+    ws.onclose = on_close_ws
+
+
+class Proxy:
+    ids = 0
+    def __init__(self):
+        self.__id__ = Proxy.ids
+        Proxy.ids += 1
+        with 𝕚𝕟𝕡𝕦𝕥 as &quot;%s=_=document.createElement('input');_.setAttribute('type','text');%s=0;&quot;:
+            𝕚𝕟𝕡𝕦𝕥( self._xe, self._x )
+            𝕚𝕟𝕡𝕦𝕥( self._ye, self._y )
+
+        @bind(self._xe.onkeyup, self)
+        def update_xe(e):
+            print 'update xe:' + self._xe.value
+            self.x = self._xe.value
+
+        @bind(self._ye.onkeyup, self)
+        def update_ye(e):
+            print 'update ye:' + self._ye.value
+            self.y = self._ye.value
+
+
+    def restore(self, restore):
+        for key in restore.keys():
+            self[ '_' + key ] = restore[key]
+            self[ '_' + key + 'e' ].value = restore[key]
+
+    def getwidget(self):
+        div = document.createElement('div')
+        with 𝓕 as &quot;div.appendChild(document.createTextNode(%s));div.appendChild(%s);div.appendChild(document.createElement('br'))&quot;:
+            𝓕('some field X:', self._xe )
+            𝓕('some field Y:', self._ye )
+        return div
+
+    @getter
+    def x(self):
+        return self._x
+    @setter
+    def x(self, v):
+        if v != self._x:
+            msg = {id:self.__id__, key:'x', value:v}
+            ws.send( JSON.stringify(msg) )
+            self._x = v
+            self._xe.value = v  ## updates widget
+
+    @getter
+    def y(self):
+        return self._y
+    @setter
+    def y(self, v):
+        if v != self._y:
+            msg = {id:self.__id__, key:'y', value:v}
+            ws.send( JSON.stringify(msg) )
+            self._y = v
+            self._ye.value = v  ## updates widget
+
+class Manager:
+    def __init__(self):
+        self.instances = {}
+    def makeproxy(self):
+        p = new Proxy()
+        self.instances[p.__id__] = p
+        return p
+
+@debugger
+def main():
+    global man, p
+    ## connect websocket
+    connect_ws()
+    man = Manager()
+    p = man.makeproxy()
+
+    document-&gt;('#FORM')-&gt;(
+        document-&gt;('h3')-&gt;('update database:'), 
+        p.getwidget()
+    )
+
+</code></pre>
+
+<h2 id="html">HTML</h2>
+<p>@index.html</p>
+<pre><code class="html">&lt;html&gt;
+&lt;head&gt;
+&lt;link href='~/bootstrap-3.3.5-dist/css/bootstrap.css' rel='stylesheet' zip=&quot;https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip&quot;/&gt;
+&lt;script src=&quot;~/rusthon_cache/jquery-2.1.4.min.js&quot; source=&quot;http://code.jquery.com/jquery-2.1.4.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;~/bootstrap-3.3.5-dist/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
+&lt;@myapp&gt;
+&lt;/head&gt;
+&lt;body onload=&quot;main()&quot;&gt;
+&lt;div id=&quot;FORM&quot; class=&quot;well&quot;&gt;&lt;/div&gt;
+&lt;pre id=&quot;RESULTS&quot; class=&quot;well&quot;&gt;
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../example-project/" class="btn btn-neutral float-right" title="MultilangExample">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../hello_angular/" class="btn btn-neutral" title="Angular"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../hello_angular/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../example-project/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

@@ -3,72 +3,120 @@
 
     
     <url>
-     <loc>http://secureosv.news/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/quick_start/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/hello_angular/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/getting_started/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/fullstack_nosql_onsql/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/markdown_format/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/example-project/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/syntax/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/cpython_embed/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/lists/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/cython_mandelbrot/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/memory/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/nim_threadpool/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/seastar/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/hello_rapydscript/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>http://secureosv.news/js_backend/</loc>
-     <lastmod>2016-04-08</lastmod>
+     <loc>None/hello_threejs/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/hello_java/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/nodejs_file/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/nodejs_tornado/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/hello_osv/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/javascript_gotchas/</loc>
+     <lastmod>2016-04-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/javascript_webworkers/</loc>
+     <lastmod>2016-04-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

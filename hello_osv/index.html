@@ -8,7 +8,7 @@
   
   
   
-  <title>QuickStart - Pythia</title>
+  <title>OSv - PythiaExamples</title>
   
 
   <link rel="shortcut icon" href="../img/favicon.ico">
@@ -23,9 +23,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "QuickStart";
-    var mkdocs_page_input_path = "quick_start.md";
-    var mkdocs_page_url = "/quick_start/";
+    var mkdocs_page_name = "OSv";
+    var mkdocs_page_input_path = "hello_osv.md";
+    var mkdocs_page_url = "/hello_osv/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -43,7 +43,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pythia</a>
+        <a href=".." class="icon icon-home"> PythiaExamples</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -62,18 +62,89 @@
 <li>
           
             <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_angular/">Angular</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../fullstack_nosql_onsql/">FullWebStack</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../example-project/">MultilangExample</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cpython_embed/">MixingPython2</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cython_mandelbrot/">MixingCython</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nim_threadpool/">Nimlang</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_rapydscript/">Rapydscript</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_threejs/">ThreeJS</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../hello_java/">Java</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_file/">NodeJs</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../nodejs_tornado/">NodeJsTornado</a>
+        
+    </li>
+<li>
+          
+            <li>
     <li class="toctree-l1 current">
-        <a class="current" href="./">QuickStart</a>
+        <a class="current" href="./">OSv</a>
         
             <ul>
             
-                <li class="toctree-l3"><a href="#installing-pythia">installing pythia</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#optional-dependencies">optional dependencies</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#documentation">documentation</a></li>
+                <li class="toctree-l3"><a href="#osv-hello-world">OSV Hello World</a></li>
                 
             
             </ul>
@@ -83,49 +154,14 @@
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../getting_started/">CommandLine</a>
+        <a class="" href="../javascript_gotchas/">JavascriptGotchas</a>
         
     </li>
 <li>
           
             <li>
     <li class="toctree-l1 ">
-        <a class="" href="../markdown_format/">ExtendedMarkdown</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../syntax/">Syntax</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../lists/">Lists</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../memory/">MemoryModel</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../seastar/">Seastar</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../js_backend/">JavaScript</a>
+        <a class="" href="../javascript_webworkers/">JavascriptWebworkers</a>
         
     </li>
 <li>
@@ -140,7 +176,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Pythia</a>
+        <a href="..">PythiaExamples</a>
       </nav>
 
       
@@ -152,7 +188,7 @@
     
       
     
-    <li>QuickStart</li>
+    <li>OSv</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -166,28 +202,37 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="installing-pythia">installing pythia</h2>
-<p>pythia requires 64bit linux and g++4.9 for all features and test scripts to work.</p>
-<p>Run <code>install.sh</code> script as root.
-This creates a symbolic link <code>pythia</code> that points to the current location of <code>pythia.py</code>.</p>
+                <h2 id="osv-hello-world">OSV Hello World</h2>
+<p>What is OSv? http://osv.io/</p>
+<p>You do not need to install OSv, Pythia will automatically download and build the base image for you.
+After installing Pythia, run this command, this will compile and run the example.</p>
 <pre><code class="bash">cd
 git clone https://github.com/secureosv/pythia.git
 cd pythia
 sudo ./install.sh
+pythia ./examples/hello_osv.md --osv
 </code></pre>
 
-<h2 id="optional-dependencies">optional dependencies</h2>
-<ul>
-<li>git</li>
-<li>gnuplot</li>
-<li>cython</li>
-</ul>
-<h2 id="documentation">documentation</h2>
-<ul>
-<li><a href="../getting_started/">getting started</a></li>
-<li><a href="../syntax/">syntax</a></li>
-<li><a href="../seastar/">seastar</a></li>
-</ul>
+<pre><code class="pythia">#backend:c++
+from runtime import *
+from time import sleep
+import osv/power.hh
+
+class A:
+    def __init__(self, txt:string ):
+        self.txt = txt
+    def foo(self):
+        print self.txt
+
+def main():
+    a = A('hello world xxx')
+    a.foo()
+    sleep(1)
+    #osv::halt()  ## hang and lock up vm
+    print 'rebooting..'
+    osv::reboot()
+
+</code></pre>
               
             </div>
           </div>
@@ -195,10 +240,10 @@ sudo ./install.sh
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../getting_started/" class="btn btn-neutral float-right" title="CommandLine">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../javascript_gotchas/" class="btn btn-neutral float-right" title="JavascriptGotchas">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../nodejs_tornado/" class="btn btn-neutral" title="NodeJsTornado"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -226,10 +271,10 @@ sudo ./install.sh
           <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../nodejs_tornado/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../getting_started/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../javascript_gotchas/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
