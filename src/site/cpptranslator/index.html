@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <title>C++Translator - PythiaSource</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "C++Translator";
+    var mkdocs_page_input_path = "cpptranslator.md";
+    var mkdocs_page_url = "/cpptranslator/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PythiaSource</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../generatorbase/">MultiBackendBaseClass</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../jstranslator/">JavascriptTranslator</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../gotranslator/">GolangTranslator</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../cpprustbase/">SharedRustC++Class</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">C++Translator</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#c-translator">C++ Translator</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#imports">Imports</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#todo">TODO</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#cpython-c-api">CPython C-API</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#slice-and-list-comprehension-intx-for-x-in-rangen">Slice and List Comprehension [:], []int(x for x in range(n))</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#translate-to-c">Translate to C++</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../typedpython/">PreProcessor</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../intermediateform/">PreTranslator</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PythiaSource</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>C++Translator</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="c-translator">C++ Translator</h2>
+<p><img alt="toplevel" src="http://rusthon.github.io/Rusthon/images/RusthonC++.svg" /></p>
+<h2 id="imports">Imports</h2>
+<ul>
+<li><a href="jvm.md">@import jvm.md</a></li>
+<li><a href="nim.md">@import nim.md</a></li>
+<li><a href="cppheader.md">@import cppheader.md</a></li>
+<li><a href="cpython.md">@import cpython.md</a></li>
+<li><a href="nuitka.md">@import nuitka.md</a></li>
+</ul>
+<pre><code class="python">
+NUITKA_HEAD = '''
+//PyObject *get_nuitka_module() { return module___main__; }
+//PyDictObject *get_nuitka_module_dict() { return moduledict___main__; }
+
+'''
+
+def gen_nuitka_header():
+    return NUITKA_HEAD
+
+</code></pre>
+
+<p>TODO: make inline cpp-channel.h an option.</p>
+<pre><code class="python">
+class CppGenerator( RustGenerator, CPythonGenerator ):
+
+    def make_tuple(self, elts):
+        tupletype = []
+        for telt in elts:
+            if isinstance(telt, ast.Str):  ## TODO test tuple with strings
+                v = telt.s
+                if v.startswith('&quot;') and v.endswith('&quot;'):  ## TODO this looks like a bug
+                    v = v[1:-1]
+            elif isinstance(telt, ast.List): #v.startswith('[') and v.endswith(']'):
+                tsubvec = None
+                for st in telt.elts:
+                    if isinstance(st, ast.Num):
+                        if str(st.n).isdigit():
+                            tsubvec = 'int'
+                        else:
+                            tsubvec = 'float64'
+                        break
+                assert tsubvec is not None
+                v = 'std::vector&lt;%s&gt;' %tsubvec
+
+            elif isinstance(telt, ast.Num):
+                if str(telt.n).isdigit():
+                    v = 'int'
+                else:
+                    v = 'float64'
+            elif isinstance(telt, ast.Name):
+                v = 'decltype(%s)' % self.visit(telt)
+            else:
+                v = self.visit(telt)
+
+            if v.startswith('[]'):
+                t  = v.split(']')[-1]
+                if self._memory[-1]=='STACK':
+                    v = 'std::vector&lt;%s&gt;' %t
+                else:
+                    v = 'std::vector&lt;%s&gt;*' %t
+
+            tupletype.append(v)
+
+
+        targs = []
+        for ti,te in enumerate(elts):
+            tt = tupletype[ti]
+            tv = self.visit(te)
+            if tv.startswith('[') and tv.endswith(']'):  ## old style
+                assert tt.startswith('std::vector')
+                if tt.endswith('*'):
+                    tv = '(new %s{%s})' %(tt[:-1], tv[1:-1])
+                else:
+                    tv = '%s{%s}' %(tt, tv[1:-1])
+            #elif tv.startswith('std::vector'):  ## never happens?
+            #   raise RuntimeError(tv)
+
+            if tt.startswith('std::vector') and self._memory[-1]=='HEAP':
+                tupletype[ti] = 'std::shared_ptr&lt;%s&gt;' %tt
+                #if not tv.startswith('new ') and tt.endswith('*'):  ## TODO test when is this required
+                #   raise RuntimeError(self.format_error(tt))
+                #   tv = 'std::shared_ptr&lt;%s&gt;(new %s)' %(tt[:-1], tv)
+                #else:
+                tv = 'std::shared_ptr&lt;%s&gt;(%s)' %(tt, tv)
+
+            targs.append(tv)
+
+        return tupletype, targs
+
+    def visit_List(self, node):
+        vectype = None
+        vecinit = []
+        tupletype = None
+        for elt in node.elts:
+            if vectype is None:
+                if isinstance(elt, ast.Num):
+                    if str(elt.n).isdigit():
+                        vectype = 'int'
+                    else:
+                        vectype = 'float64'
+                elif isinstance(elt, ast.Str):
+                    vectype = 'std::string'
+                elif isinstance(elt, ast.Name):
+                    vectype = 'decltype(%s)' %elt.id
+                elif isinstance(elt, ast.Tuple):
+                    if tupletype is None:
+                        tupletype = [None] * len(elt.elts)
+                    for i,sub in enumerate(elt.elts):
+                        if tupletype[i] is None:
+                            if isinstance(sub, ast.Num):
+                                if str(sub.n).isdigit():
+                                    tupletype[i] = 'int'
+                                else:
+                                    tupletype[i] = 'float64'
+                            elif isinstance(sub, ast.Str):
+                                tupletype[i] = 'std::string'
+                            elif isinstance(sub, ast.Name):
+                                tupletype[i] = 'decltype(%s)' %sub.id
+                            else:
+                                tupletype[i] = 'decltype(%s)' %self.visit(sub)
+
+            if isinstance(elt, ast.Tuple):
+                b = self.visit_Tuple(elt, force_make_tuple=True)
+                vecinit.append( b )
+
+            else:
+                b = self.visit(elt)
+                vecinit.append( b )
+        if tupletype:
+            assert None not in tupletype
+            if self._memory[-1]=='STACK':
+                vectype = 'std::tuple&lt;%s&gt;' %','.join(tupletype)
+            else:
+                vectype = 'std::shared_ptr&lt;std::tuple&lt;%s&gt;&gt;' %','.join(tupletype)
+
+        if self._memory[-1]=='STACK':
+            return 'std::vector&lt;%s&gt;{%s}' % (vectype,','.join(vecinit))
+        else:
+            return 'new std::vector&lt;%s&gt;{%s}' % (vectype,','.join(vecinit))
+
+
+    def visit_Return(self, node):
+        if isinstance(node.value, ast.Tuple):
+            ## initializer list ##
+            return 'return {%s};' % ', '.join(map(self.visit, node.value.elts))
+        if node.value:
+            if isinstance(node.value, ast.Name) and node.value.id=='self':
+                if self._memory[-1]=='STACK':
+                    v = '*this;'
+                else:
+                    #v = 'std::make_shared&lt;%s&gt;(*this)' %self._class_stack[-1].name
+                    #v = 'shared_from_this()'  ## this breaks subclasses when the base class has a method that returns `self`
+                    v = 'std::static_pointer_cast&lt;%s&gt;(shared_from_this())' %self._class_stack[-1].name
+
+            elif isinstance(node.value, ast.Name) and node.value.id=='next':  ## seastar lambda repeat
+                v = 'stop_iteration::no'
+            elif isinstance(node.value, ast.Name) and node.value.id=='stop':  ## seastar lambda repeat
+                v = 'make_ready_future&lt;stop_iteration&gt;(stop_iteration::yes)'
+
+            elif isinstance(node.value, ast.Name) and node.value.id=='future':  ## seastar
+                v = 'make_ready_future&lt;&gt;()'
+            elif isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Subscript):
+                T = self.visit(node.value.func.slice)
+                F = self.visit(node.value.args[0])
+                v = 'make_ready_future&lt;%s&gt;(%s)' %(T,F)
+            else:
+                v = self.visit(node.value)
+            try:
+                return 'return %s;' % v
+            except:
+                raise RuntimeError(v)
+        else:
+            return 'return;'
+
+
+    def is_container_type(self, T):
+        ## TODO better parsing
+        if 'std::vector' in T or 'std::map' in T:
+            return True
+        elif self.usertypes and 'vector' in self.usertypes:
+            if self.usertypes['vector']['template'].split('&lt;')[0] in T:
+                return True
+        return False
+
+    def visit_Assert(self, node):
+        t = ts = self.visit(node.test)
+        ts = ts.replace('&quot;', '\\&quot;')
+        return 'if (!(%s)) {throw std::runtime_error(&quot;assertion failed: %s&quot;); }' %(t,ts)
+
+
+    def visit_ImportFrom(self, node):
+        # print node.module
+        # print node.names[0].name
+        # print node.level
+        if node.module=='runtime':
+            self._use_runtime = True
+        return ''
+
+    def get_user_class_headers(self):
+        return self._user_class_headers
+
+    def visit_Import(self, node):
+        includes = []
+
+        for alias in node.names:
+            name = alias.name.replace('__SLASH__', '/').replace('__DASH__', '-')
+            if alias.asname:
+                self._user_class_headers[ alias.asname ] = {
+                    'file':name,
+                    'source':[]
+                }
+
+            if name == 'jvm':
+                self._has_jvm = True
+            elif name == 'nim':
+                self._has_nim = True
+            elif name == 'nuitka':
+                self._has_nuitka = True
+            elif name == 'cpython':
+                self._has_cpython = True
+            elif name.endswith('.h') or name.endswith('.hh'):
+                includes.append('#include &quot;%s&quot;' %name)
+            else:
+                includes.append('#include &lt;%s&gt;' %name)
+
+        return '\n'.join(includes)
+
+
+    def visit_Module(self, node):
+        header = [ CPP_HEADER ]
+        lines = []
+
+        for b in node.body:
+            line = self.visit(b)
+            if line == 'main();':  ## to be compatible with other backends that need to call main directly
+                continue
+
+            if line is not None:
+                for sub in line.splitlines():
+                    if sub==';':
+                        #raise SyntaxError('bad semicolon')
+                        pass
+                    else:
+                        lines.append( sub )
+            else:
+                if isinstance(b, ast.Import):
+                    header.append( self.visit(b) )
+                else:
+                    raise SyntaxError(b)
+
+        if self._has_channels:
+            ## https://github.com/ahorn/cpp-channel
+            #header.append('#include &lt;channel&gt;')
+            ## instead of including, just directly inline cpp-channel source
+            #dirname = os.path.dirname(os.path.abspath(__file__))
+            header.append(
+                open( os.path.join(RUSTHON_LIB_ROOT, 'src/runtime/c++/cpp-channel.h') ).read()
+            )
+
+        if self._has_jvm:
+            header.append( gen_jvm_header(self._java_classpaths) )
+
+        if self._has_nim:
+            header.append( gen_nim_header() )
+
+        if self._has_nuitka:
+            header.append( gen_nuitka_header() )
+
+        if self._has_cpython:
+            header.append( gen_cpython_header() )
+
+        ## forward declare all classes
+        for classname in self._classes:
+            header.append('class %s;' %classname)
+
+        if len(self._kwargs_type_.keys()):
+            #header.append('class _KwArgs_;')
+
+            impl = []
+            header.append('class _KwArgs_ {')
+            header.append(' public:')
+
+            for name in self._kwargs_type_:
+                type = self._kwargs_type_[name]
+                header.append( '  %s _%s_;' %(type,name))
+                header.append( '  bool __use__%s;' %name)
+
+            for name in self._kwargs_type_:
+                type = self._kwargs_type_[name]
+                header.append( '  _KwArgs_*  %s(%s %s);' %(name, type, name))
+
+                impl.append( '  _KwArgs_*   _KwArgs_::%s(%s %s) {' %(name, type, name))
+                impl.append( '      this-&gt;__use__%s = true;' %name)
+                impl.append( '      this-&gt;_%s_ = %s;' %(name, name))
+                impl.append( '      return this;')
+                impl.append('};')
+            header.append('};')
+            header.extend( impl )
+
+        if self._has_cpython:
+            header.append( self.gen_cpython_helpers() )
+
+
+        self.output_pak = pak = {'c_header':'', 'cpp_header':'', 'main':''}
+        cheader = None
+        cppheader = None
+        if len(self._cheader):
+            cheader = []
+            cppheader = ['extern &quot;C&quot; {']
+            for line in self._cheader:
+                cheader.append(line)
+                cppheader.append('\t'+line)
+            cppheader.append('}')
+
+        if cheader:
+            pak['header.c'] = '\n'.join( cheader )
+        if cppheader:
+            pak['header.cpp'] = '\n'.join( cppheader )
+
+        if self._user_class_headers:
+            pass ## see get_user_class_headers
+        else:
+            if 'int main() {' in lines:  ## old hack to insert method defs before main
+                main_index = lines.index('int main() {')
+                for idef in self._cpp_class_impl:
+                    lines.insert(main_index,idef)
+            else:
+                ## option to split this part into the cpp body TODO
+                for idef in self._cpp_class_impl:
+                    lines.append(idef)
+
+        if self._use_runtime:
+            lines = header + list(self._imports) + lines
+        else:
+            lines = list(self._imports) + lines
+
+        if len(self._kwargs_type_.keys()) and False:
+            header = []
+            impl = []
+            header.append('class _KwArgs_ {')
+            header.append(' public:')
+
+            for name in self._kwargs_type_:
+                type = self._kwargs_type_[name]
+                header.append( '  %s _%s_;' %(type,name))
+                header.append( '  bool __use__%s;' %name)
+
+            for name in self._kwargs_type_:
+                type = self._kwargs_type_[name]
+                header.append( '  _KwArgs_*  %s(%s %s);' %(name, type, name))
+
+                impl.append( '  _KwArgs_*   _KwArgs_::%s(%s %s) {' %(name, type, name))
+                impl.append( '      this-&gt;__use__%s = true;' %name)
+                impl.append( '      this-&gt;_%s_ = %s;' %(name, name))
+                impl.append( '      return this;')
+                impl.append('};')
+            header.append('};')
+            header.extend( impl )
+            lines.extend(header)
+
+
+        pak['main'] = '\n'.join( lines )
+        return pak['main']
+
+    def visit_Set(self, node):
+        ## c++11 aggregate initialization
+        ## http://en.cppreference.com/w/cpp/language/aggregate_initialization
+        return '{%s}' %','.join([self.visit(elt) for elt in node.elts])
+
+</code></pre>
+
+<p>low level <code>new</code> for interfacing with external c++.
+Also used for code that is blocked with <code>with pointers:</code>
+to create a class without having to create a temp variable,
+<code>f( new(MyClass(x,y)) )</code>, directly calls the constructor,
+if MyClass is a Rusthon class then <strong>init</strong> will be called.
+TODO fix mixing with std::shared_ptr by keeping a weak_ptr
+in each object that <strong>init</strong> returns (also fixes the _ref_hacks)</p>
+<pre><code class="python">
+    def _visit_call_helper_new(self, node):
+        if isinstance(node.args[0], ast.BinOp): # makes an array or map
+            a = self.visit(node.args[0])
+            if type(a) is not tuple:
+                raise SyntaxError(self.format_error('TODO some extended type'))
+
+            atype, avalue = a
+            if atype.endswith('*'): atype = atype[:-1]
+            else: pass  ## this should never happen
+            return '(/*array-or-map*/ new %s %s)' %(atype, avalue)
+
+        ## Pythia User Class ##
+        elif isinstance(node.args[0], ast.Call) and isinstance(node.args[0].func, ast.Name) and node.args[0].func.id in self._classes:
+            classname = node.args[0].func.id
+            args = [self.visit(arg) for arg in node.args[0].args ]
+            if self._classes[classname]._requires_init:
+                if not isinstance(self._stack[-2], ast.Assign):
+                    raise RuntimeError('TODO new(A(new(B))')
+                return '(/*initialize-class*/ new %s)-&gt;__init__(%s)' %(classname, ','.join(args))
+
+            elif args:  ## a rusthon class that subclasses from an external c++ class ##
+                return '(/*external-parent-class*/ new %s(%s))' %(classname, ','.join(args))
+            else:
+                return '(/*create-class*/ new %s)' %classname
+
+        ## external c++ class ##
+        else:
+            classname = self.visit(node.args[0])
+            return '(/*external-class*/ new %s)' %classname
+
+</code></pre>
+
+<p>Subclasses from <code>RustGenerator</code>, see here:
+<a href="rusttranslator.md">rusttranslator.md</a>
+TODO: reverse, <code>RustGenerator</code> should subclass from <code>CppGenerator</code>.</p>
+<p>note: polymorphic classes are not generated by default, virtual methods are not required,
+casting works fine with <code>static_cast</code> and <code>std::static_pointer_cast</code>.</p>
+<pre><code class="python">
+    def __init__(self, source=None, requirejs=False, insert_runtime=False, cached_json_files=None, use_try=True):
+        RustGenerator.__init__(self, source=source, requirejs=False, insert_runtime=False)
+        self._cpp = True
+        self._rust = False  ## can not be true at the same time self._cpp is true, conflicts in switch/match hack.
+        self._shared_pointers = True
+        self._noexcept = False
+        self._polymorphic = False  ## by default do not use polymorphic classes (virtual methods)
+        self._has_jvm = False
+        self._jvm_classes = dict()
+        self._has_nim = False
+        self._has_nuitka = False
+        self._has_cpython = False
+        self._known_pyobjects  = dict()
+        self._use_runtime = insert_runtime
+        self.cached_json_files = cached_json_files or dict()
+        self.usertypes = dict()
+        self._user_class_headers = dict()
+        self._finally_id = 0
+        self._use_try = use_try
+        self._has_gnu_stm = False
+
+    def visit_Delete(self, node):
+        targets = [self.visit(t) for t in node.targets]
+        if len(targets)==0:
+            raise RuntimeError('no delete targets')
+        r = []
+        if self.usertypes and 'weakref' in self.usertypes and 'reset' in self.usertypes['weakref']:
+            for t in targets:
+                r.append('%s.%s();' %(t, self.usertypes['weakref']['reset']))
+        elif self.usertypes and 'shared' in self.usertypes and 'reset' in self.usertypes['shared']:
+            for t in targets:
+                r.append('%s.%s();' %(t, self.usertypes['shared']['reset']))
+        elif self._shared_pointers:
+            for t in targets:
+                r.append('%s.reset();' %t)
+        else:
+            for t in targets:
+                if t in self._known_arrays:
+                    r.append('delete[] %s;')
+                else:
+                    r.append('delete %s;')
+
+        return '\n'.join(r)
+
+    def visit_Str(self, node, wrap=True):
+        s = node.s.replace(&quot;\\&quot;, &quot;\\\\&quot;).replace('\n', '\\n').replace('\r', '\\r').replace('&quot;', '\\&quot;')
+        if wrap is False:
+            return s
+        elif self._force_cstr:
+            return '&quot;%s&quot;' % s
+
+        elif self.usertypes and 'string' in self.usertypes.keys():
+            if self.usertypes['string'] is None:
+                return '&quot;%s&quot;' % s
+            else:
+                return self.usertypes['string']['new'] % '&quot;%s&quot;' % s
+        else:
+            return 'std::string(&quot;%s&quot;)' % s
+
+    def visit_Print(self, node):
+        r = []
+        for e in node.values:
+            s = self.visit(e)
+            if isinstance(e, ast.List) or isinstance(e, ast.Tuple):
+                for sube in e.elts:
+                    r.append('std::cout &lt;&lt; %s;' %self.visit(sube))
+                if r:
+                    r[-1] += 'std::cout &lt;&lt; std::endl;'
+                else:
+                    r.append('std::cout &lt;&lt; std::endl;')
+            else:
+                r.append('std::cout &lt;&lt; %s &lt;&lt; std::endl;' %s)
+        return '\n'.join(r)
+</code></pre>
+
+<h2 id="todo">TODO</h2>
+<ul>
+<li>test finally</li>
+</ul>
+<pre><code class="python">
+    def visit_TryExcept(self, node, finallybody=None):
+        ## TODO: check why `catch (...)` is not catching file errors
+        out = []
+
+        use_try = self._use_try  ## when building with external tools or platforms -fexceptions can not be enabled.
+
+
+        if use_try:
+            if finallybody:
+                self._finally_id += 1
+                out.append('bool __finally_done_%s = false;' %self._finally_id)
+                out.append( self.indent()+'try {' )
+            else:
+                out.append( 'try {' )
+
+        self.push()
+        for b in node.body:
+            out.append( self.indent()+self.visit(b) )
+
+        self.pull()
+        if use_try:
+            out.append(self.indent()+ '}' )
+
+            handler_types = []
+            for ha in node.handlers:
+                if ha.type:
+                    handler_types.append(self.visit(ha.type))
+
+            if handler_types:
+                out.append( self.indent() + 'catch (std::runtime_error* __error__) {' )
+                self.push()
+                out.append( self.indent() + 'std::string __errorname__ = __parse_error_type__(__error__);')
+            else:
+                out.append( self.indent() + 'catch (...) {' )
+                self.push()
+
+            for h in node.handlers:
+                out.append(
+                    self.indent() + self.visit_ExceptHandler(h, finallybody=finallybody)
+                )
+            self.pull()
+
+            out.append(self.indent()+ '}' )
+
+            ## TODO also catch these error that standard c++ libraries are likely to throw ##
+            #out.append( self.indent() + 'catch (const std::overflow_error&amp; e) { std::cout &lt;&lt; &quot;OVERFLOW ERROR&quot; &lt;&lt; std::endl; }' )
+            #out.append( self.indent() + 'catch (const std::runtime_error&amp; e) { std::cout &lt;&lt; &quot;RUNTIME ERROR&quot; &lt;&lt; std::endl; }' )
+            #out.append( self.indent() + 'catch (const std::exception&amp; e) {' )
+            #out.append( self.indent() + 'catch (...) { std::cout &lt;&lt; &quot;UNKNOWN ERROR&quot; &lt;&lt; std::endl; }' )
+
+
+            ## wrap in another try that is silent
+            if finallybody:
+                out.append(self.indent()+'if (__finally_done_%s == false) {' %self._finally_id )
+                self.push()
+                out.append(self.indent()+'try {     // finally block')
+                self.push()
+                for b in finallybody:
+                    out.append(self.indent()+self.visit(b))
+                self.pull()
+                out.append(self.indent()+'} catch (...) {}')
+                self.pull()
+                out.append(self.indent()+'}')
+
+                self._finally_id -= 1
+
+        return '\n'.join( out )
+
+    def visit_ExceptHandler(self, node, finallybody=None):
+        #out = ['catch (std::runtime_error* __error__) {']
+        T = 'Error'
+        out = []
+        if node.type:
+            T = self.visit(node.type)
+            out.append('if (__errorname__ == std::string(&quot;%s&quot;)) {' %T )
+
+        self.push()
+
+        if node.name:
+            #out.append(self.indent()+'auto %s = *__error__;' % self.visit(node.name))
+            out.append(self.indent()+'auto %s = __error__;' % self.visit(node.name))
+
+        ## this happens before the exception body, while this is not strictly python
+        ## it is close enough, because the main requirement is that the finally body
+        ## is always run, even if there is a return or new exception raised.
+        if finallybody:
+            out.append(self.indent()+'__finally_done_%s = true;' %self._finally_id)
+            self.push()
+            out.append(self.indent()+'try {     // finally block')
+            self.push()
+            for b in finallybody:
+                out.append(self.indent()+self.visit(b))
+            self.pull()
+            out.append(self.indent()+'} catch (...) {}')
+            self.pull()
+
+
+        for b in node.body:
+            out.append(self.indent()+self.visit(b))
+
+        self.pull()
+        if node.type:
+            out.append(self.indent()+'}')
+        return '\n'.join(out)
+
+
+</code></pre>
+
+<h2 id="cpython-c-api">CPython C-API</h2>
+<p>user syntax <code>import cpython</code> and <code>-&gt;</code></p>
+<pre><code class="python">
+    def gen_cpy_call(self, pyob, node):
+        fname = self.visit(node.func)
+        if not node.args and not node.keywords:
+            return 'PyObject_Call(%s, Py_BuildValue(&quot;()&quot;), NULL)' %pyob
+        else:
+            lambda_args = [
+                '[&amp;] {',
+                'auto args = PyTuple_New(%s);' %len(node.args),
+            ]
+            for i,arg in enumerate(node.args):
+                if isinstance(arg, ast.Num):
+                    n = arg.n
+                    if str(n).isdigit():
+                        n = 'PyInt_FromLong(%s)' %n
+                        lambda_args.append('PyTuple_SetItem(args, %s, %s);' %(i, n))
+                    else:
+                        n = 'PyFloat_FromDouble(%s)' %n
+                        lambda_args.append('PyTuple_SetItem(args, %s, %s);' %(i, n))
+                elif isinstance(arg, ast.Str):
+                    n = 'PyString_FromString(&quot;%s&quot;)' %arg.s
+                    lambda_args.append('PyTuple_SetItem(args, %s, %s);' %(i, n))
+                else:
+                    lambda_args.append('PyTuple_SetItem(args, %s, %s);' %(i, self.visit(arg)))
+            lambda_args.append('return args; }()')
+            return 'PyObject_Call(%s, %s, NULL)' %(pyob, '\n'.join(lambda_args))
+
+    def gen_cpy_get(self, pyob, name):
+        return 'PyObject_GetAttrString(%s,&quot;%s&quot;)' %(pyob, name)
+
+</code></pre>
+
+<h2 id="slice-and-list-comprehension-intx-for-x-in-rangen">Slice and List Comprehension <code>[:]</code>, <code>[]int(x for x in range(n))</code></h2>
+<p>negative slice is not fully supported, only <code>-1</code> literal works.</p>
+<pre><code class="python">
+    def _gen_slice(self, target=None, value=None, lower=None, upper=None, step=None, type=None, result_size=None):
+        assert target
+        assert value
+        fixed_size = None
+        if type and isinstance(type, tuple) and type[1]:
+            fixed_size = type[1]
+            type = type[0]
+
+        elif type and type.startswith('[]'):
+            T = type.split(']')[-1].strip()
+            if self.is_prim_type(T) or self._memory[-1]=='STACK':
+                type = T
+            elif type.count('[')==1:
+                type = 'std::shared_ptr&lt;%s&gt;' %T
+            else:
+                raise RuntimeError('TODO md-array slice')
+
+
+        #################################################
+        if fixed_size:
+            slice = ['/* &lt;fixed size slice&gt; %s : %s : %s */' %(lower, upper, step)]
+            con = []
+            is_constant = True
+
+            if fixed_size.isdigit():
+                fixed_size = int(fixed_size)
+                if lower and not upper:
+                    if lower.isdigit():
+                        for i in range(int(lower), fixed_size):
+                            con.append('%s[%s]' %(value,i))
+                    else:
+                        is_constant = False
+                elif upper and not lower:
+                    if upper.isdigit():
+                        for i in range(0, int(upper)):
+                            con.append('%s[%s]' %(value,i))
+                    else:
+                        is_constant = False
+                elif not lower and not upper:
+                    if step=='-1':
+                        i = fixed_size-1
+                        while i &gt;= 0:
+                            con.append('%s[%s]' %(value,i))
+                            i -= 1
+                    else:
+                        for i in range(fixed_size):
+                            con.append('%s[%s]' %(value,i))
+                else:
+                    raise SyntaxError('todo slice fixed size stack array')
+
+                if is_constant:
+                    slice.append(
+                        self.indent()+'%s %s[%s] = {%s};' %(type,target, result_size, ','.join(con))
+                    )
+                else:
+                    pass  ## fallback to for loop
+            else:
+                is_constant = False
+
+            if not is_constant:
+                if not lower and not upper:
+                    if step=='-1':
+                        slice.extend([
+                            self.indent()+'%s %s[%s];' %(type,target, fixed_size),
+                            self.indent()+'int __L = 0;',
+                            self.indent()+'for (int __i=%s-1; __i&gt;=%s; __i--) {' %(fixed_size, lower),
+                            self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+                            self.indent()+'  __L ++;',
+                            self.indent()+'}',
+                        ])
+                    else:
+                        slice.extend([
+                            self.indent()+'%s %s[%s];' %(type,target, fixed_size),
+                            self.indent()+'for (int __i=0; __i&lt;%s; __i++) {' %fixed_size,
+                            self.indent()+'  %s[__i] = %s[__i];' %(target, value),
+                            self.indent()+'}',
+                        ])
+
+                elif lower and not upper:
+                    if step=='-1':
+                        slice.extend([
+                            self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),                        
+                            self.indent()+'int __L = 0;',
+                            self.indent()+'for (int __i=%s-1; __i&gt;=%s; __i--) {' %(fixed_size, lower),
+                            self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+                            self.indent()+'  __L ++;',
+                            self.indent()+'}',
+                        ])
+                    else:
+                        slice.extend([
+                            self.indent()+'%s %s[%s-%s];' %(type,target, fixed_size, lower),                        
+                            self.indent()+'int __L = 0;',
+                            self.indent()+'for (int __i=%s; __i&lt;%s; __i++) {' %(lower, fixed_size),
+                            self.indent()+'  %s[__L] = %s[__i];' %(target, value),
+                            self.indent()+'  __L ++;',
+                            self.indent()+'}',
+                        ])
+                elif upper and not lower:
+                    slice.extend([
+                        self.indent()+'%s %s[%s];' %(type,target, upper),                       
+                        self.indent()+'int __U = 0;',
+                        self.indent()+'for (int __i=0; __i&lt;%s; __i++) {' %upper,
+                        self.indent()+'  %s[__U] = %s[__i];' %(target, value),
+                        self.indent()+'  __U ++;',
+                        self.indent()+'}',
+                    ])
+                else:
+                    raise SyntaxError('\n'.join(slice))
+            return '\n'.join(slice)
+
+        elif type:
+            slice = ['/*&lt;&lt;slice&gt;&gt; `%s` [%s:%s:%s] %s */' %(value, lower, upper, step, type)]
+            if '&lt;' in type and '&gt;' in type:
+                type = type.split('&lt;')[-1].split('&gt;')[0]
+                if self._memory[-1]=='HEAP':
+                    if not self.is_prim_type(type):
+                        type = 'std::shared_ptr&lt;%s&gt;' %type
+
+            if step==&quot;-1&quot;:  ##if step.isdigit() and int(step)&lt;0: TODO
+                if self._memory[-1]=='STACK':
+                    slice.append(self.indent()+'std::vector&lt;%s&gt; %s;' %(type,target))
+                else:
+                    slice.append(self.indent()+'std::vector&lt;%s&gt; _ref_%s;' %(type,target))
+
+                step = step[1:]  ## strip `-`
+                if lower and not upper:
+                    if self._memory[-1]=='STACK':
+                        slice.extend([
+                            'for(int _i_=%s;_i_&gt;=0;_i_-=%s){' %(lower,step),
+                            ' %s.push_back(%s[_i_]);' %(target, value),
+                            '}'
+                        ])
+                    else:
+                        slice.extend([
+                            #'for(int _i_=%s-&gt;size()-(1+%s);_i_&gt;=0;_i_-=%s){' %(value,lower,step),
+                            'for(int _i_=%s;_i_&gt;=0;_i_-=%s){' %(lower,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+                            '}'
+                        ])
+                elif upper:
+                    raise RuntimeError('slice todo')
+                else:
+                    if self._memory[-1]=='STACK':
+                        slice.extend([
+                            'for(int _i_=%s.size()-1;_i_&gt;=0;_i_-=%s){' %(value,step),
+                            ' %s.push_back(%s[_i_]);' %(target, value),
+                            '}',
+                        ])
+                    else:
+                        slice.extend([
+                            'for(int _i_=%s-&gt;size()-1;_i_&gt;=0;_i_-=%s){' %(value,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+                            '}',
+                        ])
+
+            elif step:
+                if self._memory[-1]=='STACK':
+                    slice.append('std::vector&lt;%s&gt; %s;' %(type,target))
+                else:
+                    slice.append('std::vector&lt;%s&gt; _ref_%s;' %(type,target))
+
+                if lower and not upper:
+                    if self._memory[-1]=='STACK':
+                        slice.append( ''.join([
+                            'if(%s&lt;0){'%step,
+                            'for(int _i_=%s.size()-%s-1;_i_&gt;=0;_i_+=%s){' %(value,lower,step),
+                            ' %s.push_back(%s[_i_]);' %(target, value),
+                            '}} else {',
+                            'for(int _i_=%s;_i_&lt;%s.size();_i_+=%s){' %(lower,value,step),
+                            ' %s.push_back(%s[_i_]);' %(target, value),
+                            '}}',
+                            ])
+                        )
+                    else:
+                        slice.append( ''.join([
+                            'if(%s&lt;0){'%step,
+                            'for(int _i_=%s-&gt;size()-%s-1;_i_&gt;=0;_i_+=%s){' %(value,lower,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+                            '}} else {',
+                            'for(int _i_=%s;_i_&lt;%s-&gt;size();_i_+=%s){' %(lower,value,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);' %(target, value),
+                            '}}',
+                            ])
+                        )
+                elif upper:
+                    raise SyntaxError('TODO slice upper with step')
+                else:
+                    if self._memory[-1]=='STACK':
+                        slice.append( ''.join([
+                            'if(%s&lt;0){'%step,
+                            'for(int _i_=%s.size()-1;_i_&gt;=0;_i_+=%s){' %(value,step),
+                            ' %s.push_back(%s[_i_]);}' %(target, value),
+                            '} else {',
+                            'for(int _i_=0;_i_&lt;%s.size();_i_+=%s){' %(value,step),
+                            ' %s.push_back(%s[_i_]);}' %(target, value),
+                            '}',
+                            ])
+                        )
+
+                    else:
+                        slice.append( ''.join([
+                            'if(%s&lt;0){'%step,
+                            'for(int _i_=%s-&gt;size()-1;_i_&gt;=0;_i_+=%s){' %(value,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
+                            '} else {',
+                            'for(int _i_=0;_i_&lt;%s-&gt;size();_i_+=%s){' %(value,step),
+                            ' _ref_%s.push_back((*%s)[_i_]);}' %(target, value),
+                            '}',
+                            ])
+                        )
+            else:
+                isptr = False
+                #if value in self._known_arrays and isinstance(self._known_arrays[value], str):
+                #   if self._known_arrays[value].startswith('[]'):
+                #       isptr = True
+                if value in self._known_pointers:
+                    isptr = True
+                    if self._memory[-1]=='HEAP':
+                        self._known_pointers[target] = self._known_pointers[value]
+                if self._memory[-1]=='STACK':
+                    self._known_refs[target] = type
+                ################################
+
+                if isptr and self._memory[-1]=='HEAP':
+                    slice.append(self.indent()+'auto %s = new std::vector&lt;%s&gt;(' %(target, type))                    
+                elif self._memory[-1]=='STACK':
+                    slice.append(self.indent()+'std::vector&lt;%s&gt; %s(' %(type,target))
+                else:
+                    slice.append(self.indent()+'std::vector&lt;%s&gt; _ref_%s(' %(type,target))
+
+                if lower:
+                    if isptr:
+                        slice.append(self.indent()+'%s-&gt;begin()+%s,' %(value, lower))
+                    elif self._memory[-1]=='STACK':
+                        slice.append(self.indent()+'%s.begin()+%s,' %(value, lower))
+                    else:
+                        slice.append(self.indent()+'%s-&gt;begin()+%s,' %(value, lower))
+                else:
+                    if isptr:
+                        slice.append(self.indent()+'%s-&gt;begin(),' %value)
+                    elif self._memory[-1]=='STACK':
+                        slice.append(self.indent()+'%s.begin(),' %value)
+                    else:
+                        slice.append(self.indent()+'%s-&gt;begin(),' %value)
+
+                if upper:
+                    if upper &lt; 0:
+                        if self._memory[-1]=='STACK':
+                            slice.append(self.indent()+'%s.end() %s'%(value, upper))
+                        else:
+                            slice.append(self.indent()+'%s-&gt;end() %s'%(value, upper))
+                    else:
+                        if self._memory[-1]=='STACK':
+                            slice.append(self.indent()+'%s.begin()+%s'%(value, upper))
+                        else:
+                            slice.append(self.indent()+'%s-&gt;begin()+%s'%(value, upper))
+
+                else:
+                    if isptr:
+                        slice.append(self.indent()+'%s-&gt;end()'%value)
+                    elif self._memory[-1]=='STACK':
+                        slice.append(self.indent()+'%s.end()'%value)
+                    else:
+                        slice.append(self.indent()+'%s-&gt;end()'%value)
+
+                slice.append(self.indent()+');')
+
+            vectype = 'std::vector&lt;%s&gt;' %type
+
+            if self._memory[-1]=='STACK':
+                pass
+            elif not self._shared_pointers:
+                slice.append(self.indent()+'%s* %s = &amp;_ref_%s);' %(vectype, target, target))
+            elif self._unique_ptr:
+                slice.append(self.indent()+'std::unique_ptr&lt;%s&gt; %s = _make_unique&lt;%s&gt;(_ref_%s);' %(vectype, target, vectype, target))
+            else:
+                slice.append(self.indent()+'std::shared_ptr&lt;%s&gt; %s = std::make_shared&lt;%s&gt;(_ref_%s);' %(vectype, target, vectype, target))
+            return '\n'.join(slice)
+
+        else:  ## slice an unknown type of array ##
+            if not lower and not upper and not step:  ## slice copy `myarr[:]`
+                if self._memory[-1]=='STACK':
+                    return 'std::vector&lt; decltype(%s-&gt;begin())::value_type &gt; %s( %s-&gt;begin(), %s-&gt;end() );' %(value, target, value, value)
+                else:
+                    vectype = 'std::vector&lt;decltype(%s-&gt;begin())::value_type&gt;' %value
+                    return 'auto %s = std::make_shared&lt;%s&gt;( %s(%s-&gt;begin(),%s-&gt;end()) );' %(target, vectype,vectype, value, value)
+
+            elif lower and not upper and not step:
+                if self._memory[-1]=='STACK':
+                    return 'std::vector&lt; decltype(%s-&gt;begin())::value_type &gt; %s( %s-&gt;begin()+%s, %s-&gt;end() );' %(value, target, value, lower, value)
+                else:
+                    vectype = 'std::vector&lt;decltype(%s-&gt;begin())::value_type&gt;' %value
+                    return 'auto %s = std::make_shared&lt;%s&gt;( %s(%s-&gt;begin()+%s,%s-&gt;end()) );' %(target, vectype,vectype, value, lower, value)
+            elif upper and not lower and not step:
+                if self._memory[-1]=='STACK':
+                    return 'std::vector&lt; decltype(%s-&gt;begin())::value_type &gt; %s( %s-&gt;begin(), %s-&gt;begin()+%s );' %(value, target, value, value, upper)
+                else:
+                    vectype = 'std::vector&lt;decltype(%s-&gt;begin())::value_type&gt;' %value
+                    return 'auto %s = std::make_shared&lt;%s&gt;( %s(%s-&gt;begin(),%s-&gt;begin()+%s) );' %(target, vectype,vectype, value, value, upper)
+
+            else:
+                raise RuntimeError('TODO slice unknown')
+
+
+</code></pre>
+
+<h2 id="translate-to-c">Translate to C++</h2>
+<p>TODO save GCC PGO files.</p>
+<pre><code class="python">
+def translate_to_cpp(script, insert_runtime=True, cached_json_files=None, use_try=True):
+    if '--debug-inter' in sys.argv:
+        raise RuntimeError(script)
+
+    if '--osv' in sys.argv:
+        osv = open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/osv_builtins.py') ).read()
+        osv = python_to_pythonjs( osv, cpp=True )
+        script = osv + '\n' + script
+
+    if insert_runtime:
+        runtime = open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/cpp_builtins.py') ).read()
+        runtime = python_to_pythonjs( runtime, cpp=True )
+        script = runtime + '\n' + script
+
+    try:
+        tree = ast.parse(script)
+    except SyntaxError as err:
+        e = ['%s:   %s'%(i+1, line) for i,line in enumerate(script.splitlines())]
+        sys.stderr.write('\n'.join(e))
+        raise err
+
+    g = CppGenerator(
+        source=script, 
+        insert_runtime=insert_runtime, 
+        cached_json_files=cached_json_files,
+        use_try = use_try
+    )
+    g.visit(tree) # first pass gathers classes
+    pass2 = g.visit(tree)
+    g.reset()
+    pass3 = g.visit(tree)
+    userheaders = g.get_user_class_headers()
+    if userheaders:
+        g.output_pak['user-headers'] = userheaders
+    return g.output_pak
+
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../typedpython/" class="btn btn-neutral float-right" title="PreProcessor">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../cpprustbase/" class="btn btn-neutral" title="SharedRustC++Class"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/secureosv/pythia" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../cpprustbase/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../typedpython/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

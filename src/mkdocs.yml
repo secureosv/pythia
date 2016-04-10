@@ -1,0 +1,15 @@
+site_name: PythiaSource
+repo_url: https://github.com/secureosv/pythia
+docs_dir: pythia
+theme: readthedocs
+
+pages:
+- Home: index.md
+- MultiBackendBaseClass: generatorbase.md
+- JavascriptTranslator: jstranslator.md
+- GolangTranslator: gotranslator.md
+- SharedRustC++Class: cpprustbase.md
+- C++Translator: cpptranslator.md
+- PreProcessor: typedpython.md
+- PreTranslator: intermediateform.md
+

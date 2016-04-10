@@ -983,12 +983,12 @@ def translate_to_cpp(script, insert_runtime=True, cached_json_files=None, use_tr
 		raise RuntimeError(script)
 
 	if '--osv' in sys.argv:
-		osv = open( os.path.join(RUSTHON_LIB_ROOT, 'src/runtime/osv_builtins.py') ).read()
+		osv = open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/osv_builtins.py') ).read()
 		osv = python_to_pythonjs( osv, cpp=True )
 		script = osv + '\n' + script
 
 	if insert_runtime:
-		runtime = open( os.path.join(RUSTHON_LIB_ROOT, 'src/runtime/cpp_builtins.py') ).read()
+		runtime = open( os.path.join(RUSTHON_LIB_ROOT, 'src/pythia/runtime/cpp_builtins.py') ).read()
 		runtime = python_to_pythonjs( runtime, cpp=True )
 		script = runtime + '\n' + script
 

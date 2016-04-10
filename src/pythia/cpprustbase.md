@@ -2249,50 +2249,12 @@ TODO tuple return for c++
 
 
 	def visit_Return(self, node):
+		assert not self._cpp  ## cpptranslator.md overrides this
 		if isinstance(node.value, ast.Tuple):
 			return 'return %s;' % ', '.join(map(self.visit, node.value.elts))
-		if node.value:
-			try:
-				if isinstance(node.value, ast.Name) and node.value.id=='self' and self._cpp:
-					if self._memory[-1]=='STACK':
-						v = '*this;'
-					else:
-						v = 'std::make_shared<%s>(this);' %self._class_stack[-1].name
-				else:
-					v = self.visit(node.value)
-			except GenerateTypeAssert as err:
-
-				raise RuntimeError('TODO')
-				G = err[0]
-				type = G['type']
-				if type == 'self':
-					type = self._class_stack[-1].name
-
-
-				if not hasattr(node.value, 'uid'):
-					node.value.uid = self.uid()
-
-				id = '__magic__%s' % node.value.uid
-				if id not in self.unodes: self.unodes[ id ] = node.value
-
-				if hasattr(node.value, 'is_struct_pointer'):
-
-					out = [
-						'%s := %s( *%s )' %(id, type, G['value']),
-						'return &%s' %id,
-					]
-				else:
-					out = [
-						'%s := %s.( *%s )' %(id, G['value'], type),
-						'return %s' %id,
-					]
-
-				return '\n'.join(out)
-
-			if v.startswith('&'):  ## this was just for Go
-				return '_hack := %s; return &_hack' %v[1:]
-			else:
-				return 'return %s;' % v
+		elif node.value:
+			v = self.visit(node.value)
+			return 'return %s;' % v
 		return 'return;'
 ```
 
