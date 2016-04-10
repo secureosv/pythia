@@ -2447,6 +2447,10 @@ TODO clean up go stuff.
 		if returns_self and self._cpp:
 			return_type = self._class_stack[-1].name
 
+		## picked up from first pass
+		if hasattr(node, 'return_type') and node.return_type:
+			return_type = node.return_type
+		## used after first pass
 		node.func_returns = return_type
 
 		is_delete = node.name == '__del__'

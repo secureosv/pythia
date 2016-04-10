@@ -155,7 +155,11 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			## initializer list ##
 			return 'return {%s};' % ', '.join(map(self.visit, node.value.elts))
 		if node.value:
+			func = self._function_stack[-1]
+
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
+				func.return_type = 'auto'
+
 				if self._memory[-1]=='STACK':
 					v = '*this;'
 				else:
@@ -175,6 +179,14 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 				F = self.visit(node.value.args[0])
 				v = 'make_ready_future<%s>(%s)' %(T,F)
 			else:
+				if isinstance(node.value, ast.Num):
+					if str(node.value.n).isdigit():
+						func.return_type = 'int'
+					else:
+						func.return_type = 'float64'
+				elif isinstance(node.value, ast.Str):
+					func.return_type = 'std::string'
+
 				v = self.visit(node.value)
 			try:
 				return 'return %s;' % v

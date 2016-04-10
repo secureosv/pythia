@@ -13,9 +13,12 @@ tuplemap = {
 }
 
 class MyClass:
-	#def mymethod(self):  TODO `auto` fails here as return type
-	def mymethod(self) ->int:
+	def mymethod(self):
 		return 99
+	def somefloat(self):
+		return 1.1
+	def somestring(self):
+		return 'hi'
 
 with stack:
 	tuplemap_stack = {
@@ -88,6 +91,8 @@ def test_heap():
 	#obmap = map[string]MyClass{}
 	#obmap['xx'] = MyClass()
 	assert obmap['xx'].mymethod()==99
+	print obmap['xx'].somefloat()
+	print obmap['xx'].somestring()
 
 def main():
 	print mymap
