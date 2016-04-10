@@ -2311,6 +2311,9 @@ TODO clean up go stuff.
 		node.func_args = []
 		node.func_body = []
 
+		if not hasattr(node, '_return_nodes'):
+			node._return_nodes = set()
+
 		if self._function_stack[0] is node:
 			self._global_functions[node.name] = node
 			self._vars = set()
@@ -2448,8 +2451,11 @@ TODO clean up go stuff.
 			return_type = self._class_stack[-1].name
 
 		## picked up from first pass
-		if hasattr(node, 'return_type') and node.return_type:
+		if hasattr(node, 'return_type') and node.return_type and not return_type:
 			return_type = node.return_type
+
+		if not len(node._return_nodes) and not return_type:
+			return_type = 'void'
 		## used after first pass
 		node.func_returns = return_type
 

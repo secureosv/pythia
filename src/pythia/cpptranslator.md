@@ -156,6 +156,8 @@ class CppGenerator( RustGenerator, CPythonGenerator ):
 			return 'return {%s};' % ', '.join(map(self.visit, node.value.elts))
 		if node.value:
 			func = self._function_stack[-1]
+			if node not in func._return_nodes:
+				func._return_nodes.add(node)
 
 			if isinstance(node.value, ast.Name) and node.value.id=='self':
 				func.return_type = 'auto'
